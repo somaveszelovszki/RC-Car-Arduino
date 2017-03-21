@@ -17,4 +17,6 @@ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\leonardo\Debug\Communicator.cpp
  F:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\cores\arduino/Arduino.h \
  F:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\cores\arduino/USBDesc.h \
  F:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\cores\arduino/USBCore.h \
- F:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\variants\leonardo/pins_arduino.h
+ F:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\variants\leonardo/pins_arduino.h \
+ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\leonardo\Debug\PeriodicThread.h \
+ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\leonardo\Debug\Watchdog.h

@@ -1,19 +1,31 @@
 #include "Command.h"
 
-Command::Command(Command::CODE code, String value) {
+Command::Command(Command::CODE code, const String& value) {
   this->code = code;
   this->value = value;
 }
 
-Command::CODE Command::getCode() {
+Command::Command(const Command& other) {
+	*this = other;
+}
+
+Command Command::operator=(const Command& other) {
+	this->code = other.code;
+	this->value = other.value;
+
+	return *this;
+}
+
+
+Command::CODE Command::getCode() const {
 	return code;
 }
 
-String Command::getValue() {
+String Command::getValue() const {
 	return value;
 }
 
-int Command::getValueAsInt() {
+int Command::getValueAsInt() const {
 	return value.toInt();
 }
 
@@ -25,18 +37,16 @@ int Command::getValueAsInt() {
  */
 Command* Command::fromString(String commandString) {
 
-	Serial.println(commandString);
+	// finds separator in string (separates key from value)
+	int separatorIndex = commandString.indexOf(SEPARATOR_CHAR);
 
-  // finds separator in string (separates key from value)
-  int separatorIndex = commandString.indexOf(SEPARATOR_CHAR);
+	// code is before separator
+	int code = commandString.substring(0, separatorIndex).toInt();
 
-  // code is before separator
-  int code = commandString.substring(0, separatorIndex).toInt();
+	// value is after separator
+	String value = commandString.substring(separatorIndex + 1, commandString.length() - 1);
 
-  // value is after separator
-  String value = commandString.substring(separatorIndex + 1);
-
-  return new Command((CODE) code, value);
+	return new Command((CODE) code, value);
 }
 
 /**
@@ -44,10 +54,9 @@ Command* Command::fromString(String commandString) {
  * e.g. code=1 and value=10
  * output will be "1:10;"
  */
-String Command::toString() {
+String Command::toString() const {
+	String codeStr(code);
 
-  String codeStr(code);
-
-  return codeStr + SEPARATOR_CHAR + value + END_CHAR;
+	return codeStr + SEPARATOR_CHAR + value + END_CHAR;
 }
 

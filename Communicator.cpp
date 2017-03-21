@@ -1,56 +1,55 @@
 #include "Communicator.h"
 
-Communicator::Communicator() {
-	bluetoothSerial = new SoftwareSerial(Common::PINS::BLUETOOTH_RX, Common::PINS::BLUETOOTH_TX);
-}
-
-Communicator::~Communicator() {
-	delete bluetoothSerial;
+Communicator::Communicator() : PeriodicThread(DEFAULT_CYCLE_PERIOD) {
+	bluetoothSerial = new SoftwareSerial(BLUETOOTH_RX_PIN, BLUETOOTH_TX_PIN);
 }
 
 void Communicator::initialize() {
 	bluetoothSerial->begin(BLUETOOTH_BAUD_RATE);
 
-	this->reset_recv_watchdog();
+	watchdog->restart();
 }
 
-void Communicator::reset_recv_watchdog() {
-	recv_watchdog = recv_watchdog_timeout;
-}
+bool Communicator::receiveChars() {
 
+	// gets number of available characters
+	int availableChars = bluetoothSerial->available();
 
-bool Communicator::receiveChar() {
+	// reads and stores characters one by one
+	for (int i = 0; i < availableChars; ++i) {
+		char c = bluetoothSerial->read();
 
-	if (bluetoothSerial->available()) {
+		recvBuffer += c;
 
-		this->reset_recv_watchdog();
-
-		char c = this->bluetoothSerial->read();
-
-		Serial.print(c);
-
+		// if command end character was received, stops character reading and signals caller by returning true
 		if (c == Command::END_CHAR) {
 			return true;
 		}
-
-		recvBuffer += c;
 	}
 
 	return false;
 }
 
 Command* Communicator::fetchCommand() {
+	// parses command from buffer string
 	Command* command = Command::fromString(recvBuffer);
+
+	// clears buffer string
 	recvBuffer = "";
 
 	return command;
 }
 
 
-size_t Communicator::sendCommand(Command* command) {
-	return Common::write(bluetoothSerial, command->toString());
+size_t Communicator::sendCommand(const Command& command) {
+	return Common::write(*bluetoothSerial, command.toString());
 }
 
-bool Communicator::timedOut() {
-	return recv_watchdog <= 0;
+Watchdog* Communicator::getWatchdog() const {
+	return watchdog;
 }
+
+Communicator::~Communicator() {
+	delete &bluetoothSerial;
+}
+

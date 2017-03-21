@@ -12,7 +12,8 @@ public:
 	enum CODE {
 		Speed = 1,           // [0 100] contains direction as well (>50 means FORWARD)
 		SteeringAngle = 2,  // [-100 100] positive means steering to the right
-		ServoRecalibrate = 3
+		ServoRecalibrate = 3,
+		DriveMode = 4,		// values from DriveController::MODE enum
 	};
 
 
@@ -25,16 +26,20 @@ public:
 	static const char END_CHAR = ';';
 	static const char SEPARATOR_CHAR = ':';
 
-	Command(CODE code, String value);
+	Command(CODE code, const String& value);
 
-	CODE getCode();
+	Command(const Command& other);
 
-	String getValue();
+	Command operator=(const Command& other);
 
-	int getValueAsInt();
+	CODE getCode() const;
+
+	String getValue() const;
+
+	int getValueAsInt() const;
 
 	static Command* fromString(String commandString);
-	String toString();
+	String toString() const;
 };
 
 #endif

@@ -2,7 +2,7 @@
 #define MOTORHANDLER_H
 
 #include <Servo.h>
-#include <Adafruit_MotorShield.h>
+//#include <Adafruit_MotorShield.h>
 
 #include "Command.h"
 
@@ -18,28 +18,35 @@
 // servo pin
 #define SERVO_PIN 9
 
+#define DC_MOTOR_FORWARD_PIN 3
+#define DC_MOTOR_BACKWARD_PIN 11
+
 // servo command value range (0 is servo middle position)
-#define SERVO_MIN_COMMAND_VALUE -100
-#define SERVO_MAX_COMMAND_VALUE 100
+#define SERVO_COMMAND_VALUE_MIN -100
+#define SERVO_COMMAND_VALUE_MAX 100
+#define SERVO_COMMAND_VALUE_MIDDLE (SERVO_COMMAND_VALUE_MIN + (SERVO_COMMAND_VALUE_MAX - SERVO_COMMAND_VALUE_MIN) / 2)
 
 // servo motor restrictions
-#define SERVO_MIN_POSITION 0
-#define SERVO_MAX_POSITION 180
+#define SERVO_POSITION_MIN 0
+#define SERVO_POSITION_MAX 180
 
 // steering construction restriction
 #define SERVO_DEFAULT_MAX_ROTATION 70
 
-
 // DC motor command value range (50 is DC motor stop, >50 means FORWARD)
-#define DC_MIN_COMMAND_VALUE 0
-#define DC_MAX_COMMAND_VALUE 100
+#define DC_COMMAND_VALUE_MIN 0
+#define DC_COMMAND_VALUE_MAX 100
+#define DC_COMMAND_VALUE_STOP (DC_COMMAND_VALUE_MIN + (DC_COMMAND_VALUE_MAX - DC_COMMAND_VALUE_MIN) / 2)
 
 // DC Motor value range
 #define DC_MAX_VALUE 255
 
+/*
+	Handles motors - acceleration and steering.
+*/
 class MotorHandler {
 
-private:
+public:
 
 	/*
 		Handles a servo motor.
@@ -56,6 +63,8 @@ private:
 		*/
 		int commandValueToAngle(int commandValue);
 
+		void writeValue(int value);
+
 	public:
 
 		/*
@@ -63,16 +72,32 @@ private:
 		*/
 		void recalibrate(int newMiddlePos);
 
+		/*
+			Writes command value to motor.
+		*/
 		void writeCommandValue(int commandValue);
 
+		/*
+			Positions servo motor to middle.
+		*/
 		void positionMiddle();
 	};
 
 	class DCMotor {
+
+	public:
+		enum DIRECTION {
+			FORWARD, BACKWARD, RELEASE
+		};
+
 	private:
 
-		Adafruit_DCMotor* delegate;
+		unsigned int fwdPin;
+		unsigned int bwdPin;
 
+		int speed;
+
+		void writeValue(int value);
 		/*
 		Maps command values to actual DC motor speed values.
 		*/
@@ -80,29 +105,38 @@ private:
 
 	public:
 
-		DCMotor(Adafruit_DCMotor* DC_Motor);
+		DCMotor(unsigned int fwdPin, unsigned int bwdPin);
 
 		void writeCommandValue(int commandValue);
 
 		void release();
+
+		DIRECTION getDirection();
+
+		/*
+			Returns speed in [cm/s].
+		*/
+		int getSpeed_cm_per_sec();
 	};
 
-	Adafruit_MotorShield* AF_MotorShield;
+private:
 
+	ServoMotor* servoMotor;
 	DCMotor* DC_Motor;
 
 
 public:
-	ServoMotor* servoMotor;
 // TODO
 	MotorHandler();
 
 	void initialize();
 
-	void executeCommand_Speed(int value);
-	void executeCommand_SteeringAngle(int value);
-	void executeCommand_ServoRecalibrate(int value);
+	void setSpeed(int value);
+	void setSteeringAngle(int value);
+	void recalibrateServo(int value);
 
+	DCMotor::DIRECTION getDirection();
+	int getSpeed_cm_per_sec();
 };
 
 #endif

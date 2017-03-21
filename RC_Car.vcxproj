@@ -47,7 +47,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>F:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\SoftwareSerial\src;F:\Program Files (x86)\Arduino\libraries\Servo\src;F:\Program Files (x86)\Arduino\libraries\Adafruit_MotorShield;F:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\Wire\src;C:\Users\Soma\Documents\Arduino\libraries\NewPing;F:\Program Files (x86)\Arduino\libraries;F:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries;C:\Users\Soma\Documents\Arduino\libraries;F:\Program Files (x86)\Arduino\hardware\arduino\avr\cores\arduino;F:\Program Files (x86)\Arduino\hardware\arduino\avr\variants\leonardo;$(ProjectDir)..\RC_Car;F:\Program Files (x86)\Arduino\hardware\tools\avr\avr\include\;F:\Program Files (x86)\Arduino\hardware\tools\avr\avr\include\avr\;F:\Program Files (x86)\Arduino\hardware\tools\avr\lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Soma\Documents\Arduino\libraries\pt;F:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\SoftwareSerial\src;F:\Program Files (x86)\Arduino\libraries\Servo\src;C:\Users\Soma\Documents\Arduino\libraries\NewPing;F:\Program Files (x86)\Arduino\libraries;F:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries;C:\Users\Soma\Documents\Arduino\libraries;F:\Program Files (x86)\Arduino\hardware\arduino\avr\cores\arduino;F:\Program Files (x86)\Arduino\hardware\arduino\avr\variants\leonardo;$(ProjectDir)..\RC_Car;F:\Program Files (x86)\Arduino\hardware\tools\avr\avr\include\;F:\Program Files (x86)\Arduino\hardware\tools\avr\avr\include\avr\;F:\Program Files (x86)\Arduino\hardware\tools\avr\lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>$(ProjectDir)__vm\.RC_Car.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <PreprocessorDefinitions>__AVR_ATmega32u4__;__AVR_ATmega32U4__;_VMDEBUG=1;F_CPU=16000000L;ARDUINO=10801;ARDUINO_AVR_LEONARDO;ARDUINO_ARCH_AVR;USB_VID=0x2341;USB_PID=0x8036;__cplusplus=201103L;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -86,18 +86,26 @@
       <FileType>CppCode</FileType>
     </ClInclude>
     <ClInclude Include="Communicator.h" />
+    <ClInclude Include="ConnectionTimedOutEvent.h" />
     <ClInclude Include="DriveController.h" />
+    <ClInclude Include="Event.h" />
+    <ClInclude Include="PeriodicThread.h" />
     <ClInclude Include="MotorHandler.h" />
     <ClInclude Include="SensorHandler.h" />
+    <ClInclude Include="Watchdog.h" />
     <ClInclude Include="__vm\.RC_Car.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Command.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="Communicator.cpp" />
+    <ClCompile Include="ConnectionTimedOutEvent.cpp" />
     <ClCompile Include="DriveController.cpp" />
+    <ClCompile Include="Event.cpp" />
     <ClCompile Include="MotorHandler.cpp" />
+    <ClCompile Include="PeriodicThread.cpp" />
     <ClCompile Include="SensorHandler.cpp" />
+    <ClCompile Include="Watchdog.cpp" />
   </ItemGroup>
   <PropertyGroup>
     <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>
