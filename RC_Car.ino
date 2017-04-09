@@ -59,38 +59,42 @@ static PT_THREAD(communicatorThread(struct pt *pt)) {
 		case Command::CODE::ServoRecalibrate:
 			driveController->executeCommand_ServoRecalibrate(*receivedCommand);
 			break;
-		}
 
-		delete receivedCommand;
-	}
-
-	// TODO REMOVE THIS - ONLY FOR TESTS
-	if (CYCLE_COUNTER % 50 == 0) {
-
-		char s[3];
-		itoa(70, s, 10);
-
-		Command* receivedCommand = new Command(Command::CODE::Speed, s);
-
-		//Serial.println(receivedCommand->toString());
-
-		switch (receivedCommand->getCode()) {
-
-		case Command::CODE::Speed:
-			driveController->executeCommand_Speed(*receivedCommand);
-			break;
-
-		case Command::CODE::SteeringAngle:
-			driveController->executeCommand_SteeringAngle(*receivedCommand);
-			break;
-
-		case Command::CODE::ServoRecalibrate:
-			driveController->executeCommand_ServoRecalibrate(*receivedCommand);
+		case Command::CODE::DriveMode:
+			driveController->executeCommand_DriveMode(*receivedCommand);
 			break;
 		}
 
 		delete receivedCommand;
 	}
+
+	//// TODO REMOVE THIS - ONLY FOR TESTS
+	//if (false && CYCLE_COUNTER % 50 == 0) {
+
+	//	char s[3];
+	//	itoa(70, s, 10);
+
+	//	Command* receivedCommand = new Command(Command::CODE::Speed, s);
+
+	//	//Serial.println(receivedCommand->toString());
+
+	//	switch (receivedCommand->getCode()) {
+
+	//	case Command::CODE::Speed:
+	//		driveController->executeCommand_Speed(*receivedCommand);
+	//		break;
+
+	//	case Command::CODE::SteeringAngle:
+	//		driveController->executeCommand_SteeringAngle(*receivedCommand);
+	//		break;
+
+	//	case Command::CODE::ServoRecalibrate:
+	//		driveController->executeCommand_ServoRecalibrate(*receivedCommand);
+	//		break;
+	//	}
+
+	//	delete receivedCommand;
+	//}
 
 	// checks if communication timed out
 	if (communicator->getWatchdog()->timedOut()) {
@@ -179,9 +183,6 @@ void loop() {
 
 	communicatorThread(&communicator_pt);
 	sensorThread(&sensor_pt);
-
-	//String asd = "---------------------------------------------------------";
-	//Serial.println(asd);
 
 	/*for (int i = 0; i < 100; i++) {
 		Command* command;

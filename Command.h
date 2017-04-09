@@ -13,7 +13,7 @@ public:
 		Speed = 1,           // [0 100] contains direction as well (>50 means FORWARD)
 		SteeringAngle = 2,  // [-100 100] positive means steering to the right
 		ServoRecalibrate = 3,
-		DriveMode = 4,		// values from DriveController::MODE enum
+		DriveMode = 4		// values from DriveController::MODE enum
 	};
 
 

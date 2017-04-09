@@ -54,6 +54,7 @@ public:
 	void executeCommand_Speed(const Command& command);
 	void executeCommand_SteeringAngle(const Command& command);
 	void executeCommand_ServoRecalibrate(const Command& command);
+	void executeCommand_DriveMode(const Command& command);
 
 
 	// handler methods

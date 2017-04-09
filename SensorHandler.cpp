@@ -9,6 +9,14 @@ SensorHandler::Ultrasonic::Ultrasonic() {
 	setEnabled(false);
 }
 
+const SensorHandler::ValidationData SensorHandler::Ultrasonic::maxDistanceValidationData = {
+	maxDistanceValidationSampleNum, maxDistanceValidationErrorPercent
+};
+
+const SensorHandler::ValidationData SensorHandler::Ultrasonic::defaultValidationData = {
+	defaultValidationSampleNum, defaultValidationErrorPercent
+};
+
 void SensorHandler::Ultrasonic::initialize() {
 
 	// initializes measured distances array
@@ -102,64 +110,86 @@ void SensorHandler::Ultrasonic::echoCheck() { // If ping received, set the senso
 void SensorHandler::Ultrasonic::updateDistances() {
 	for (unsigned int sensorPos = 0; sensorPos < ULTRASONIC_NUM_SENSORS; ++sensorPos) {
 		updateDistances((Common::POSITION) sensorPos);
+		//Serial.print(validatedDistances[sensorPos][currentSampleIndex]);
+		//if (sensorPos != ULTRASONIC_NUM_SENSORS - 1) Serial.print(", ");
 	}
 
-	/*Serial.print("stored: ");
-	Serial.print(storedDistances[Common::POSITION::FRONT_LEFT][currentSensorPos]);
+	//Serial.println();
+
+	Serial.print("stored: ");
+	Serial.print(storedDistances[Common::POSITION::FRONT_LEFT][currentSampleIndex]);
 	Serial.print("\t\t");
 	Serial.print("validated: ");
-	Serial.println(validatedDistances[Common::POSITION::FRONT_LEFT][currentSensorPos]);*/
+	Serial.println(validatedDistances[Common::POSITION::FRONT_LEFT][currentSampleIndex]);
 }
 
 void SensorHandler::Ultrasonic::updateDistances(Common::POSITION sensorPos) {
-	// defines how many stored measured values need to be ULTRASONIC_MAX_DISTANCE, so that we can validate value
-	//		->	many times the sensors do not respond, which equals ULTRASONIC_MAX_DISTANCE as a value,
-	//			so we must not believe it unless the result is the same for a few times in a row
-	static unsigned int maxDistanceValidationSampleNum = 5;		// -> if the result has been ULTRASONIC_MAX_DISTANCE for 2 times in a row, we believe it
-	
-
-	// if measured distance is ULTRASONIC_MAX_DISTANCE, validates it
-	if (measuredDistances[sensorPos] == ULTRASONIC_MAX_DISTANCE) {
-		unsigned int maxDistanceSampleCount = 0;
-
-		// iterates through stored values (from latest to earliest) and counts ULTRASONIC_MAX_DISTANCE values
-		// latest (validationSampleNum - 1) results should be ULTRASONIC_MAX_DISTANCE for us to believe that it is valid
-		for (unsigned int sampleIndex = (currentSampleIndex + ULTRASONIC_NUM_DISTANCE_SAMPLES - 1) % ULTRASONIC_NUM_DISTANCE_SAMPLES;
-			sampleIndex != currentSampleIndex; /*no increment*/) {
-
-			if (storedDistances[sensorPos][sampleIndex] == ULTRASONIC_MAX_DISTANCE) {
-				++maxDistanceSampleCount;
-			} else {
-				break;
-			}
-
-			sampleIndex = (sampleIndex + ULTRASONIC_NUM_DISTANCE_SAMPLES - 1) % ULTRASONIC_NUM_DISTANCE_SAMPLES;
-		}
-
-		// validation OK -> we believe that measured distance is really ULTRASONIC_MAX_DISTANCE
-		if (maxDistanceSampleCount >= maxDistanceValidationSampleNum - 1) {
-			validatedDistances[sensorPos][currentSampleIndex] = ULTRASONIC_MAX_DISTANCE;
-		} else {	// validation FAILED -> validated value will be previous not ULTRASONIC_MAX_DISTANCE value
-
-			validatedDistances[sensorPos][currentSampleIndex] = storedDistances[sensorPos][
-				(currentSampleIndex + ULTRASONIC_NUM_DISTANCE_SAMPLES - 1 - maxDistanceSampleCount) % ULTRASONIC_NUM_DISTANCE_SAMPLES
-			];
-		}
-
-	} else {
-		validatedDistances[sensorPos][currentSampleIndex] = measuredDistances[sensorPos];
-	}
 
 	storedDistances[sensorPos][currentSampleIndex] = measuredDistances[sensorPos];
 
-	/*if (sensorPos == 0) {
-		Serial.print("stored: ");
-		Serial.print(storedDistances[sensorPos][currentSampleIndex]);
-		Serial.print("\t\t");
-		Serial.print("valid: ");
-		Serial.println(validatedDistances[sensorPos][currentSampleIndex]);
-	}*/
+	// if measured distance is ULTRASONIC_MAX_DISTANCE, validates it
+	if (measuredDistances[sensorPos] == ULTRASONIC_MAX_DISTANCE) {
+		validate(sensorPos, maxDistanceValidationData);
 
+	} else {
+		validate(sensorPos, defaultValidationData);
+	}
+}
+
+void SensorHandler::Ultrasonic::validate(Common::POSITION sensorPos, ValidationData validationData) {
+
+	unsigned long prevValidatedValue = validatedDistances[sensorPos][(currentSampleIndex + ULTRASONIC_NUM_DISTANCE_SAMPLES - 1) % ULTRASONIC_NUM_DISTANCE_SAMPLES];
+	unsigned long currentStoredValue = storedDistances[sensorPos][currentSampleIndex];
+
+	/*
+		Checks if current stored value is in the given range of the previous validated value for the sensor.
+		e.g. if the previous validated value was 150, we will believe 145 without hesitation, no need for further validation
+	*/
+	if (isInRange(prevValidatedValue, currentStoredValue, validationData.errorPercent, Common::ERROR_SIGN::BOTH)) {
+		validatedDistances[sensorPos][currentSampleIndex] = currentStoredValue;
+		return;
+	}
+
+	// if we got here, current stored value is out of range of the previous validated value so we need to validate
+
+	unsigned int sampleCount = 0;
+
+	// iterates through stored values (from latest to earliest) and counts how many values are also out of range of previous validated value (sign of error is also important to match)
+	// latest (validationSampleNum - 1) results should be out of range for us to believe that current value is valid
+	for (unsigned int sampleIndex = (currentSampleIndex + ULTRASONIC_NUM_DISTANCE_SAMPLES - 1) % ULTRASONIC_NUM_DISTANCE_SAMPLES;
+		sampleIndex != currentSampleIndex;
+		sampleIndex = (sampleIndex + ULTRASONIC_NUM_DISTANCE_SAMPLES - 1) % ULTRASONIC_NUM_DISTANCE_SAMPLES) {
+
+		if (!isInRange(prevValidatedValue, storedDistances[sensorPos][sampleIndex], validationData.errorPercent,
+			currentStoredValue < prevValidatedValue ? Common::ERROR_SIGN::NEGATIVE : Common::ERROR_SIGN::POSITIVE)) {
+			
+			++sampleCount;
+		} else {
+			break;
+		}
+	}
+
+	// validation OK -> we believe that distance is really what we measured
+	if (sampleCount >= validationData.validationSampleNum - 1) {
+		validatedDistances[sensorPos][currentSampleIndex] = currentStoredValue;
+	} else {	// validation FAILED -> validated value will be previous validated value
+
+		validatedDistances[sensorPos][currentSampleIndex] = prevValidatedValue;
+	}
+}
+
+/*
+	Checks if value is in a given range of the reference value.
+*/
+bool SensorHandler::Ultrasonic::isInRange(unsigned long ref, unsigned long value, unsigned int errorPercent, Common::ERROR_SIGN errorDir) {
+
+	unsigned long max = errorDir == Common::ERROR_SIGN::NEGATIVE ?
+		ref : ref * (100 + errorPercent) / 100;
+
+	unsigned long min = errorDir == Common::ERROR_SIGN::POSITIVE ?
+		ref : ref * (100 - errorPercent) / 100;
+
+	return value <= max && value >= min;
 }
 
 void SensorHandler::Ultrasonic::copyCurrentValidatedDistances(unsigned long dest[ULTRASONIC_NUM_SENSORS]) {

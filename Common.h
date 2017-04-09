@@ -7,6 +7,12 @@
 class Common {
 public:
 
+	enum ERROR_SIGN {
+		POSITIVE,
+		NEGATIVE,
+		BOTH
+	};
+
 	/*
 		If you add a position, update POSITION_COUNT
 	*/

@@ -22,6 +22,14 @@
 #define ULTRASONIC_NUM_DISTANCE_SAMPLES 10
 #define ULTRASONIC_MAX_DISTANCE 200
 
+// defines how many stored measured values need to be ULTRASONIC_MAX_DISTANCE, so that we can validate value
+//		->	many times the sensors do not respond, which equals ULTRASONIC_MAX_DISTANCE as a value,
+//			so we must not believe it unless the result is the same for a few times in a row
+#define maxDistanceValidationSampleNum 5		// -> if the result has been ULTRASONIC_MAX_DISTANCE for 2 times in a row, we believe it
+#define maxDistanceValidationErrorPercent 0
+#define defaultValidationSampleNum 2
+#define defaultValidationErrorPercent 50
+
 /*
 	Reads, validates and stores sensors' data.
 */
@@ -31,6 +39,11 @@ private:
 	static const unsigned long DEFAULT_CYCLE_PERIOD = 1;
 
 public:
+
+	struct ValidationData {
+		unsigned int validationSampleNum;
+		unsigned int errorPercent;
+	};
 
 	class Ultrasonic {
 
@@ -43,6 +56,10 @@ public:
 		};
 
 	private:
+
+		static const ValidationData maxDistanceValidationData;
+		static const ValidationData defaultValidationData;
+
 
 		UltrasonicSensor sensors[ULTRASONIC_NUM_SENSORS] = {     // Sensor object array.
 			UltrasonicSensor(ULTRASONIC_FRONT_LEFT_TRIG_PIN, ULTRASONIC_FRONT_LEFT_ECHO_PIN),	// front left
@@ -67,6 +84,10 @@ public:
 		unsigned int currentSampleIndex;
 
 		void updateDistances(Common::POSITION sensorPos);
+
+		void validate(Common::POSITION sensorPos, ValidationData validationData);
+
+		bool isInRange(unsigned long ref, unsigned long value, unsigned int errorPercent, Common::ERROR_SIGN errorDir);
 
 	public:
 

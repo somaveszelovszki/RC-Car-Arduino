@@ -29,5 +29,4 @@ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\leonardo\Debug\RC_Car.cpp.o: \
  F:\Program\ Files\ (x86)\Arduino\libraries\Servo\src/Servo.h \
  F:\Program\ Files\ (x86)\Arduino\libraries\Servo\src/avr/ServoTimers.h \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\leonardo\Debug\SensorHandler.h \
- C:\Users\Soma\Documents\Arduino\libraries\NewPing/NewPing.h \
- F:\Program\ Files\ (x86)\Microsoft\ Visual\ Studio\ 14.0\Common7\IDE\Extensions\gjgmy2sd.tsq\Micro\ Platforms\default\debuggers\VM_DBG/VM_DBG.h
+ C:\Users\Soma\Documents\Arduino\libraries\NewPing/NewPing.h

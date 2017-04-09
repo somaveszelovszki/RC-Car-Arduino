@@ -50,7 +50,7 @@
       <AdditionalIncludeDirectories>C:\Users\Soma\Documents\Arduino\libraries\pt;F:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\SoftwareSerial\src;F:\Program Files (x86)\Arduino\libraries\Servo\src;C:\Users\Soma\Documents\Arduino\libraries\NewPing;F:\Program Files (x86)\Arduino\libraries;F:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries;C:\Users\Soma\Documents\Arduino\libraries;F:\Program Files (x86)\Arduino\hardware\arduino\avr\cores\arduino;F:\Program Files (x86)\Arduino\hardware\arduino\avr\variants\leonardo;$(ProjectDir)..\RC_Car;F:\Program Files (x86)\Arduino\hardware\tools\avr\avr\include\;F:\Program Files (x86)\Arduino\hardware\tools\avr\avr\include\avr\;F:\Program Files (x86)\Arduino\hardware\tools\avr\lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>$(ProjectDir)__vm\.RC_Car.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
-      <PreprocessorDefinitions>__AVR_ATmega32u4__;__AVR_ATmega32U4__;_VMDEBUG=1;F_CPU=16000000L;ARDUINO=10801;ARDUINO_AVR_LEONARDO;ARDUINO_ARCH_AVR;USB_VID=0x2341;USB_PID=0x8036;__cplusplus=201103L;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__AVR_ATmega32u4__;__AVR_ATmega32U4__;F_CPU=16000000L;ARDUINO=10801;ARDUINO_AVR_LEONARDO;ARDUINO_ARCH_AVR;USB_VID=0x2341;USB_PID=0x8036;__cplusplus=201103L;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -74,6 +74,7 @@
     <ProjectCapability Include="VisualMicro" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram.cd" />
     <None Include="RC_Car.ino">
       <FileType>CppCode</FileType>
     </None>

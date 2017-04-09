@@ -57,9 +57,6 @@ void MotorHandler::DCMotor::writeValue(int value) {
 
 	speed = value;		// TODO read speed from incremental rotary sensor
 
-	Serial.print("DC motor: ");
-	Serial.println(value);
-
 	analogWrite(fwdPin, value >= 0 ? value : 0);
 	analogWrite(bwdPin, value >= 0 ? 0 : (-1 * value));
 }

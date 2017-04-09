@@ -50,20 +50,16 @@ void DriveController::executeCommand_ServoRecalibrate(const Command& command) {
 	motorHandler->recalibrateServo(command.getValueAsInt());
 }
 
+void DriveController::executeCommand_DriveMode(const Command& command) {
+	setMode((MODE)command.getValueAsInt());
+}
+
 
 void DriveController::handleDistanceData(const unsigned long distances[ULTRASONIC_NUM_SENSORS]) {
 
 	// gets drive mode, direction and speed
 	MotorHandler::DCMotor::DIRECTION dir = motorHandler->getDirection();
 	int speed_cmpsec = motorHandler->getSpeed_cm_per_sec();
-
-	/*for (unsigned int i = 0; i < ULTRASONIC_NUM_SENSORS; ++i) {
-
-		char s[4];
-		Serial.print(itoa(distances[i], s, 10));
-		Serial.print(", ");
-	}
-	Serial.println("");*/
 
 	switch (mode) {
 	case FREE_DRIVE:
@@ -100,14 +96,16 @@ bool DriveController::isDistanceCritical(Common::POSITION pos, unsigned long dis
 
 	if (speed > 0) {		// FORWARD
 		if (pos == Common::POSITION::FRONT_LEFT || pos == Common::POSITION::FRONT_RIGHT) {
-			Serial.print("distance: ");
+			/*Serial.print("distance: ");
 			Serial.print(distance);
+			Serial.print(" cm");
 			Serial.print("\t\tspeed: ");
 			Serial.println(speed);
+			Serial.print(" cm/sec");
 			Serial.print(preCrashTime);
 			Serial.print(" <= ");
 			Serial.println(CRITICAL_PRE_CRASH_TIME);
-			Serial.println();
+			Serial.println();*/
 			
 			// checks if time until crash is below critical
 			if (preCrashTime <= CRITICAL_PRE_CRASH_TIME) {
