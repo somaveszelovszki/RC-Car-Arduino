@@ -3,7 +3,7 @@ RC Car with self-driving features for Arduino.
 
 ### Watch video of car:
 
-[![Watch video of car](https://img.youtube.com/vi/1fxzbHSggno/3.jpg)](https://www.youtube.com/watch?v=1fxzbHSggno)
+[![Watch video of car](https://img.youtube.com/vi/D-heAh4WQEI/3.jpg)](https://www.youtube.com/watch?v=D-heAh4WQEI)
 
 Controller Android application source code can be found [here](https://github.com/somaveszelovszki/RC-Car-Android).
 
