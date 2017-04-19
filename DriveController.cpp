@@ -59,7 +59,6 @@ void DriveController::handleDistanceData(const unsigned long distances[ULTRASONI
 
 	// gets drive mode, direction and speed
 	MotorHandler::DCMotor::DIRECTION dir = motorHandler->getDirection();
-	int speed_cmpsec = motorHandler->getSpeed_cm_per_sec();
 
 	switch (mode) {
 	case FREE_DRIVE:
@@ -68,7 +67,7 @@ void DriveController::handleDistanceData(const unsigned long distances[ULTRASONI
 
 		// if measured distance is critical, stops the car
 		for (unsigned int sensorPos = 0; sensorPos < ULTRASONIC_NUM_SENSORS; ++sensorPos) {
-			if (isDistanceCritical((Common::POSITION) sensorPos, distances[sensorPos], speed_cmpsec)) {
+			if (isDistanceCritical((Common::POSITION) sensorPos, distances[sensorPos])) {
 				stopDCMotor();
 				isStopped = true;
 				stopTimer = EMERGENCY_BREAK_STOP_TIME_MS;
@@ -85,18 +84,31 @@ void DriveController::handleDistanceData(const unsigned long distances[ULTRASONI
 	}
 }
 
-bool DriveController::isDistanceCritical(Common::POSITION pos, unsigned long distance, int speed) {
+void DriveController::handleMotorRotationData(SensorHandler::RotaryEncoder::Result motorRotation) {
+	// counts speed [cm/sec] from rotary encoder position and elapsed time still last sample
+	// (* 1000) is needed for millisec->sec conversion
+	/*Serial.print("pos: ");
+	Serial.print(motorRotation.d_pos);
+	Serial.print("\t\ttime: ");
+	Serial.println((int)motorRotation.d_time);*/
+	speed = MOTOR_TRANSFER_RATE * ((motorRotation.d_pos / (double) ROTARY_RESOLUTION) * WHEEL_CIRCUMFERENCE) / motorRotation.d_time * 1000;
+	Serial.print("speed: ");
+	Serial.println(speed);
+}
+
+bool DriveController::isDistanceCritical(Common::POSITION pos, unsigned long distance) {
 
 	if (speed == 0) return false;
-
-	static double CRITICAL_PRE_CRASH_TIME = 0.50;	// critical time until crash - in [sec]
 
 	// time until crash with given speed
 	double preCrashTime = distance / abs((double)speed);
 
+	Serial.print("pre crash time: ");
+	Serial.println(preCrashTime);
+
 	if (speed > 0) {		// FORWARD
 		if (pos == Common::POSITION::FRONT_LEFT || pos == Common::POSITION::FRONT_RIGHT) {
-			/*Serial.print("distance: ");
+			Serial.print("distance: ");
 			Serial.print(distance);
 			Serial.print(" cm");
 			Serial.print("\t\tspeed: ");
@@ -105,7 +117,7 @@ bool DriveController::isDistanceCritical(Common::POSITION pos, unsigned long dis
 			Serial.print(preCrashTime);
 			Serial.print(" <= ");
 			Serial.println(CRITICAL_PRE_CRASH_TIME);
-			Serial.println();*/
+			Serial.println();
 			
 			// checks if time until crash is below critical
 			if (preCrashTime <= CRITICAL_PRE_CRASH_TIME) {
@@ -130,4 +142,12 @@ bool DriveController::isDistanceCritical(Common::POSITION pos, unsigned long dis
 
 void DriveController::stopDCMotor() {
 	motorHandler->setSpeed(DC_COMMAND_VALUE_STOP);
+}
+
+void DriveController::attachServoMotor() {
+	motorHandler->attachServo();
+}
+
+void DriveController::detachServoMotor() {
+	motorHandler->detachServo();
 }

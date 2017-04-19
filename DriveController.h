@@ -6,6 +6,12 @@
 
 #define EMERGENCY_BREAK_STOP_TIME_MS 3000;
 
+#define MOTOR_TRANSFER_RATE 1.0			// transfer rate between motor and wheels (defined by car architecture)
+#define WHEEL_CIRCUMFERENCE 20.3		// circumference of motor-powered wheels - in [cm]
+#define CRITICAL_PRE_CRASH_TIME 0.5		// critical time until crash - in [sec]
+
+#define MAX_SPEED 55 // [cm/sec]
+
 /**
    Controls motors, responsible for driving car.
 */
@@ -24,10 +30,12 @@ public:
 
 private:
 	MODE mode;
-	MotorHandler* motorHandler;
+	MotorHandler *motorHandler;
 
 	// needed when program in SAFE_DRIVE mode stops car
 	bool isStopped = false;
+
+	int speed = 0;		// wheel speed in cm/sec
 
 public:
 
@@ -64,18 +72,21 @@ public:
 	*/
 	void handleDistanceData(const unsigned long distances[ULTRASONIC_NUM_SENSORS]);
 
+	void handleMotorRotationData(SensorHandler::RotaryEncoder::Result motorRotation);
+
 	/*
 		Decides if given distance at given position and at given speed is critical - need to stop the car.
 		TODO replace with DANGER_LEVELs
 	*/
-	bool isDistanceCritical(Common::POSITION pos, unsigned long distance, int speed);
+	bool isDistanceCritical(Common::POSITION pos, unsigned long distance);
 
 	/*
 		Stops DC motor.
 	*/
 	void stopDCMotor();
 
-
+	void attachServoMotor();
+	void detachServoMotor();
 
 	// TODO replace with a better solution for restarting motor
 	unsigned int stopTimer;

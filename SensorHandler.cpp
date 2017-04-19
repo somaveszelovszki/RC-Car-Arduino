@@ -1,6 +1,6 @@
 #include "SensorHandler.h"
 
-SensorHandler* sensorHandler;
+SensorHandler *sensorHandler;
 
 SensorHandler::Ultrasonic::UltrasonicSensor::UltrasonicSensor(uint8_t trigger_pin, uint8_t echo_pin) : NewPing(trigger_pin, echo_pin, ULTRASONIC_MAX_DISTANCE) {
 }
@@ -82,7 +82,7 @@ void SensorHandler::Ultrasonic::pingNextSensor() {
 	currentSensorPos = (Common::POSITION)((int)(currentSensorPos + 1) % ULTRASONIC_NUM_SENSORS);
 
 	// if sensor is not responsive, does not ping it
-	if (!responsive[currentSensorPos]) return;
+	//if (!responsive[currentSensorPos]) return;
 
 	busy = true;
 	sensors[currentSensorPos].timer_stop();          // Make sure previous timer is canceled before starting a new ping (insurance).
@@ -116,11 +116,11 @@ void SensorHandler::Ultrasonic::updateDistances() {
 
 	//Serial.println();
 
-	Serial.print("stored: ");
-	Serial.print(storedDistances[Common::POSITION::FRONT_LEFT][currentSampleIndex]);
-	Serial.print("\t\t");
-	Serial.print("validated: ");
-	Serial.println(validatedDistances[Common::POSITION::FRONT_LEFT][currentSampleIndex]);
+	//Serial.print("stored: ");
+	//Serial.print(storedDistances[Common::POSITION::FRONT_LEFT][currentSampleIndex]);
+	//Serial.print("\t\t");
+	//Serial.print("validated: ");
+	//Serial.println(validatedDistances[Common::POSITION::FRONT_LEFT][currentSampleIndex]);
 }
 
 void SensorHandler::Ultrasonic::updateDistances(Common::POSITION sensorPos) {
@@ -203,7 +203,7 @@ bool SensorHandler::Ultrasonic::cycleFinished() {
 	return currentSensorPos == ULTRASONIC_NUM_SENSORS - 1;
 }
 
-Watchdog* SensorHandler::Ultrasonic::getWatchdog() const {
+Watchdog *SensorHandler::Ultrasonic::getWatchdog() const {
 	return watchdog;
 }
 
@@ -221,10 +221,28 @@ void SensorHandler::Ultrasonic::onWatchdogTimedOut() {
 
 SensorHandler::SensorHandler() : PeriodicThread(DEFAULT_CYCLE_PERIOD) {
 	this->ultrasonic = new Ultrasonic();
+	this->rotaryEncoder = new RotaryEncoder(ROTARY_ENCODER_A_PIN, ROTARY_ENCODER_B_PIN);
 }
 
 void SensorHandler::initialize() {
 	this->ultrasonic->initialize();
+
+	this->rotaryEncoder->initialize();
+}
+
+void SensorHandler::watchdogDecrement() {
+	ultrasonic->getWatchdog()->decrement();
+	rotaryEncoder->getWatchdog()->decrement();
+}
+
+// Interrupt on A changing state
+void doRotaryEncoderA() {
+	sensorHandler->rotaryEncoder->onChange_A();
+}
+
+// Interrupt on B changing state, same as A above
+void doRotaryEncoderB() {
+	sensorHandler->rotaryEncoder->onChange_B();
 }
 
 /*
@@ -232,4 +250,71 @@ void SensorHandler::initialize() {
 */
 void ultrasonicEchoCheckIT() {
 	sensorHandler->ultrasonic->echoCheck();
+}
+
+SensorHandler::RotaryEncoder::RotaryEncoder(uint8_t A_pin, uint8_t B_pin) {
+	this->A_pin = A_pin;
+	this->B_pin = B_pin;
+
+}
+
+void SensorHandler::RotaryEncoder::initialize() {
+	pinMode(ROTARY_ENCODER_A_PIN, INPUT);
+	pinMode(ROTARY_ENCODER_B_PIN, INPUT);
+	// turn on pullup resistors
+	digitalWrite(ROTARY_ENCODER_A_PIN, HIGH);
+	digitalWrite(ROTARY_ENCODER_B_PIN, HIGH);
+
+	// encoder pin on interrupt 0 (pin 2)
+	attachInterrupt(0, doRotaryEncoderA, CHANGE);
+	// encoder pin on interrupt 1 (pin 3)
+	attachInterrupt(1, doRotaryEncoderB, CHANGE);
+
+	watchdog->restart();
+
+	position = 0;
+	time = 0;
+	storedResult.d_time = 0;
+	storedResult.d_pos = 0;
+}
+
+void SensorHandler::RotaryEncoder::onChange_A() {
+	// Test transition, did things really change? 
+	if (digitalRead(ROTARY_ENCODER_A_PIN) != A_set) {  // debounce once more
+		A_set = !A_set;
+
+		// adjust counter + if A leads B
+		if (A_set && !B_set)
+			++position;
+	}
+}
+
+void SensorHandler::RotaryEncoder::onChange_B() {
+	if (digitalRead(ROTARY_ENCODER_B_PIN) != B_set) {
+		B_set = !B_set;
+		//  adjust counter - 1 if B leads A
+		if (B_set && !A_set)
+			--position;
+	}
+}
+
+SensorHandler::RotaryEncoder::Result SensorHandler::RotaryEncoder::readAndUpdateIfTimedOut() {
+	
+	if (watchdog->checkTimeOutAndRestart()) {
+		uint64_t milliSecs = Common::milliSecs();
+
+		storedResult.d_time = milliSecs - time;
+		storedResult.d_pos = position;
+
+		noInterrupts();
+		time = milliSecs;
+		position = 0;
+		interrupts();
+	}
+
+	return storedResult;
+}
+
+Watchdog  *SensorHandler::RotaryEncoder::getWatchdog() {
+	return watchdog;
 }

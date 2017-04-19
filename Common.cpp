@@ -44,10 +44,16 @@ void Common::initTimer() {
 	interrupts();
 }
 
+uint64_t Common::milliSecs() {
+	return MILLI_SEC_COUNTER;
+}
+
 template <typename T>
 static void Common::arrayCopy(T dest[], T src[], size_t size) {
 	for (size_t i = 0; i < size; ++i) {
 		dest[i] = src[i];
 	}
 }
+
+uint64_t Common::MILLI_SEC_COUNTER = 0;
 

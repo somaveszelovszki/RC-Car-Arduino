@@ -3,6 +3,9 @@
 
 #include "Common.h"
 
+#define COMMAND_END_CHAR ';'
+#define COMMAND_SEPARATOR_CHAR ':'
+
 /**
    Command class contains data about a received command.
 */
@@ -23,9 +26,6 @@ private:
 
 public:
 
-	static const char END_CHAR = ';';
-	static const char SEPARATOR_CHAR = ':';
-
 	Command(CODE code, const String& value);
 
 	Command(const Command& other);
@@ -38,8 +38,12 @@ public:
 
 	int getValueAsInt() const;
 
-	static Command* fromString(String commandString);
+	bool isValid() const;
+
+	static Command *fromString(String commandString);
 	String toString() const;
+
+	bool isValid(char c) const;
 };
 
 #endif

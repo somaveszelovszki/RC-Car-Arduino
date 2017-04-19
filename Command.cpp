@@ -29,16 +29,43 @@ int Command::getValueAsInt() const {
 	return value.toInt();
 }
 
+bool Command::isValid() const {
+	String commandString = this->toString();
+
+	if (commandString == NULL || commandString.length() == 0) return false;
+
+	for (int i = 0; i < commandString.length(); ++i) {
+		if (!isValid(commandString.charAt(i)))
+			return false;
+	}
+
+	return true;
+}
+
+bool Command::isValid(char c) const {
+	if (c >= '0' && c <= '9') return true;
+
+	if (c == COMMAND_SEPARATOR_CHAR || c == COMMAND_END_CHAR) return true;
+
+	if (c >= 'a' && c <= 'b') return true;
+
+	if (c >= 'A' && c <= 'Z') return true;
+
+	if (c == ' ' || c == '_') return true;
+
+	return false;
+}
+
 /**
  * Parses Command from String object.
  * e.g. incoming String is "1:10"
  * output will be: 
  *    Command { code=1 and value=10 }
  */
-Command* Command::fromString(String commandString) {
+Command *Command::fromString(String commandString) {
 
 	// finds separator in string (separates key from value)
-	int separatorIndex = commandString.indexOf(SEPARATOR_CHAR);
+	int separatorIndex = commandString.indexOf(COMMAND_SEPARATOR_CHAR);
 
 	// code is before separator
 	int code = commandString.substring(0, separatorIndex).toInt();
@@ -57,6 +84,6 @@ Command* Command::fromString(String commandString) {
 String Command::toString() const {
 	String codeStr(code);
 
-	return codeStr + SEPARATOR_CHAR + value + END_CHAR;
+	return codeStr + COMMAND_SEPARATOR_CHAR + value + COMMAND_END_CHAR;
 }
 

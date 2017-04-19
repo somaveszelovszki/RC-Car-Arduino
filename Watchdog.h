@@ -30,6 +30,8 @@ public:
 	void decrement();
 
 	bool timedOut();
+
+	bool checkTimeOutAndRestart();
 };
 
 #endif

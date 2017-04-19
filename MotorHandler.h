@@ -6,19 +6,10 @@
 
 #include "Command.h"
 
-// motor ports for Adafruit MotorShield
-#define MOTOR_1_PORT 1
-#define MOTOR_2_PORT 2
-#define MOTOR_3_PORT 3
-#define MOTOR_4_PORT 4
-
-// DC motor port
-#define DC_MOTOR_PORT MOTOR_3_PORT
-
 // servo pin
 #define SERVO_PIN 9
 
-#define DC_MOTOR_FORWARD_PIN 3
+#define DC_MOTOR_FORWARD_PIN 5
 #define DC_MOTOR_BACKWARD_PIN 11
 
 // servo command value range (0 is servo middle position)
@@ -112,17 +103,12 @@ public:
 		void release();
 
 		DIRECTION getDirection();
-
-		/*
-			Returns speed in [cm/s].
-		*/
-		int getSpeed_cm_per_sec();
 	};
 
 private:
 
-	ServoMotor* servoMotor;
-	DCMotor* DC_Motor;
+	ServoMotor *servoMotor;
+	DCMotor *DC_Motor;
 
 
 public:
@@ -135,8 +121,10 @@ public:
 	void setSteeringAngle(int value);
 	void recalibrateServo(int value);
 
+	void attachServo();
+	void detachServo();
+
 	DCMotor::DIRECTION getDirection();
-	int getSpeed_cm_per_sec();
 };
 
 #endif

@@ -18,11 +18,11 @@
 */
 class Communicator : public PeriodicThread {
 private:
-	SoftwareSerial* bluetoothSerial;
+	SoftwareSerial *bluetoothSerial;
 
 	String recvBuffer = "";
 
-	Watchdog* watchdog = new Watchdog(WATCHDOG_TIMEOUT);	// timeout in ms
+	Watchdog *watchdog = new Watchdog(WATCHDOG_TIMEOUT);	// timeout in ms
 
 	static const unsigned long DEFAULT_CYCLE_PERIOD = 1;
 
@@ -45,7 +45,7 @@ public:
 		Parses command from buffer string and clears buffer string content.
 		@returns pointer to parsed command
 	*/
-	Command* fetchCommand();
+	Command *fetchCommand();
 	
 	/*
 		Sends command as string.
@@ -56,7 +56,7 @@ public:
 	/*
 		Gets watchdog.
 	*/
-	Watchdog* getWatchdog() const;
+	Watchdog *getWatchdog() const;
 
 	~Communicator();
 };

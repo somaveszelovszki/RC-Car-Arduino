@@ -24,7 +24,6 @@ void MotorHandler::ServoMotor::recalibrate(int newMiddlePos) {
 void MotorHandler::ServoMotor::writeValue(int value) {
 	if (this->currentValue != value) {
 		this->write(value);
-
 		currentValue = value;
 	}
 }
@@ -76,11 +75,6 @@ MotorHandler::DCMotor::DIRECTION MotorHandler::DCMotor::getDirection() {
 	return speed > 0 ? FORWARD : speed < 0 ? BACKWARD : RELEASE;
 }
 
-int MotorHandler::DCMotor::getSpeed_cm_per_sec() {
-	// TODO read speed from incremental rotary sensor
-	return speed/2;
-}
-
 
 
 MotorHandler::MotorHandler() {
@@ -92,7 +86,7 @@ MotorHandler::MotorHandler() {
 
 
 void MotorHandler::initialize() {
-	servoMotor->attach(SERVO_PIN);
+	attachServo();
 	servoMotor->positionMiddle();	DC_Motor->release();}
 
 void MotorHandler::setSpeed(int value) {
@@ -107,12 +101,14 @@ void MotorHandler::recalibrateServo(int value) {
 	servoMotor->recalibrate(value);
 }
 
+void MotorHandler::attachServo() {
+	servoMotor->attach(SERVO_PIN);
+}
+
+void MotorHandler::detachServo() {
+	servoMotor->detach();
+}
+
 MotorHandler::DCMotor::DIRECTION MotorHandler::getDirection() {
 	return DC_Motor->getDirection();
 }
-
-int MotorHandler::getSpeed_cm_per_sec() {
-	return DC_Motor->getSpeed_cm_per_sec();
-}
-
-

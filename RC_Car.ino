@@ -13,9 +13,11 @@
 // counts loop cycles
 static unsigned long CYCLE_COUNTER = 0;
 
-Communicator* communicator;				// handles communication (data sending/receiving) with phone
-DriveController* driveController;		// controls motors according to measured distances from objects and user commands
-extern SensorHandler* sensorHandler;	// reads, validates and stores sensors' data
+Communicator *communicator;				// handles communication (data sending/receiving) with phone
+DriveController *driveController;		// controls motors according to measured distances from objects and user commands
+extern SensorHandler *sensorHandler;	// reads, validates and stores sensors' data
+
+ISR(TIMER0_COMPA_vect);
 
 /*
 	Called when communication timed out - meaning that communication with phone has stopped.
@@ -41,60 +43,38 @@ static PT_THREAD(communicatorThread(struct pt *pt)) {
 	//Serial.println("communicatorThread running...");
 
 	// reads available characters - if command end was found, returns true
-	if (communicator->receiveChars()) {
-		Command* receivedCommand = communicator->fetchCommand();
+	if (communicator->receiveChars() ) {
 
-		//Serial.println(receivedCommand->toString());
+		Command *receivedCommand = communicator->fetchCommand();
 
-		switch (receivedCommand->getCode()) {
+		Serial.println(receivedCommand->toString());
 
-		case Command::CODE::Speed:
-			driveController->executeCommand_Speed(*receivedCommand);
-			break;
+		if (receivedCommand->isValid()) {
+			switch (receivedCommand->getCode()) {
 
-		case Command::CODE::SteeringAngle:
-			driveController->executeCommand_SteeringAngle(*receivedCommand);
-			break;
+			case Command::CODE::Speed:
+				driveController->executeCommand_Speed(*receivedCommand);
+				break;
 
-		case Command::CODE::ServoRecalibrate:
-			driveController->executeCommand_ServoRecalibrate(*receivedCommand);
-			break;
+			case Command::CODE::SteeringAngle:
+				driveController->executeCommand_SteeringAngle(*receivedCommand);
+				break;
 
-		case Command::CODE::DriveMode:
-			driveController->executeCommand_DriveMode(*receivedCommand);
-			break;
+			case Command::CODE::ServoRecalibrate:
+				driveController->executeCommand_ServoRecalibrate(*receivedCommand);
+				break;
+
+			case Command::CODE::DriveMode:
+				driveController->executeCommand_DriveMode(*receivedCommand);
+				break;
+			}
+		} else {
+			Serial.println("invalid");
+
 		}
 
 		delete receivedCommand;
 	}
-
-	//// TODO REMOVE THIS - ONLY FOR TESTS
-	//if (false && CYCLE_COUNTER % 50 == 0) {
-
-	//	char s[3];
-	//	itoa(70, s, 10);
-
-	//	Command* receivedCommand = new Command(Command::CODE::Speed, s);
-
-	//	//Serial.println(receivedCommand->toString());
-
-	//	switch (receivedCommand->getCode()) {
-
-	//	case Command::CODE::Speed:
-	//		driveController->executeCommand_Speed(*receivedCommand);
-	//		break;
-
-	//	case Command::CODE::SteeringAngle:
-	//		driveController->executeCommand_SteeringAngle(*receivedCommand);
-	//		break;
-
-	//	case Command::CODE::ServoRecalibrate:
-	//		driveController->executeCommand_ServoRecalibrate(*receivedCommand);
-	//		break;
-	//	}
-
-	//	delete receivedCommand;
-	//}
 
 	// checks if communication timed out
 	if (communicator->getWatchdog()->timedOut()) {
@@ -115,10 +95,9 @@ static PT_THREAD(sensorThread(struct pt *pt)) {
 
 	PT_WAIT_UNTIL(pt, sensorHandler->periodCycleThresholdReached(CYCLE_COUNTER));
 
-	//Serial.println("sensorThread running...");
-
-	//Serial.println(sensorHandler->ultrasonic->isEnabled() ? "enabled" : "not enabled");
-	//Serial.println(sensorHandler->ultrasonic->isBusy() ? "busy" : "not busy");
+	// handles motor rotation sensor data -> updates speed
+	SensorHandler::RotaryEncoder::Result motorRotation = sensorHandler->rotaryEncoder->readAndUpdateIfTimedOut();
+	//driveController->handleMotorRotationData(motorRotation);
 
 	// gets next ultrasonic sensor distance (will run in background and call an IT routine)
 	if (sensorHandler->ultrasonic->isEnabled() && !sensorHandler->ultrasonic->isBusy()) {
@@ -185,7 +164,7 @@ void loop() {
 	sensorThread(&sensor_pt);
 
 	/*for (int i = 0; i < 100; i++) {
-		Command* command;
+		Command *command;
 		char s[3];
 		itoa(i, s, 10);
 	
@@ -206,10 +185,12 @@ void loop() {
 */
 ISR(TIMER0_COMPA_vect) {
 
+	++Common::MILLI_SEC_COUNTER;
+
 	// decreases watchdog timers
 
 	communicator->getWatchdog()->decrement();
-	sensorHandler->ultrasonic->getWatchdog()->decrement();
+	sensorHandler->watchdogDecrement();
 
 	driveController->stopTimer = driveController->stopTimer > 0 ? driveController->stopTimer - 1 : 0;
 }

@@ -11,8 +11,10 @@ void Watchdog::reset() {
 }
 
 void Watchdog::restart() {
+	noInterrupts();
 	reset();
 	resume();
+	interrupts();
 }
 
 void Watchdog::pause() {
@@ -35,8 +37,20 @@ void Watchdog::decrement() {
 }
 
 bool Watchdog::timedOut() {
+	noInterrupts();
 	if (counter == 0) {
 		reset();
+		interrupts();
+		return true;
+	}
+	interrupts();
+	return false;
+}
+
+bool Watchdog::checkTimeOutAndRestart() {
+
+	if (timedOut()) {
+		restart();
 		return true;
 	}
 	return false;

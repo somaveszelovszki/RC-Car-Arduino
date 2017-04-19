@@ -22,7 +22,7 @@ bool Communicator::receiveChars() {
 		recvBuffer += c;
 
 		// if command end character was received, stops character reading and signals caller by returning true
-		if (c == Command::END_CHAR) {
+		if (c == COMMAND_END_CHAR) {
 			return true;
 		}
 	}
@@ -30,9 +30,9 @@ bool Communicator::receiveChars() {
 	return false;
 }
 
-Command* Communicator::fetchCommand() {
+Command *Communicator::fetchCommand() {
 	// parses command from buffer string
-	Command* command = Command::fromString(recvBuffer);
+	Command *command = Command::fromString(recvBuffer);
 
 	// clears buffer string
 	recvBuffer = "";
@@ -45,7 +45,7 @@ size_t Communicator::sendCommand(const Command& command) {
 	return Common::write(*bluetoothSerial, command.toString());
 }
 
-Watchdog* Communicator::getWatchdog() const {
+Watchdog *Communicator::getWatchdog() const {
 	return watchdog;
 }
 

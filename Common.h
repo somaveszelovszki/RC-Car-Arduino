@@ -32,6 +32,12 @@ public:
 
 	template <typename T>
 	static void arrayCopy(T dest[], T src[], size_t size);
+
+	static uint64_t MILLI_SEC_COUNTER;
+
+	static uint64_t milliSecs();
+
+
 };
 
 #endif
