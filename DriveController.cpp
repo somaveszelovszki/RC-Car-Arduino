@@ -1,7 +1,7 @@
 #include "DriveController.h"
 
-DriveController::DriveController() {
-	motorHandler = new MotorHandler();
+DriveController::DriveController(RotaryEncoder *rotaryEncoder) {
+	motorHandler = new MotorHandler(rotaryEncoder);
 	
 	mode = FREE_DRIVE;		// default mode
 }
@@ -22,7 +22,7 @@ DriveController::MODE DriveController::getMode() {
 void DriveController::executeCommand_Speed(const Command& command) {
 	switch (mode) {
 	case FREE_DRIVE:
-		motorHandler->setSpeed(command.getValueAsInt());
+		motorHandler->setDesiredSpeed(command.getValueAsInt());
 		break;
 	case SAFE_DRIVE:
 
@@ -30,10 +30,10 @@ void DriveController::executeCommand_Speed(const Command& command) {
 		if (isStopped) {
 			if (stopTimer == 0) {
 				isStopped = false;
-				motorHandler->setSpeed(command.getValueAsInt());
+				motorHandler->setDesiredSpeed(command.getValueAsInt());
 			}
 		} else {
-			motorHandler->setSpeed(command.getValueAsInt());
+			motorHandler->setDesiredSpeed(command.getValueAsInt());
 		}
 		break;
 
@@ -58,7 +58,7 @@ void DriveController::executeCommand_DriveMode(const Command& command) {
 void DriveController::handleDistanceData(const unsigned long distances[ULTRASONIC_NUM_SENSORS]) {
 
 	// gets drive mode, direction and speed
-	MotorHandler::DCMotor::DIRECTION dir = motorHandler->getDirection();
+	MotorHandler::DIRECTION dir = motorHandler->getDirection();
 
 	switch (mode) {
 	case FREE_DRIVE:
@@ -68,7 +68,7 @@ void DriveController::handleDistanceData(const unsigned long distances[ULTRASONI
 		// if measured distance is critical, stops the car
 		for (unsigned int sensorPos = 0; sensorPos < ULTRASONIC_NUM_SENSORS; ++sensorPos) {
 			if (isDistanceCritical((Common::POSITION) sensorPos, distances[sensorPos])) {
-				stopDCMotor();
+				releaseMotor();
 				isStopped = true;
 				stopTimer = EMERGENCY_BREAK_STOP_TIME_MS;
 				break;
@@ -82,18 +82,6 @@ void DriveController::handleDistanceData(const unsigned long distances[ULTRASONI
 		// TODO
 		break;
 	}
-}
-
-void DriveController::handleMotorRotationData(SensorHandler::RotaryEncoder::Result motorRotation) {
-	// counts speed [cm/sec] from rotary encoder position and elapsed time still last sample
-	// (* 1000) is needed for millisec->sec conversion
-	/*Serial.print("pos: ");
-	Serial.print(motorRotation.d_pos);
-	Serial.print("\t\ttime: ");
-	Serial.println((int)motorRotation.d_time);*/
-	speed = MOTOR_TRANSFER_RATE * ((motorRotation.d_pos / (double) ROTARY_RESOLUTION) * WHEEL_CIRCUMFERENCE) / motorRotation.d_time * 1000;
-	Serial.print("speed: ");
-	Serial.println(speed);
 }
 
 bool DriveController::isDistanceCritical(Common::POSITION pos, unsigned long distance) {
@@ -140,8 +128,8 @@ bool DriveController::isDistanceCritical(Common::POSITION pos, unsigned long dis
 }
 
 
-void DriveController::stopDCMotor() {
-	motorHandler->setSpeed(DC_COMMAND_VALUE_STOP);
+void DriveController::releaseMotor() {
+	motorHandler->releaseMotor();
 }
 
 void DriveController::attachServoMotor() {
@@ -150,4 +138,12 @@ void DriveController::attachServoMotor() {
 
 void DriveController::detachServoMotor() {
 	motorHandler->detachServo();
+}
+
+void DriveController::watchdogDecrement() {
+	motorHandler->watchdogDecrement();
+}
+
+void DriveController::updateValues() {
+	motorHandler->updateSpeed();
 }

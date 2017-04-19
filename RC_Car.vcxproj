@@ -92,6 +92,7 @@
     <ClInclude Include="Event.h" />
     <ClInclude Include="PeriodicThread.h" />
     <ClInclude Include="MotorHandler.h" />
+    <ClInclude Include="RotaryEncoder.h" />
     <ClInclude Include="SensorHandler.h" />
     <ClInclude Include="Watchdog.h" />
     <ClInclude Include="__vm\.RC_Car.vsarduino.h" />
@@ -105,6 +106,7 @@
     <ClCompile Include="Event.cpp" />
     <ClCompile Include="MotorHandler.cpp" />
     <ClCompile Include="PeriodicThread.cpp" />
+    <ClCompile Include="RotaryEncoder.cpp" />
     <ClCompile Include="SensorHandler.cpp" />
     <ClCompile Include="Watchdog.cpp" />
   </ItemGroup>

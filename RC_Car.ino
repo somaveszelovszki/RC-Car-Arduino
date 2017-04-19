@@ -17,6 +17,8 @@ Communicator *communicator;				// handles communication (data sending/receiving)
 DriveController *driveController;		// controls motors according to measured distances from objects and user commands
 extern SensorHandler *sensorHandler;	// reads, validates and stores sensors' data
 
+extern RotaryEncoder *motorRotaryEncoder = new RotaryEncoder(ROTARY_ENCODER_A_PIN, ROTARY_ENCODER_B_PIN);
+
 ISR(TIMER0_COMPA_vect);
 
 /*
@@ -95,8 +97,10 @@ static PT_THREAD(sensorThread(struct pt *pt)) {
 
 	PT_WAIT_UNTIL(pt, sensorHandler->periodCycleThresholdReached(CYCLE_COUNTER));
 
+	driveController->updateValues();
+
 	// handles motor rotation sensor data -> updates speed
-	SensorHandler::RotaryEncoder::Result motorRotation = sensorHandler->rotaryEncoder->readAndUpdateIfTimedOut();
+	//SensorHandler::RotaryEncoder::Result motorRotation = sensorHandler->rotaryEncoder->readAndUpdateIfTimedOut();
 	//driveController->handleMotorRotationData(motorRotation);
 
 	// gets next ultrasonic sensor distance (will run in background and call an IT routine)
@@ -137,7 +141,7 @@ void setup() {
 	Serial.println("setup...");
 
 	communicator = new Communicator();
-	driveController = new DriveController();
+	driveController = new DriveController(motorRotaryEncoder);
 	sensorHandler = new SensorHandler();
 
 	communicator->initialize();
@@ -191,6 +195,7 @@ ISR(TIMER0_COMPA_vect) {
 
 	communicator->getWatchdog()->decrement();
 	sensorHandler->watchdogDecrement();
+	driveController->watchdogDecrement();
 
 	driveController->stopTimer = driveController->stopTimer > 0 ? driveController->stopTimer - 1 : 0;
 }
@@ -198,7 +203,7 @@ ISR(TIMER0_COMPA_vect) {
 
 void onCommunicationTimedOut() {
 	// TODO
-	driveController->stopDCMotor();
+	driveController->releaseMotor();
 
 	Serial.println("communicator timed out");
 

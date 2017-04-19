@@ -6,8 +6,12 @@ Value is in [-100 +100]
 
 Position is in [0 +180]
 */
-int MotorHandler::ServoMotor::commandValueToAngle(int commandValue) {
-	return map(commandValue, SERVO_COMMAND_VALUE_MIN, SERVO_COMMAND_VALUE_MAX, MIDDLE_POSITION - MAX_ROTATION, MIDDLE_POSITION + MAX_ROTATION);
+int MotorHandler::commandValueToSteeringAngle(int commandValue) {
+
+	int middle = servoMotor->getMiddlePosition();
+	int max = servoMotor->getMaxRotation();
+
+	return map(commandValue, SERVO_COMMAND_VALUE_MIN, SERVO_COMMAND_VALUE_MAX, middle - max, middle + max);
 }
 
 void MotorHandler::ServoMotor::recalibrate(int newMiddlePos) {
@@ -17,27 +21,16 @@ void MotorHandler::ServoMotor::recalibrate(int newMiddlePos) {
 	int managableRotation = min(newMiddlePos - SERVO_POSITION_MIN, SERVO_POSITION_MAX - newMiddlePos);
 
 	MAX_ROTATION = min(managableRotation, SERVO_DEFAULT_MAX_ROTATION);
-
-	this->positionMiddle();
 }
 
-void MotorHandler::ServoMotor::writeValue(int value) {
-	if (this->currentValue != value) {
-		this->write(value);
-		currentValue = value;
-	}
+int MotorHandler::ServoMotor::getMiddlePosition() {
+	return MIDDLE_POSITION;
 }
 
-void MotorHandler::ServoMotor::writeCommandValue(int commandValue) {
-
-	int newValue = commandValueToAngle(commandValue);
-
-	writeValue(newValue);
+int MotorHandler::ServoMotor::getMaxRotation() {
+	return MAX_ROTATION;
 }
 
-void MotorHandler::ServoMotor::positionMiddle() {
-	this->writeCommandValue(0);
-}
 
 
 MotorHandler::DCMotor::DCMotor(unsigned int fwdPin, unsigned int bwdPin) {
@@ -48,53 +41,84 @@ MotorHandler::DCMotor::DCMotor(unsigned int fwdPin, unsigned int bwdPin) {
 	pinMode(bwdPin, OUTPUT);
 }
 
-int MotorHandler::DCMotor::commandValueToSpeed(int commandValue) {
-	return map(commandValue, DC_COMMAND_VALUE_MIN, DC_COMMAND_VALUE_MAX, (-1) * DC_MAX_VALUE, DC_MAX_VALUE);
+int MotorHandler::commandValueToSpeed(int commandValue) {
+	return map(commandValue, DC_COMMAND_VALUE_MIN, DC_COMMAND_VALUE_MAX, (-1) * MAX_SPEED, MAX_SPEED);
 }
 
 void MotorHandler::DCMotor::writeValue(int value) {
 
-	speed = value;		// TODO read speed from incremental rotary sensor
+	if (value > DC_MAX_VALUE)
+		value = DC_MAX_VALUE;
+
+	if (value < DC_MIN_VALUE)
+		value = DC_MIN_VALUE;
 
 	analogWrite(fwdPin, value >= 0 ? value : 0);
 	analogWrite(bwdPin, value >= 0 ? 0 : (-1 * value));
+
+	int prevValue = value;
 }
 
-void MotorHandler::DCMotor::writeCommandValue(int commandValue) {
-
-	int speed = commandValueToSpeed(commandValue);
-
-	writeValue(speed);
+int MotorHandler::DCMotor::getPreviousValue() {
+	return prevValue;
 }
 
-void MotorHandler::DCMotor::release() {
-	writeValue(0);
+void MotorHandler::watchdogDecrement() {
+	rotaryEncoder->getWatchdog()->decrement();
 }
 
-MotorHandler::DCMotor::DIRECTION MotorHandler::DCMotor::getDirection() {
-	return speed > 0 ? FORWARD : speed < 0 ? BACKWARD : RELEASE;
+MotorHandler::DIRECTION MotorHandler::getDirection() {
+
+	int actualSpeed = getActualSpeed();
+
+	return actualSpeed > 0 ? FORWARD : actualSpeed < 0 ? BACKWARD : RELEASE;
 }
 
 
+int MotorHandler::getActualSpeed() {
 
-MotorHandler::MotorHandler() {
+	RotaryEncoder::Result motorRotation = rotaryEncoder->readAndUpdateIfTimedOut();
+
+	return MOTOR_TRANSFER_RATE * ((motorRotation.d_pos / (double)ROTARY_RESOLUTION) * WHEEL_CIRCUMFERENCE)
+		/ motorRotation.d_time * 1000;
+}
+
+int MotorHandler::getDesiredSpeed() {
+	return desiredSpeed;
+}
+
+MotorHandler::MotorHandler(RotaryEncoder *rotaryEncoder) {
 	servoMotor = new ServoMotor();
-	//AF_MotorShield = new Adafruit_MotorShield();
-
 	DC_Motor = new DCMotor(DC_MOTOR_FORWARD_PIN, DC_MOTOR_BACKWARD_PIN);
+	this->rotaryEncoder = rotaryEncoder;
+	setDesiredSpeed(0);
 }
 
 
 void MotorHandler::initialize() {
 	attachServo();
-	servoMotor->positionMiddle();	DC_Motor->release();}
+	positionServoMiddle();	releaseMotor();}
 
-void MotorHandler::setSpeed(int value) {
-	DC_Motor->writeCommandValue(value);
+void MotorHandler::releaseMotor() {
+	setDesiredSpeed(DC_COMMAND_VALUE_STOP);
+}
+
+void MotorHandler::updateSpeed() {
+	int error = desiredSpeed - getActualSpeed();
+
+	DC_Motor->writeValue(DC_Motor->getPreviousValue() + error * SPEED_CONTROLLER_K);
+}
+
+void MotorHandler::positionServoMiddle() {
+	servoMotor->write(commandValueToSteeringAngle(SERVO_COMMAND_VALUE_MIDDLE));
+}
+
+void MotorHandler::setDesiredSpeed(int commandSpeed) {
+	desiredSpeed = commandValueToSpeed(commandSpeed);		// TODO send real command values
 }
 
 void MotorHandler::setSteeringAngle(int value) {
-	servoMotor->writeCommandValue(value);
+	servoMotor->write(value);
 }
 
 void MotorHandler::recalibrateServo(int value) {
@@ -107,8 +131,4 @@ void MotorHandler::attachServo() {
 
 void MotorHandler::detachServo() {
 	servoMotor->detach();
-}
-
-MotorHandler::DCMotor::DIRECTION MotorHandler::getDirection() {
-	return DC_Motor->getDirection();
 }

@@ -28,5 +28,6 @@ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\leonardo\Debug\RC_Car.cpp.o: \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\leonardo\Debug\MotorHandler.h \
  F:\Program\ Files\ (x86)\Arduino\libraries\Servo\src/Servo.h \
  F:\Program\ Files\ (x86)\Arduino\libraries\Servo\src/avr/ServoTimers.h \
+ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\leonardo\Debug\RotaryEncoder.h \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\leonardo\Debug\SensorHandler.h \
  C:\Users\Soma\Documents\Arduino\libraries\NewPing/NewPing.h
