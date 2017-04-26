@@ -48,6 +48,14 @@ uint64_t Common::milliSecs() {
 	return MILLI_SEC_COUNTER;
 }
 
+bool Common::contains(char array[], size_t arraySize, char item) {
+	for (int i = 0; i < arraySize; ++i) {
+		if (array[i] == item)
+			return true;
+	}
+	return false;
+}
+
 template <typename T>
 static void Common::arrayCopy(T dest[], T src[], size_t size) {
 	for (size_t i = 0; i < size; ++i) {

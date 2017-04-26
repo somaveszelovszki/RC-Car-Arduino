@@ -56,7 +56,7 @@ void MotorHandler::DCMotor::writeValue(int value) {
 	analogWrite(fwdPin, value >= 0 ? value : 0);
 	analogWrite(bwdPin, value >= 0 ? 0 : (-1 * value));
 
-	int prevValue = value;
+	prevValue = value;
 }
 
 int MotorHandler::DCMotor::getPreviousValue() {
@@ -69,18 +69,20 @@ void MotorHandler::watchdogDecrement() {
 
 MotorHandler::DIRECTION MotorHandler::getDirection() {
 
-	int actualSpeed = getActualSpeed();
+	int actualSpeed;
+	getActualSpeed(&actualSpeed);
 
 	return actualSpeed > 0 ? FORWARD : actualSpeed < 0 ? BACKWARD : RELEASE;
 }
 
+bool MotorHandler::getActualSpeed(int *speed) {
 
-int MotorHandler::getActualSpeed() {
+	RotaryEncoder::Result rot;
+	bool isNewValue = rotaryEncoder->readAndUpdateIfTimedOut(&rot);
 
-	RotaryEncoder::Result motorRotation = rotaryEncoder->readAndUpdateIfTimedOut();
+	*speed = MOTOR_TRANSFER_RATE * ((rot.d_pos / (double)ROTARY_RESOLUTION) * WHEEL_CIRCUMFERENCE) / rot.d_time * 1000;
 
-	return MOTOR_TRANSFER_RATE * ((motorRotation.d_pos / (double)ROTARY_RESOLUTION) * WHEEL_CIRCUMFERENCE)
-		/ motorRotation.d_time * 1000;
+	return isNewValue;
 }
 
 int MotorHandler::getDesiredSpeed() {
@@ -97,16 +99,33 @@ MotorHandler::MotorHandler(RotaryEncoder *rotaryEncoder) {
 
 void MotorHandler::initialize() {
 	attachServo();
-	positionServoMiddle();	releaseMotor();}
+	positionServoMiddle();	releaseMotor();	rotaryEncoder->initialize();}
 
 void MotorHandler::releaseMotor() {
 	setDesiredSpeed(DC_COMMAND_VALUE_STOP);
 }
 
 void MotorHandler::updateSpeed() {
-	int error = desiredSpeed - getActualSpeed();
+	int actualSpeed;
+	if (getActualSpeed(&actualSpeed)) {
+		int error = desiredSpeed - actualSpeed;
+		derivative = error - prevError;
 
-	DC_Motor->writeValue(DC_Motor->getPreviousValue() + error * SPEED_CONTROLLER_K);
+		Serial.print("desired: ");
+		Serial.print(desiredSpeed);
+		Serial.print("\tactual: ");
+		Serial.println(actualSpeed);
+		Serial.print("prev: ");
+		Serial.print(DC_Motor->getPreviousValue());
+		Serial.print("\twriting: ");
+		Serial.println(DC_Motor->getPreviousValue()
+			+ error * SPEED_CONTROLLER_Kp
+			+ derivative * SPEED_CONTROLLER_Kd);
+		Serial.println();
+		DC_Motor->writeValue(DC_Motor->getPreviousValue()
+			+ error * SPEED_CONTROLLER_Kp
+			+ derivative * SPEED_CONTROLLER_Kd);
+	}
 }
 
 void MotorHandler::positionServoMiddle() {
@@ -117,12 +136,12 @@ void MotorHandler::setDesiredSpeed(int commandSpeed) {
 	desiredSpeed = commandValueToSpeed(commandSpeed);		// TODO send real command values
 }
 
-void MotorHandler::setSteeringAngle(int value) {
-	servoMotor->write(value);
+void MotorHandler::setSteeringAngle(int commandAngle) {
+	servoMotor->write(commandValueToSteeringAngle(commandAngle));
 }
 
-void MotorHandler::recalibrateServo(int value) {
-	servoMotor->recalibrate(value);
+void MotorHandler::recalibrateServo(int commandAngle) {
+	servoMotor->recalibrate(commandValueToSteeringAngle(commandAngle));
 }
 
 void MotorHandler::attachServo() {

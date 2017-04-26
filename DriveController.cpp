@@ -57,8 +57,9 @@ void DriveController::executeCommand_DriveMode(const Command& command) {
 
 void DriveController::handleDistanceData(const unsigned long distances[ULTRASONIC_NUM_SENSORS]) {
 
-	// gets drive mode, direction and speed
-	MotorHandler::DIRECTION dir = motorHandler->getDirection();
+	// TODO remove this line
+	mode = FREE_DRIVE;
+
 
 	switch (mode) {
 	case FREE_DRIVE:
@@ -67,7 +68,7 @@ void DriveController::handleDistanceData(const unsigned long distances[ULTRASONI
 
 		// if measured distance is critical, stops the car
 		for (unsigned int sensorPos = 0; sensorPos < ULTRASONIC_NUM_SENSORS; ++sensorPos) {
-			if (isDistanceCritical((Common::POSITION) sensorPos, distances[sensorPos])) {
+			if (isDistanceCritical((SensorHandler::Ultrasonic::POSITION) sensorPos, distances[sensorPos])) {
 				releaseMotor();
 				isStopped = true;
 				stopTimer = EMERGENCY_BREAK_STOP_TIME_MS;
@@ -84,7 +85,13 @@ void DriveController::handleDistanceData(const unsigned long distances[ULTRASONI
 	}
 }
 
-bool DriveController::isDistanceCritical(Common::POSITION pos, unsigned long distance) {
+bool DriveController::isDistanceCritical(SensorHandler::Ultrasonic::POSITION pos, unsigned long distance) {
+
+	int speed;
+	motorHandler->getActualSpeed(&speed);
+
+	//Serial.print("speed: ");
+	//Serial.println(speed);
 
 	if (speed == 0) return false;
 
@@ -95,7 +102,7 @@ bool DriveController::isDistanceCritical(Common::POSITION pos, unsigned long dis
 	Serial.println(preCrashTime);
 
 	if (speed > 0) {		// FORWARD
-		if (pos == Common::POSITION::FRONT_LEFT || pos == Common::POSITION::FRONT_RIGHT) {
+		if (pos == SensorHandler::Ultrasonic::POSITION::FRONT_LEFT || pos == SensorHandler::Ultrasonic::POSITION::FRONT_RIGHT) {
 			Serial.print("distance: ");
 			Serial.print(distance);
 			Serial.print(" cm");
@@ -115,7 +122,7 @@ bool DriveController::isDistanceCritical(Common::POSITION pos, unsigned long dis
 			}
 		}
 	} else {		// BACKWARD
-		if (pos == Common::POSITION::BACK_LEFT || pos == Common::POSITION::BACK_RIGHT) {
+		if (pos == SensorHandler::Ultrasonic::POSITION::REAR_LEFT || pos == SensorHandler::Ultrasonic::POSITION::REAR_RIGHT) {
 
 			// checks if time until crash is below critical
 			if (preCrashTime <= CRITICAL_PRE_CRASH_TIME) {

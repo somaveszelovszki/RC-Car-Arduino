@@ -23,7 +23,7 @@ private:
 	bool A_set = false;
 	bool B_set = false;
 
-	int position;
+	int position = 0;
 	uint64_t time;
 
 	Result storedResult;
@@ -38,7 +38,10 @@ public:
 	void onChange_A();
 	void onChange_B();
 
-	Result readAndUpdateIfTimedOut();
+	/*
+		Returns true if timed out, so result is a new valid value
+	*/
+	bool readAndUpdateIfTimedOut(Result *result);
 
 	Watchdog *getWatchdog();
 };

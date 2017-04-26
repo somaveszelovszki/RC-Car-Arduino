@@ -13,11 +13,11 @@
 // counts loop cycles
 static unsigned long CYCLE_COUNTER = 0;
 
-Communicator *communicator;				// handles communication (data sending/receiving) with phone
-DriveController *driveController;		// controls motors according to measured distances from objects and user commands
-extern SensorHandler *sensorHandler;	// reads, validates and stores sensors' data
+extern RotaryEncoder *motorRotaryEncoder;
 
-extern RotaryEncoder *motorRotaryEncoder = new RotaryEncoder(ROTARY_ENCODER_A_PIN, ROTARY_ENCODER_B_PIN);
+Communicator *communicator = new Communicator();
+DriveController *driveController = new DriveController(motorRotaryEncoder);
+extern SensorHandler *sensorHandler;
 
 ISR(TIMER0_COMPA_vect);
 
@@ -42,14 +42,10 @@ static PT_THREAD(communicatorThread(struct pt *pt)) {
 
 	PT_WAIT_UNTIL(pt, communicator->periodCycleThresholdReached(CYCLE_COUNTER));
 
-	//Serial.println("communicatorThread running...");
-
 	// reads available characters - if command end was found, returns true
 	if (communicator->receiveChars() ) {
 
 		Command *receivedCommand = communicator->fetchCommand();
-
-		Serial.println(receivedCommand->toString());
 
 		if (receivedCommand->isValid()) {
 			switch (receivedCommand->getCode()) {
@@ -71,8 +67,7 @@ static PT_THREAD(communicatorThread(struct pt *pt)) {
 				break;
 			}
 		} else {
-			Serial.println("invalid");
-
+			Serial.println("invalid command received");
 		}
 
 		delete receivedCommand;
@@ -98,10 +93,6 @@ static PT_THREAD(sensorThread(struct pt *pt)) {
 	PT_WAIT_UNTIL(pt, sensorHandler->periodCycleThresholdReached(CYCLE_COUNTER));
 
 	driveController->updateValues();
-
-	// handles motor rotation sensor data -> updates speed
-	//SensorHandler::RotaryEncoder::Result motorRotation = sensorHandler->rotaryEncoder->readAndUpdateIfTimedOut();
-	//driveController->handleMotorRotationData(motorRotation);
 
 	// gets next ultrasonic sensor distance (will run in background and call an IT routine)
 	if (sensorHandler->ultrasonic->isEnabled() && !sensorHandler->ultrasonic->isBusy()) {
@@ -139,10 +130,6 @@ void setup() {
 	Serial.begin(115200);
 
 	Serial.println("setup...");
-
-	communicator = new Communicator();
-	driveController = new DriveController(motorRotaryEncoder);
-	sensorHandler = new SensorHandler();
 
 	communicator->initialize();
 	driveController->initialize();

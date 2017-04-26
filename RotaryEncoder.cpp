@@ -1,11 +1,10 @@
 #include "RotaryEncoder.h"
 
-RotaryEncoder *rotaryEncoder;
+RotaryEncoder *motorRotaryEncoder = new RotaryEncoder(ROTARY_ENCODER_A_PIN, ROTARY_ENCODER_B_PIN);
 
 RotaryEncoder::RotaryEncoder(uint8_t A_pin, uint8_t B_pin) {
 	this->A_pin = A_pin;
 	this->B_pin = B_pin;
-
 }
 
 void RotaryEncoder::initialize() {
@@ -36,6 +35,7 @@ void RotaryEncoder::onChange_A() {
 		// adjust counter + if A leads B
 		if (A_set && !B_set)
 			++position;
+		//Serial.println(position);
 	}
 }
 
@@ -45,27 +45,38 @@ void RotaryEncoder::onChange_B() {
 		//  adjust counter - 1 if B leads A
 		if (B_set && !A_set)
 			--position;
+		//Serial.println(position);
 	}
 }
 
-RotaryEncoder::Result RotaryEncoder::readAndUpdateIfTimedOut() {
+bool RotaryEncoder::readAndUpdateIfTimedOut(RotaryEncoder::Result *result) {
 
-	if (watchdog->checkTimeOutAndRestart()) {
+	bool timedOut = watchdog->checkTimeOutAndRestart();
+
+	if (timedOut) {
 		uint64_t milliSecs = Common::milliSecs();
 
 		storedResult.d_time = milliSecs - time;
 		storedResult.d_pos = position;
 
-		noInterrupts();
+		/*Serial.print("time: ");
+		Serial.print((int)storedResult.d_time);
+		Serial.print("\tpos: ");
+		Serial.println((int)storedResult.d_pos);*/
+
 		time = milliSecs;
+		noInterrupts();
 		position = 0;
 		interrupts();
 	}
 
-	return storedResult;
+	result->d_time = storedResult.d_time;
+	result->d_pos = storedResult.d_pos;
+
+	return timedOut;
 }
 
-Watchdog  *RotaryEncoder::getWatchdog() {
+Watchdog *RotaryEncoder::getWatchdog() {
 	return watchdog;
 }
 
@@ -73,10 +84,10 @@ Watchdog  *RotaryEncoder::getWatchdog() {
 
 // Interrupt on A changing state
 void doRotaryEncoderA() {
-	rotaryEncoder->onChange_A();
+	motorRotaryEncoder->onChange_A();
 }
 
 // Interrupt on B changing state, same as A above
 void doRotaryEncoderB() {
-	rotaryEncoder->onChange_B();
+	motorRotaryEncoder->onChange_B();
 }

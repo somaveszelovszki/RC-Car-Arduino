@@ -39,8 +39,8 @@
 #define MOTOR_TRANSFER_RATE 1.0			// transfer rate between motor and wheels (defined by car architecture)
 #define WHEEL_CIRCUMFERENCE 20.3		// circumference of motor-powered wheels - in [cm]
 
-#define SPEED_CONTROLLER_K 5
-
+#define SPEED_CONTROLLER_Kp 2
+#define SPEED_CONTROLLER_Kd 2
 
 /*
 	Handles motors - acceleration and steering.
@@ -91,6 +91,9 @@ public:
 
 private:
 
+	int prevError = 0;
+	int derivative = 0;
+
 	int desiredSpeed;
 
 	ServoMotor *servoMotor;
@@ -108,7 +111,6 @@ private:
 	*/
 	int commandValueToSteeringAngle(int commandValue);
 
-	int getActualSpeed();
 	int getDesiredSpeed();
 
 
@@ -121,6 +123,9 @@ public:
 	void releaseMotor();
 
 	void updateSpeed();
+
+	bool getActualSpeed(int *speed);
+
 
 	/*
 	Positions servo motor to middle.

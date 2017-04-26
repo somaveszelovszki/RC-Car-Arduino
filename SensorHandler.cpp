@@ -1,9 +1,6 @@
 #include "SensorHandler.h"
 
-SensorHandler *sensorHandler;
-
-SensorHandler::Ultrasonic::UltrasonicSensor::UltrasonicSensor(uint8_t trigger_pin, uint8_t echo_pin) : NewPing(trigger_pin, echo_pin, ULTRASONIC_MAX_DISTANCE) {
-}
+SensorHandler *sensorHandler = new SensorHandler();
 
 SensorHandler::Ultrasonic::Ultrasonic() {
 	setEnabled(false);
@@ -18,6 +15,11 @@ const SensorHandler::ValidationData SensorHandler::Ultrasonic::defaultValidation
 };
 
 void SensorHandler::Ultrasonic::initialize() {
+
+	pinMode(ULTRASONIC_SEL_0, OUTPUT);
+	pinMode(ULTRASONIC_SEL_1, OUTPUT);
+	pinMode(ULTRASONIC_SEL_2, OUTPUT);
+	pinMode(ULTRASONIC_SEL_3, OUTPUT);
 
 	// initializes measured distances array
 	for (unsigned int sensorPos = 0; sensorPos < ULTRASONIC_NUM_SENSORS; ++sensorPos) {
@@ -41,7 +43,7 @@ void SensorHandler::Ultrasonic::initialize() {
 
 	setEnabled(true);
 	busy = false;
-	currentSensorPos = (Common::POSITION)(ULTRASONIC_NUM_SENSORS - 1);
+	currentSensorPos = (SensorHandler::Ultrasonic::POSITION)(ULTRASONIC_NUM_SENSORS - 1);
 	currentSampleIndex = ULTRASONIC_NUM_DISTANCE_SAMPLES - 1;
 }
 
@@ -79,25 +81,26 @@ void SensorHandler::Ultrasonic::pingNextSensor() {
 	}
 
 	// increases sensor position
-	currentSensorPos = (Common::POSITION)((int)(currentSensorPos + 1) % ULTRASONIC_NUM_SENSORS);
-
+	currentSensorPos = (SensorHandler::Ultrasonic::POSITION)((int)(currentSensorPos + 1) % ULTRASONIC_NUM_SENSORS);
+	//currentSensorPos = FRONT_LEFT;
 	// if sensor is not responsive, does not ping it
 	//if (!responsive[currentSensorPos]) return;
 
 	busy = true;
-	sensors[currentSensorPos].timer_stop();          // Make sure previous timer is canceled before starting a new ping (insurance).
+	sensorConnection->timer_stop();          // Make sure previous timer is canceled before starting a new ping (insurance).
 	measuredDistances[currentSensorPos] = ULTRASONIC_MAX_DISTANCE;                      // in case there's no ping echo for this sensor.
-	sensors[currentSensorPos].ping_timer(ultrasonicEchoCheckIT); // Do the ping (processing continues, interrupt will call echoCheck to look for echo).
+	updateSensorSelection();
+	sensorConnection->ping_timer(ultrasonicEchoCheckIT); // Do the ping (processing continues, interrupt will call echoCheck to look for echo).
 	watchdog->restart();
 }
 
 void SensorHandler::Ultrasonic::echoCheck() { // If ping received, set the sensor distance to array.
 
-	if (sensors[currentSensorPos].check_timer()) {
+	if (sensorConnection->check_timer()) {
 
 		watchdog->reset();
 
-		measuredDistances[currentSensorPos] = sensors[currentSensorPos].ping_result / US_ROUNDTRIP_CM;
+		measuredDistances[currentSensorPos] = sensorConnection->ping_result / US_ROUNDTRIP_CM;
 
 		if (measuredDistances[currentSensorPos] == 0) {
 			measuredDistances[currentSensorPos] = ULTRASONIC_MAX_DISTANCE;
@@ -109,21 +112,19 @@ void SensorHandler::Ultrasonic::echoCheck() { // If ping received, set the senso
 
 void SensorHandler::Ultrasonic::updateDistances() {
 	for (unsigned int sensorPos = 0; sensorPos < ULTRASONIC_NUM_SENSORS; ++sensorPos) {
-		updateDistances((Common::POSITION) sensorPos);
+		updateDistances((SensorHandler::Ultrasonic::POSITION) sensorPos);
 		//Serial.print(validatedDistances[sensorPos][currentSampleIndex]);
 		//if (sensorPos != ULTRASONIC_NUM_SENSORS - 1) Serial.print(", ");
 	}
 
-	//Serial.println();
-
 	//Serial.print("stored: ");
-	//Serial.print(storedDistances[Common::POSITION::FRONT_LEFT][currentSampleIndex]);
+	//Serial.print(storedDistances[SensorHandler::Ultrasonic::POSITION::FRONT_LEFT][currentSampleIndex]);
 	//Serial.print("\t\t");
 	//Serial.print("validated: ");
-	//Serial.println(validatedDistances[Common::POSITION::FRONT_LEFT][currentSampleIndex]);
+	//Serial.println(validatedDistances[SensorHandler::Ultrasonic::POSITION::FRONT_LEFT][currentSampleIndex]);
 }
 
-void SensorHandler::Ultrasonic::updateDistances(Common::POSITION sensorPos) {
+void SensorHandler::Ultrasonic::updateDistances(SensorHandler::Ultrasonic::POSITION sensorPos) {
 
 	storedDistances[sensorPos][currentSampleIndex] = measuredDistances[sensorPos];
 
@@ -136,7 +137,7 @@ void SensorHandler::Ultrasonic::updateDistances(Common::POSITION sensorPos) {
 	}
 }
 
-void SensorHandler::Ultrasonic::validate(Common::POSITION sensorPos, ValidationData validationData) {
+void SensorHandler::Ultrasonic::validate(SensorHandler::Ultrasonic::POSITION sensorPos, ValidationData validationData) {
 
 	unsigned long prevValidatedValue = validatedDistances[sensorPos][(currentSampleIndex + ULTRASONIC_NUM_DISTANCE_SAMPLES - 1) % ULTRASONIC_NUM_DISTANCE_SAMPLES];
 	unsigned long currentStoredValue = storedDistances[sensorPos][currentSampleIndex];
@@ -192,6 +193,17 @@ bool SensorHandler::Ultrasonic::isInRange(unsigned long ref, unsigned long value
 	return value <= max && value >= min;
 }
 
+void SensorHandler::Ultrasonic::updateSensorSelection() {
+
+	uint8_t pos = (uint8_t)currentSensorPos;
+
+	// writes position to selection wires (as binary value)
+	digitalWrite(ULTRASONIC_SEL_0, (pos & 0x01) != 0 ? HIGH : LOW);
+	digitalWrite(ULTRASONIC_SEL_1, (pos & 0x02) != 0 ? HIGH : LOW);
+	digitalWrite(ULTRASONIC_SEL_2, (pos & 0x04) != 0 ? HIGH : LOW);
+	digitalWrite(ULTRASONIC_SEL_3, (pos & 0x08) != 0 ? HIGH : LOW);
+}
+
 void SensorHandler::Ultrasonic::copyCurrentValidatedDistances(unsigned long dest[ULTRASONIC_NUM_SENSORS]) {
 
 	for (unsigned int sensorPos = 0; sensorPos < ULTRASONIC_NUM_SENSORS; ++sensorPos) {
@@ -209,7 +221,7 @@ Watchdog *SensorHandler::Ultrasonic::getWatchdog() const {
 
 void SensorHandler::Ultrasonic::onWatchdogTimedOut() {
 	//responsive[currentSensorPos] = false;
-	sensors[currentSensorPos].timer_stop();
+	sensorConnection->timer_stop();
 
 	/*Serial.print("not responsive: ");
 	char s[1];

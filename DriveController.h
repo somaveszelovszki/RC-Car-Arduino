@@ -26,15 +26,13 @@ public:
 
 private:
 	MODE mode;
+
 	MotorHandler *motorHandler;
 
 	// needed when program in SAFE_DRIVE mode stops car
 	bool isStopped = false;
 
-	int speed = 0;		// wheel speed in cm/sec
-
 public:
-
 	DriveController(RotaryEncoder *rotaryEncoder);
 
 	/*
@@ -72,7 +70,7 @@ public:
 		Decides if given distance at given position and at given speed is critical - need to stop the car.
 		TODO replace with DANGER_LEVELs
 	*/
-	bool isDistanceCritical(Common::POSITION pos, unsigned long distance);
+	bool isDistanceCritical(SensorHandler::Ultrasonic::POSITION pos, unsigned long distance);
 
 	/*
 		Stops DC motor.

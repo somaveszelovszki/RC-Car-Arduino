@@ -13,19 +13,6 @@ public:
 		BOTH
 	};
 
-	/*
-		If you add a position, update POSITION_COUNT
-	*/
-	enum POSITION {
-		FRONT_LEFT = 0,
-		FRONT_RIGHT = 1,
-		BACK_LEFT = 2,
-		BACK_RIGHT = 3,
-		LEFT = 4,
-		RIGHT = 5
-	};
-	static const unsigned int POSITION_COUNT = 6;
-
 	static size_t write(Print& printer, const String& str);
 
 	static void initTimer();
@@ -37,7 +24,7 @@ public:
 
 	static uint64_t milliSecs();
 
-
+	static bool contains(char array[], size_t arraySize, char item);
 };
 
 #endif

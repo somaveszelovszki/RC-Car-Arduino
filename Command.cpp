@@ -51,7 +51,14 @@ bool Command::isValid(char c) const {
 
 	if (c >= 'A' && c <= 'Z') return true;
 
-	if (c == ' ' || c == '_') return true;
+	size_t charsNum = 3;
+	char chars[] = {
+		' ',
+		'_',
+		'-'
+	};
+
+	if (Common::contains(chars, charsNum, c)) return true;
 
 	return false;
 }
