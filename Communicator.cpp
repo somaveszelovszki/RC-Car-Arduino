@@ -1,11 +1,12 @@
-#include "Communicator.h"
+#include "Communicator.hpp"
 
 Communicator::Communicator() : PeriodicThread(DEFAULT_CYCLE_PERIOD) {
-	bluetoothSerial = new SoftwareSerial(BLUETOOTH_RX_PIN, BLUETOOTH_TX_PIN);
+	//commSerial = new SoftwareSerial(BLUETOOTh_RX_PIN, BLUETOOTh_TX_PIN);
+	commSerial = new AltSoftSerial(0, 0);
 }
 
 void Communicator::initialize() {
-	bluetoothSerial->begin(BLUETOOTH_BAUD_RATE);
+	commSerial->begin(BLUETOOTH_BAUD_RATE);
 
 	watchdog->restart();
 }
@@ -13,11 +14,11 @@ void Communicator::initialize() {
 bool Communicator::receiveChars() {
 
 	// gets number of available characters
-	int availableChars = bluetoothSerial->available();
+	int availableChars = commSerial->available();
 
 	// reads and stores characters one by one
 	for (int i = 0; i < availableChars; ++i) {
-		char c = bluetoothSerial->read();
+		char c = commSerial->read();
 
 		recvBuffer += c;
 
@@ -42,7 +43,7 @@ Command *Communicator::fetchCommand() {
 
 
 size_t Communicator::sendCommand(const Command& command) {
-	return Common::write(*bluetoothSerial, command.toString());
+	return Common::write(*commSerial, command.toString());
 }
 
 Watchdog *Communicator::getWatchdog() const {
@@ -50,6 +51,6 @@ Watchdog *Communicator::getWatchdog() const {
 }
 
 Communicator::~Communicator() {
-	delete &bluetoothSerial;
+	delete &commSerial;
 }
 

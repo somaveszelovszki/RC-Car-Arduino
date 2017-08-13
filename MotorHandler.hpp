@@ -1,16 +1,15 @@
-#ifndef MOTORHANDLER_H
-#define MOTORHANDLER_H
+#ifndef MOTORHANDLER_HPP
+#define MOTORHANDLER_HPP
 
 #include <Servo.h>
-//#include <Adafruit_MotorShield.h>
 
-#include "Command.h"
-#include "RotaryEncoder.h"
+#include "Command.hpp"
+#include "RotaryEncoder.hpp"
 
 // servo pin
 #define SERVO_PIN 9
 
-#define DC_MOTOR_FORWARD_PIN 5
+#define DC_MOTOR_FORWARD_PIN 3
 #define DC_MOTOR_BACKWARD_PIN 11
 
 // servo command value range (0 is servo middle position)
@@ -36,7 +35,8 @@
 
 #define MAX_SPEED 55 // [cm/sec]
 
-#define MOTOR_TRANSFER_RATE 1.0			// transfer rate between motor and wheels (defined by car architecture)
+#define MOTOR_ROTARY_TRANSFER_RATE 3.0
+#define MOTOR_WHEEL_TRANSFER_RATE 1.0			// transfer rate between motor and wheels (defined by car architecture)
 #define WHEEL_CIRCUMFERENCE 20.3		// circumference of motor-powered wheels - in [cm]
 
 #define SPEED_CONTROLLER_Kp 2
@@ -91,8 +91,8 @@ public:
 
 private:
 
-	int prevError = 0;
-	int derivative = 0;
+	double prevError = 0.0;
+	double derivative = 0.0;
 
 	int desiredSpeed;
 
@@ -113,6 +113,9 @@ private:
 
 	int getDesiredSpeed();
 
+	//int rotationToSpeed(int rotation, int d_time);
+	//int speedToRotation(int speed, int d_time);
+
 
 public:
 // TODO
@@ -124,7 +127,7 @@ public:
 
 	void updateSpeed();
 
-	bool getActualSpeed(int *speed);
+	bool getActualSpeed(double *speed);
 
 
 	/*
@@ -144,4 +147,4 @@ public:
 	DIRECTION getDirection();
 };
 
-#endif
+#endif	// MOTORHANDLER_HPP

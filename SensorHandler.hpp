@@ -1,19 +1,19 @@
-#ifndef SENSORHANDLER_H
-#define SENSORHANDLER_H
+#ifndef SENSORHANDLER_HPP
+#define SENSORHANDLER_HPP
 
-#include "Watchdog.h"
-#include "PeriodicThread.h"
+#include "Watchdog.hpp"
+#include "PeriodicThread.hpp"
 #include <NewPing.h>
 
 #define ULTRASONIC_TRIGGER_PIN A4
 #define ULTRASONIC_ECHO_PIN ULTRASONIC_TRIGGER_PIN
 
-#define ULTRASONIC_SEL_0 A0
-#define ULTRASONIC_SEL_1 A1
-#define ULTRASONIC_SEL_2 A2
-#define ULTRASONIC_SEL_3 A3
+#define ULTRASONIC_SEL_0_PIN A0
+#define ULTRASONIC_SEL_1_PIN A1
+#define ULTRASONIC_SEL_2_PIN A2
+#define ULTRASONIC_SEL_3_PIN A3
 
-#define ULTRASONIC_NUM_SENSORS 4
+#define ULTRASONIC_NUM_SENSORS 8
 #define ULTRASONIC_NUM_DISTANCE_SAMPLES 10
 #define ULTRASONIC_MAX_DISTANCE 200
 
@@ -132,4 +132,4 @@ public:
 
 void ultrasonicEchoCheckIT();
 
-#endif
+#endif	// SENSORHANDLER_HPP

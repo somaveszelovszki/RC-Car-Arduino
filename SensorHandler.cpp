@@ -1,4 +1,4 @@
-#include "SensorHandler.h"
+#include "SensorHandler.hpp"
 
 SensorHandler *sensorHandler = new SensorHandler();
 
@@ -16,10 +16,10 @@ const SensorHandler::ValidationData SensorHandler::Ultrasonic::defaultValidation
 
 void SensorHandler::Ultrasonic::initialize() {
 
-	pinMode(ULTRASONIC_SEL_0, OUTPUT);
-	pinMode(ULTRASONIC_SEL_1, OUTPUT);
-	pinMode(ULTRASONIC_SEL_2, OUTPUT);
-	pinMode(ULTRASONIC_SEL_3, OUTPUT);
+	pinMode(ULTRASONIC_SEL_0_PIN, OUTPUT);
+	pinMode(ULTRASONIC_SEL_1_PIN, OUTPUT);
+	pinMode(ULTRASONIC_SEL_2_PIN, OUTPUT);
+	pinMode(ULTRASONIC_SEL_3_PIN, OUTPUT);
 
 	// initializes measured distances array
 	for (unsigned int sensorPos = 0; sensorPos < ULTRASONIC_NUM_SENSORS; ++sensorPos) {
@@ -82,7 +82,7 @@ void SensorHandler::Ultrasonic::pingNextSensor() {
 
 	// increases sensor position
 	currentSensorPos = (SensorHandler::Ultrasonic::POSITION)((int)(currentSensorPos + 1) % ULTRASONIC_NUM_SENSORS);
-	//currentSensorPos = FRONT_LEFT;
+	
 	// if sensor is not responsive, does not ping it
 	//if (!responsive[currentSensorPos]) return;
 
@@ -116,6 +116,8 @@ void SensorHandler::Ultrasonic::updateDistances() {
 		//Serial.print(validatedDistances[sensorPos][currentSampleIndex]);
 		//if (sensorPos != ULTRASONIC_NUM_SENSORS - 1) Serial.print(", ");
 	}
+
+	//Serial.println();
 
 	//Serial.print("stored: ");
 	//Serial.print(storedDistances[SensorHandler::Ultrasonic::POSITION::FRONT_LEFT][currentSampleIndex]);
@@ -198,10 +200,10 @@ void SensorHandler::Ultrasonic::updateSensorSelection() {
 	uint8_t pos = (uint8_t)currentSensorPos;
 
 	// writes position to selection wires (as binary value)
-	digitalWrite(ULTRASONIC_SEL_0, (pos & 0x01) != 0 ? HIGH : LOW);
-	digitalWrite(ULTRASONIC_SEL_1, (pos & 0x02) != 0 ? HIGH : LOW);
-	digitalWrite(ULTRASONIC_SEL_2, (pos & 0x04) != 0 ? HIGH : LOW);
-	digitalWrite(ULTRASONIC_SEL_3, (pos & 0x08) != 0 ? HIGH : LOW);
+	digitalWrite(ULTRASONIC_SEL_0_PIN, (pos & 0x01) != 0 ? HIGH : LOW);
+	digitalWrite(ULTRASONIC_SEL_1_PIN, (pos & 0x02) != 0 ? HIGH : LOW);
+	digitalWrite(ULTRASONIC_SEL_2_PIN, (pos & 0x04) != 0 ? HIGH : LOW);
+	digitalWrite(ULTRASONIC_SEL_3_PIN, (pos & 0x08) != 0 ? HIGH : LOW);
 }
 
 void SensorHandler::Ultrasonic::copyCurrentValidatedDistances(unsigned long dest[ULTRASONIC_NUM_SENSORS]) {

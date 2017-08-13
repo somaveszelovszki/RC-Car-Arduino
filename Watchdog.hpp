@@ -1,7 +1,7 @@
-#ifndef WATCHDOG_H
-#define WATCHDOG_H
+#ifndef WATCHDOG_HPP
+#define WATCHDOG_HPP
 
-#include "Common.h"
+#include "Common.hpp"
 
 /**
    Command class contains data about a received command.
@@ -34,5 +34,5 @@ public:
 	bool checkTimeOutAndRestart();
 };
 
-#endif
+#endif	// WATCHDOG_HPP
 

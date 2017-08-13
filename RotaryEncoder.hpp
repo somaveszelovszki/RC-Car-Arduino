@@ -1,10 +1,10 @@
-#ifndef ROTARYENCODER_H
-#define ROTARYENCODER_H
+#ifndef ROTARYENCODER_HPP
+#define ROTARYENCODER_HPP
 
-#include "Watchdog.h"
+#include "Watchdog.hpp"
 
-#define ROTARY_ENCODER_A_PIN 2
-#define ROTARY_ENCODER_B_PIN 3
+#define ROTARY_ENCODER_A_PIN 0
+#define ROTARY_ENCODER_B_PIN 1
 
 #define ROTARY_RESOLUTION 20
 
@@ -44,9 +44,12 @@ public:
 	bool readAndUpdateIfTimedOut(Result *result);
 
 	Watchdog *getWatchdog();
+
+	void disableInterrupts();
+	void enableInterrupts();
 };
 
 void doRotaryEncoderA();
 void doRotaryEncoderB();
 
-#endif
+#endif	// ROTARYENCODER_HPP

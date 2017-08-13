@@ -1,4 +1,4 @@
-#include "RotaryEncoder.h"
+#include "RotaryEncoder.hpp"
 
 RotaryEncoder *motorRotaryEncoder = new RotaryEncoder(ROTARY_ENCODER_A_PIN, ROTARY_ENCODER_B_PIN);
 
@@ -15,9 +15,9 @@ void RotaryEncoder::initialize() {
 	digitalWrite(ROTARY_ENCODER_B_PIN, HIGH);
 
 	// encoder pin on interrupt 0 (pin 2)
-	attachInterrupt(0, doRotaryEncoderA, CHANGE);
+	attachInterrupt(digitalPinToInterrupt(ROTARY_ENCODER_A_PIN), doRotaryEncoderA, CHANGE);
 	// encoder pin on interrupt 1 (pin 3)
-	attachInterrupt(1, doRotaryEncoderB, CHANGE);
+	//attachInterrupt(digitalPinToInterrupt(ROTARY_ENCODER_B_PIN), doRotaryEncoderB, CHANGE);
 
 	watchdog->restart();
 
@@ -28,24 +28,25 @@ void RotaryEncoder::initialize() {
 }
 
 void RotaryEncoder::onChange_A() {
-	// Test transition, did things really change? 
-	if (digitalRead(ROTARY_ENCODER_A_PIN) != A_set) {  // debounce once more
-		A_set = !A_set;
+	A_set = digitalRead(ROTARY_ENCODER_A_PIN);
+	if (A_set == digitalRead(ROTARY_ENCODER_A_PIN)) {
 
-		// adjust counter + if A leads B
+		// adjust counter + 1 if A leads B
 		if (A_set && !B_set)
 			++position;
-		//Serial.println(position);
+		Serial.println("A");
 	}
 }
 
 void RotaryEncoder::onChange_B() {
-	if (digitalRead(ROTARY_ENCODER_B_PIN) != B_set) {
-		B_set = !B_set;
+	B_set = digitalRead(ROTARY_ENCODER_B_PIN);
+	if (B_set == digitalRead(ROTARY_ENCODER_B_PIN)) {
+
 		//  adjust counter - 1 if B leads A
 		if (B_set && !A_set)
 			--position;
 		//Serial.println(position);
+		Serial.println("B");
 	}
 }
 
@@ -80,14 +81,22 @@ Watchdog *RotaryEncoder::getWatchdog() {
 	return watchdog;
 }
 
+void RotaryEncoder::disableInterrupts() {
+	detachInterrupt(digitalPinToInterrupt(ROTARY_ENCODER_A_PIN));
+}
+
+void RotaryEncoder::enableInterrupts() {
+	attachInterrupt(digitalPinToInterrupt(ROTARY_ENCODER_A_PIN), doRotaryEncoderA, CHANGE);
+}
+
 
 
 // Interrupt on A changing state
 void doRotaryEncoderA() {
-	motorRotaryEncoder->onChange_A();
+	//motorRotaryEncoder->onChange_A();
 }
 
 // Interrupt on B changing state, same as A above
 void doRotaryEncoderB() {
-	motorRotaryEncoder->onChange_B();
+	//motorRotaryEncoder->onChange_B();
 }

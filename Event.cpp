@@ -1,4 +1,4 @@
-#include "Event.h"
+#include "Event.hpp"
 
 Event::Event(WHAT what) {
 	this->what = what;

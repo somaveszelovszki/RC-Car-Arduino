@@ -1,4 +1,4 @@
-#include "Common.h"
+#include "Common.hpp"
 
 size_t Common::write(Print& printer, const String& str) {
 
@@ -14,27 +14,6 @@ size_t Common::write(Print& printer, const String& str) {
 
 void Common::initTimer() {
 	noInterrupts();
-
-	// initializes Timer3 - interrupt in every 1 ms
-
-	/*
-	
-	// sets compare match register for 1kHz increments
-	OCR3A = 249;	// = (16*10^6) / (1000*64) - 1 (must be <256)
-
-	TCCR3A = 0;     // set entire TCCR1A register to 0
-	TCCR3B = 0;     // same for TCCR1B
-
-	// sets CS21 and CS20 bits for 64 prescaler
-	TCCR3B |= (1 << CS31) | (1 << CS30);
-
-	// turns on CTC mode (Clear Timer on Compare Match)
-	TCCR3B |= (1 << WGM32);
-
-	// enables timer compare interrupt
-	TIMSK3 |= _BV(OCIE3A);
-
-	*/
 
 	// Timer0 is already used for millis() - we'll just interrupt somewhere
 	// in the middle and call the "Compare A" function below
@@ -54,6 +33,26 @@ bool Common::contains(char array[], size_t arraySize, char item) {
 			return true;
 	}
 	return false;
+}
+
+double Common::degreeToRadian(double degree) {
+	return degree * DEG_TO_RAD;
+
+}
+
+double Common::radianToDegree(double radian) {
+	return radian * RAD_TO_DEG;
+}
+
+template <typename T>
+double Common::pythagoreanHypotenuse(T a, T b) {
+	return sqrt(static_cast<double>(a) * static_cast<double>(a) + static_cast<double>(b) * static_cast<double>(b));
+}
+
+template<typename T>
+bool Common::isBetween(T value, T boundary1, T boundary2) {
+	return boundary2 >= boundary1 ? value >= boundary1 && value <= boundary2
+		: value >= boundary2 && value <= boundary1;
 }
 
 template <typename T>

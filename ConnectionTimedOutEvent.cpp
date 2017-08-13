@@ -1,4 +1,4 @@
-#include "ConnectionTimedOutEvent.h"
+#include "ConnectionTimedOutEvent.hpp"
 
 ConnectionTimedOutEvent::ConnectionTimedOutEvent() : Event(WHAT::ConnectionTimedOut) {
 }

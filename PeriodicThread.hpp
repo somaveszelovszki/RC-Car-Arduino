@@ -1,7 +1,7 @@
-#ifndef PERIODICTHREAD
-#define PERIODICTHREAD
+#ifndef PERIODICTHREAD_HPP
+#define PERIODICTHREAD_HPP
 
-#include "Common.h"
+#include "Common.hpp"
 
 class PeriodicThread {
 
@@ -16,7 +16,7 @@ public:
 	bool periodCycleThresholdReached(unsigned long cycleCounter);
 };
 
-#endif
+#endif	// PERIODICTHREAD_HPP
 
 
 

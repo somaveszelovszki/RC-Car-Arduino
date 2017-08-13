@@ -1,8 +1,8 @@
-#ifndef DRIVECONTROLLER_H
-#define DRIVECONTROLLER_H
+#ifndef DRIVECONTROLLER_HPP
+#define DRIVECONTROLLER_HPP
 
-#include "MotorHandler.h"
-#include "SensorHandler.h"
+#include "MotorHandler.hpp"
+#include "SensorHandler.hpp"
 
 #define EMERGENCY_BREAK_STOP_TIME_MS 3000;
 
@@ -89,6 +89,5 @@ public:
 
 };
 
-
-#endif
+#endif	// DRIVECONTROLLER_HPP
 

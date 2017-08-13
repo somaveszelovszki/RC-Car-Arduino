@@ -1,4 +1,4 @@
-#include "DriveController.h"
+#include "DriveController.hpp"
 
 DriveController::DriveController(RotaryEncoder *rotaryEncoder) {
 	motorHandler = new MotorHandler(rotaryEncoder);
@@ -26,7 +26,7 @@ void DriveController::executeCommand_Speed(const Command& command) {
 		break;
 	case SAFE_DRIVE:
 
-		// if motor has been stopped by the program and the stop timer hasn't finshed, does not let motor run
+		// if motor has been stopped by the program and the stop timer hasn't finished, does not let motor run
 		if (isStopped) {
 			if (stopTimer == 0) {
 				isStopped = false;
@@ -57,10 +57,6 @@ void DriveController::executeCommand_DriveMode(const Command& command) {
 
 void DriveController::handleDistanceData(const unsigned long distances[ULTRASONIC_NUM_SENSORS]) {
 
-	// TODO remove this line
-	mode = FREE_DRIVE;
-
-
 	switch (mode) {
 	case FREE_DRIVE:
 		return;
@@ -87,7 +83,7 @@ void DriveController::handleDistanceData(const unsigned long distances[ULTRASONI
 
 bool DriveController::isDistanceCritical(SensorHandler::Ultrasonic::POSITION pos, unsigned long distance) {
 
-	int speed;
+	double speed;
 	motorHandler->getActualSpeed(&speed);
 
 	//Serial.print("speed: ");
@@ -96,7 +92,7 @@ bool DriveController::isDistanceCritical(SensorHandler::Ultrasonic::POSITION pos
 	if (speed == 0) return false;
 
 	// time until crash with given speed
-	double preCrashTime = distance / abs((double)speed);
+	double preCrashTime = distance / abs(speed);
 
 	Serial.print("pre crash time: ");
 	Serial.println(preCrashTime);
@@ -117,7 +113,7 @@ bool DriveController::isDistanceCritical(SensorHandler::Ultrasonic::POSITION pos
 			// checks if time until crash is below critical
 			if (preCrashTime <= CRITICAL_PRE_CRASH_TIME) {
 				Serial.print("\t->\t");
-				Serial.println("CRITICAL!!!!!!!!!!!!!!");
+				Serial.println("CRITICAL!");
 				return true;
 			}
 		}

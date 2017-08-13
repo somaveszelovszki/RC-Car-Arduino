@@ -1,7 +1,7 @@
-#ifndef EVENT_H
-#define EVENT_H
+#ifndef EVENT_HPP
+#define EVENT_HPP
 
-#include "Common.h"
+#include "Common.hpp"
 
 class Event {
 public:
@@ -21,4 +21,4 @@ public:
 	WHAT getWhat();
 };
 
-#endif
+#endif	// EVENT_HPP

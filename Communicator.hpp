@@ -1,14 +1,15 @@
-#ifndef COMMUNICATOR_H
-#define COMMUNICATOR_H
+#ifndef COMMUNICATOR_HPP
+#define COMMUNICATOR_HPP
 
 #include <SoftwareSerial.h>
-#include "Command.h"
-#include "PeriodicThread.h"
-#include "Watchdog.h"
+#include "AltSoftSerial.h"
+#include "Command.hpp"
+#include "PeriodicThread.hpp"
+#include "Watchdog.hpp"
 
 
-#define BLUETOOTH_RX_PIN 8
-#define BLUETOOTH_TX_PIN 10
+#define BLUETOOTH_RX_PIN 6
+#define BLUETOOTH_TX_PIN 13
 
 #define BLUETOOTH_BAUD_RATE 9600
 #define WATCHDOG_TIMEOUT 1000
@@ -18,7 +19,8 @@
 */
 class Communicator : public PeriodicThread {
 private:
-	SoftwareSerial *bluetoothSerial;
+	//SoftwareSerial *commSerial;
+	AltSoftSerial *commSerial;
 
 	String recvBuffer = "";
 
@@ -61,4 +63,4 @@ public:
 	~Communicator();
 };
 
-#endif
+#endif	// COMMUNICATOR_HPP

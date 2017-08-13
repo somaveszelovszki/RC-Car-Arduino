@@ -1,12 +1,11 @@
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef COMMON_HPP
+#define COMMON_HPP
 
 #include <Arduino.h>
-#include <stdlib.h>
+#include <math.h>
 
 class Common {
 public:
-
 	enum ERROR_SIGN {
 		POSITIVE,
 		NEGATIVE,
@@ -25,6 +24,15 @@ public:
 	static uint64_t milliSecs();
 
 	static bool contains(char array[], size_t arraySize, char item);
+
+	static double degreeToRadian(double degree);
+	static double radianToDegree(double radian);
+
+	template <typename T>
+	static double pythagoreanHypotenuse(T a, T b);
+
+	template <typename T>
+	static bool isBetween(T value, T boundary1, T boundary2);
 };
 
-#endif
+#endif	// COMMON_HPP

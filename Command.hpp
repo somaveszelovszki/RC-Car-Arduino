@@ -1,7 +1,7 @@
-#ifndef COMMAND_H
-#define COMMAND_H
+#ifndef COMMAND_HPP
+#define COMMAND_HPP
 
-#include "Common.h"
+#include "Common.hpp"
 
 #define COMMAND_END_CHAR ';'
 #define COMMAND_SEPARATOR_CHAR ':'
@@ -46,5 +46,5 @@ public:
 	bool isValid(char c) const;
 };
 
-#endif
+#endif	// COMMAND_HPP
 

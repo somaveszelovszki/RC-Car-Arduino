@@ -6,9 +6,9 @@
 */
 
 #include <pt.h>
-#include "Communicator.h"
-#include "DriveController.h"
-#include "SensorHandler.h"
+#include "Communicator.hpp"
+#include "DriveController.hpp"
+#include "SensorHandler.hpp"
 
 // counts loop cycles
 static unsigned long CYCLE_COUNTER = 0;
@@ -34,6 +34,8 @@ void onCommunicationTimedOut();
 static struct pt communicator_pt;
 static struct pt sensor_pt;
 
+int invalidCntr = 0;
+
 /*
 	Sends data to and receives data from phone.
 */
@@ -43,11 +45,19 @@ static PT_THREAD(communicatorThread(struct pt *pt)) {
 	PT_WAIT_UNTIL(pt, communicator->periodCycleThresholdReached(CYCLE_COUNTER));
 
 	// reads available characters - if command end was found, returns true
+	
+	//motorRotaryEncoder->disableInterrupts();
+
 	if (communicator->receiveChars() ) {
+
+		//motorRotaryEncoder->enableInterrupts();
 
 		Command *receivedCommand = communicator->fetchCommand();
 
+		Serial.println(receivedCommand->toString());
+
 		if (receivedCommand->isValid()) {
+				
 			switch (receivedCommand->getCode()) {
 
 			case Command::CODE::Speed:
@@ -66,12 +76,17 @@ static PT_THREAD(communicatorThread(struct pt *pt)) {
 				driveController->executeCommand_DriveMode(*receivedCommand);
 				break;
 			}
+			invalidCntr = 0;
 		} else {
 			Serial.println("invalid command received");
+			
+			if (++invalidCntr >= 3)
+				driveController->releaseMotor();
 		}
 
 		delete receivedCommand;
-	}
+	} /*else
+		motorRotaryEncoder->enableInterrupts();*/
 
 	// checks if communication timed out
 	if (communicator->getWatchdog()->timedOut()) {
@@ -153,21 +168,6 @@ void loop() {
 
 	communicatorThread(&communicator_pt);
 	sensorThread(&sensor_pt);
-
-	/*for (int i = 0; i < 100; i++) {
-		Command *command;
-		char s[3];
-		itoa(i, s, 10);
-	
-		Serial.println(i);
-
-		command = new Command(Command::CODE::Speed, s);
-		driveController->executeCommand_Speed(*command);
-		delete command;
-
-
-		delay(15);
-	}*/
 }
 
 

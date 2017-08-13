@@ -1,4 +1,4 @@
-#include "PeriodicThread.h"
+#include "PeriodicThread.hpp"
 
 PeriodicThread::PeriodicThread(unsigned long cyclePeriod) {
 

@@ -1,4 +1,4 @@
-#include "Watchdog.h"
+#include "Watchdog.hpp"
 
 Watchdog::Watchdog(unsigned int timeout) {
 	TIMEOUT = timeout;
