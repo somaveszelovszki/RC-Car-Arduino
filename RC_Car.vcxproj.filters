@@ -21,22 +21,10 @@
     <ClInclude Include="__vm\.RC_Car.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CarSpecs.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Command.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Common.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Communicator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ConnectionTimedOutEvent.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DriveController.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Event.hpp">
@@ -54,13 +42,25 @@
     <ClInclude Include="RotaryEncoder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SensorHandler.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Trajectory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Watchdog.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="def.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Ultrasonic.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DriveThread.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CommunicatorThread.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SensorThread.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -74,10 +74,7 @@
     <ClCompile Include="Communicator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ConnectionTimedOutEvent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DriveController.cpp">
+    <ClCompile Include="DriveThread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Event.cpp">
@@ -95,13 +92,19 @@
     <ClCompile Include="RotaryEncoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SensorHandler.cpp">
+    <ClCompile Include="SensorThread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Trajectory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Watchdog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Ultrasonic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DriveThread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

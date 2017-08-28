@@ -80,35 +80,35 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CarSpecs.hpp" />
+    <ClInclude Include="def.hpp" />
     <ClInclude Include="Command.hpp" />
     <ClInclude Include="Common.hpp" />
-    <ClInclude Include="Communicator.hpp" />
-    <ClInclude Include="ConnectionTimedOutEvent.hpp" />
-    <ClInclude Include="DriveController.hpp" />
+    <ClInclude Include="CommunicatorThread.hpp" />
+    <ClInclude Include="DriveThread.hpp" />
     <ClInclude Include="Event.hpp" />
     <ClInclude Include="MotorHandler.hpp" />
     <ClInclude Include="PeriodicThread.hpp" />
     <ClInclude Include="Point.hpp" />
     <ClInclude Include="RotaryEncoder.hpp" />
-    <ClInclude Include="SensorHandler.hpp" />
+    <ClInclude Include="SensorThread.hpp" />
     <ClInclude Include="Trajectory.hpp" />
+    <ClInclude Include="Ultrasonic.hpp" />
     <ClInclude Include="Watchdog.hpp" />
     <ClInclude Include="__vm\.RC_Car.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Command.cpp" />
     <ClCompile Include="Common.cpp" />
-    <ClCompile Include="Communicator.cpp" />
-    <ClCompile Include="ConnectionTimedOutEvent.cpp" />
-    <ClCompile Include="DriveController.cpp" />
+    <ClCompile Include="CommunicatorThread.cpp" />
+    <ClCompile Include="DriveThread.cpp" />
     <ClCompile Include="Event.cpp" />
     <ClCompile Include="MotorHandler.cpp" />
     <ClCompile Include="PeriodicThread.cpp" />
     <ClCompile Include="Point.cpp" />
     <ClCompile Include="RotaryEncoder.cpp" />
-    <ClCompile Include="SensorHandler.cpp" />
+    <ClCompile Include="SensorThread.cpp" />
     <ClCompile Include="Trajectory.cpp" />
+    <ClCompile Include="Ultrasonic.cpp" />
     <ClCompile Include="Watchdog.cpp" />
   </ItemGroup>
   <PropertyGroup>

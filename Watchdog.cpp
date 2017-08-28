@@ -1,6 +1,6 @@
 #include "Watchdog.hpp"
 
-Watchdog::Watchdog(unsigned int timeout) {
+Watchdog::Watchdog(int timeout) {
 	TIMEOUT = timeout;
 	running = false;
 }
@@ -37,14 +37,14 @@ void Watchdog::decrement() {
 }
 
 bool Watchdog::timedOut() {
+	bool result = false;
 	noInterrupts();
 	if (counter == 0) {
 		reset();
-		interrupts();
-		return true;
+		result = true;
 	}
 	interrupts();
-	return false;
+	return result;
 }
 
 bool Watchdog::checkTimeOutAndRestart() {

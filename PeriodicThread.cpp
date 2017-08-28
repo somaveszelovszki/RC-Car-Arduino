@@ -1,13 +1,13 @@
 #include "PeriodicThread.hpp"
 
-PeriodicThread::PeriodicThread(unsigned long cyclePeriod) {
+int PeriodicThread::numThreads = 0;
 
-	Serial.print("cyclePeriod set to ");
-	Serial.println(cyclePeriod);
-
-	this->cyclePeriod = cyclePeriod;
+void PeriodicThread::decrementWatchdogs() {
+	for (int i = 0; i < numThreads; ++i)
+		threads[i]->watchdog->decrement();
 }
 
-bool PeriodicThread::periodCycleThresholdReached(unsigned long cycleCounter) {
-	return cycleCounter % cyclePeriod == 0;
+void PeriodicThread::initializeThreads() {
+	for (int i = 0; i < numThreads; ++i)
+		threads[i]->initialize();
 }

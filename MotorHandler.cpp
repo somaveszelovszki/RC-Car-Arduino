@@ -33,7 +33,7 @@ int MotorHandler::ServoMotor::getMaxRotation() {
 
 
 
-MotorHandler::DCMotor::DCMotor(unsigned int fwdPin, unsigned int bwdPin) {
+MotorHandler::DCMotor::DCMotor(int fwdPin, int bwdPin) {
 	this->fwdPin = fwdPin;
 	this->bwdPin = bwdPin;
 
@@ -67,12 +67,14 @@ void MotorHandler::watchdogDecrement() {
 	rotaryEncoder->getWatchdog()->decrement();
 }
 
-MotorHandler::DIRECTION MotorHandler::getDirection() {
+Common::AccelerationDir MotorHandler::getDirection() {
 
 	double actualSpeed;
 	getActualSpeed(&actualSpeed);
 
-	return actualSpeed > 0 ? FORWARD : actualSpeed < 0 ? BACKWARD : RELEASE;
+	return actualSpeed > 0 ? Common::AccelerationDir::FORWARD
+		: actualSpeed < 0 ? Common::AccelerationDir::BACKWARD
+		: Common::AccelerationDir::RELEASE;
 }
 
 bool MotorHandler::getActualSpeed(double *speed) {

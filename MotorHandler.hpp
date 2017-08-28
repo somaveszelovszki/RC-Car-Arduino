@@ -1,46 +1,10 @@
-#ifndef MOTORHANDLER_HPP
-#define MOTORHANDLER_HPP
+#ifndef MOTOR_HANDLER_HPP
+#define MOTOR_HANDLER_HPP
 
 #include <Servo.h>
 
 #include "Command.hpp"
 #include "RotaryEncoder.hpp"
-
-// servo pin
-#define SERVO_PIN 9
-
-#define DC_MOTOR_FORWARD_PIN 3
-#define DC_MOTOR_BACKWARD_PIN 11
-
-// servo command value range (0 is servo middle position)
-#define SERVO_COMMAND_VALUE_MIN -100
-#define SERVO_COMMAND_VALUE_MAX 100
-#define SERVO_COMMAND_VALUE_MIDDLE (SERVO_COMMAND_VALUE_MIN + (SERVO_COMMAND_VALUE_MAX - SERVO_COMMAND_VALUE_MIN) / 2)
-
-// servo motor restrictions
-#define SERVO_POSITION_MIN 0
-#define SERVO_POSITION_MAX 180
-
-// steering construction restriction
-#define SERVO_DEFAULT_MAX_ROTATION 70
-
-// DC motor command value range (50 is DC motor stop, >50 means FORWARD)
-#define DC_COMMAND_VALUE_MIN 0
-#define DC_COMMAND_VALUE_MAX 100
-#define DC_COMMAND_VALUE_STOP (DC_COMMAND_VALUE_MIN + (DC_COMMAND_VALUE_MAX - DC_COMMAND_VALUE_MIN) / 2)
-
-// DC Motor value range
-#define DC_MAX_VALUE 255
-#define DC_MIN_VALUE (-1) * DC_MAX_VALUE
-
-#define MAX_SPEED 55 // [cm/sec]
-
-#define MOTOR_ROTARY_TRANSFER_RATE 3.0
-#define MOTOR_WHEEL_TRANSFER_RATE 1.0			// transfer rate between motor and wheels (defined by car architecture)
-#define WHEEL_CIRCUMFERENCE 20.3		// circumference of motor-powered wheels - in [cm]
-
-#define SPEED_CONTROLLER_Kp 2
-#define SPEED_CONTROLLER_Kd 2
 
 /*
 	Handles motors - acceleration and steering.
@@ -48,10 +12,7 @@
 class MotorHandler {
 
 public:
-	enum DIRECTION {
-		FORWARD, BACKWARD, RELEASE
-	};
-
+	
 	/*
 		Handles a servo motor.
 	*/
@@ -75,14 +36,14 @@ public:
 
 	private:
 
-		unsigned int fwdPin;
-		unsigned int bwdPin;
+		int fwdPin;
+		int bwdPin;
 
 		int prevValue = 0;
 
 	public:
 
-		DCMotor(unsigned int fwdPin, unsigned int bwdPin);
+		DCMotor(int fwdPin, int bwdPin);
 
 		void writeValue(int value);
 
@@ -144,7 +105,7 @@ public:
 
 	void watchdogDecrement();
 
-	DIRECTION getDirection();
+	Common::AccelerationDir getDirection();
 };
 
-#endif	// MOTORHANDLER_HPP
+#endif	// MOTOR_HANDLER_HPP

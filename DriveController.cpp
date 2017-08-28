@@ -1,28 +1,42 @@
-#include "DriveController.hpp"
+#include "DriveThread.hpp"
 
-DriveController::DriveController(RotaryEncoder *rotaryEncoder) {
+DriveThread::DriveThread(RotaryEncoder *rotaryEncoder) : PeriodicThread(PT_PERIOD_TIME_DRIVE) {
 	motorHandler = new MotorHandler(rotaryEncoder);
-	
 	mode = FREE_DRIVE;		// default mode
 }
 
-void DriveController::initialize() {
+void DriveThread::initialize() {
 	motorHandler->initialize();
 }
 
-void DriveController::setMode(MODE mode) {
-	this->mode = mode;
+void DriveThread::run() {
+
+	updateValues();
+
+	switch (command->getCode()) {
+
+	case Command::CODE::Speed:
+		executeCommand_Speed(command);
+		break;
+
+	case Command::CODE::SteeringAngle:
+		executeCommand_SteeringAngle(command);
+		break;
+
+	case Command::CODE::ServoRecalibrate:
+		executeCommand_ServoRecalibrate(command);
+		break;
+
+	case Command::CODE::DriveMode:
+		executeCommand_DriveMode(command);
+		break;
+	}
 }
 
-DriveController::MODE DriveController::getMode() {
-	return mode;
-}
-
-
-void DriveController::executeCommand_Speed(const Command& command) {
+void DriveThread::executeCommand_Speed(const Command *command) {
 	switch (mode) {
 	case FREE_DRIVE:
-		motorHandler->setDesiredSpeed(command.getValueAsInt());
+		motorHandler->setDesiredSpeed(command->getValueAsInt());
 		break;
 	case SAFE_DRIVE:
 
@@ -30,10 +44,10 @@ void DriveController::executeCommand_Speed(const Command& command) {
 		if (isStopped) {
 			if (stopTimer == 0) {
 				isStopped = false;
-				motorHandler->setDesiredSpeed(command.getValueAsInt());
+				motorHandler->setDesiredSpeed(command->getValueAsInt());
 			}
 		} else {
-			motorHandler->setDesiredSpeed(command.getValueAsInt());
+			motorHandler->setDesiredSpeed(command->getValueAsInt());
 		}
 		break;
 
@@ -42,20 +56,20 @@ void DriveController::executeCommand_Speed(const Command& command) {
 	}
 }
 
-void DriveController::executeCommand_SteeringAngle(const Command& command) {
-	motorHandler->setSteeringAngle(command.getValueAsInt());
+void DriveThread::executeCommand_SteeringAngle(const Command *command) {
+	motorHandler->setSteeringAngle(command->getValueAsInt());
 }
 
-void DriveController::executeCommand_ServoRecalibrate(const Command& command) {
-	motorHandler->recalibrateServo(command.getValueAsInt());
+void DriveThread::executeCommand_ServoRecalibrate(const Command *command) {
+	motorHandler->recalibrateServo(command->getValueAsInt());
 }
 
-void DriveController::executeCommand_DriveMode(const Command& command) {
-	setMode((MODE)command.getValueAsInt());
+void DriveThread::executeCommand_DriveMode(const Command *command) {
+	setMode((MODE)command->getValueAsInt());
 }
 
 
-void DriveController::handleDistanceData(const unsigned long distances[ULTRASONIC_NUM_SENSORS]) {
+void DriveThread::handleDistanceData(const int distances[ULTRASONIC_NUM_SENSORS]) {
 
 	switch (mode) {
 	case FREE_DRIVE:
@@ -63,8 +77,8 @@ void DriveController::handleDistanceData(const unsigned long distances[ULTRASONI
 	case SAFE_DRIVE:
 
 		// if measured distance is critical, stops the car
-		for (unsigned int sensorPos = 0; sensorPos < ULTRASONIC_NUM_SENSORS; ++sensorPos) {
-			if (isDistanceCritical((SensorHandler::Ultrasonic::POSITION) sensorPos, distances[sensorPos])) {
+		for (int sensorPos = 0; sensorPos < ULTRASONIC_NUM_SENSORS; ++sensorPos) {
+			if (isDistanceCritical((Ultrasonic::POSITION) sensorPos, distances[sensorPos])) {
 				releaseMotor();
 				isStopped = true;
 				stopTimer = EMERGENCY_BREAK_STOP_TIME_MS;
@@ -81,7 +95,7 @@ void DriveController::handleDistanceData(const unsigned long distances[ULTRASONI
 	}
 }
 
-bool DriveController::isDistanceCritical(SensorHandler::Ultrasonic::POSITION pos, unsigned long distance) {
+bool DriveThread::isDistanceCritical(Ultrasonic::POSITION pos, int distance) const {
 
 	double speed;
 	motorHandler->getActualSpeed(&speed);
@@ -98,7 +112,7 @@ bool DriveController::isDistanceCritical(SensorHandler::Ultrasonic::POSITION pos
 	Serial.println(preCrashTime);
 
 	if (speed > 0) {		// FORWARD
-		if (pos == SensorHandler::Ultrasonic::POSITION::FRONT_LEFT || pos == SensorHandler::Ultrasonic::POSITION::FRONT_RIGHT) {
+		if (pos == Ultrasonic::POSITION::FRONT_LEFT || pos == Ultrasonic::POSITION::FRONT_RIGHT) {
 			Serial.print("distance: ");
 			Serial.print(distance);
 			Serial.print(" cm");
@@ -118,7 +132,7 @@ bool DriveController::isDistanceCritical(SensorHandler::Ultrasonic::POSITION pos
 			}
 		}
 	} else {		// BACKWARD
-		if (pos == SensorHandler::Ultrasonic::POSITION::REAR_LEFT || pos == SensorHandler::Ultrasonic::POSITION::REAR_RIGHT) {
+		if (pos == Ultrasonic::POSITION::REAR_LEFT || pos == Ultrasonic::POSITION::REAR_RIGHT) {
 
 			// checks if time until crash is below critical
 			if (preCrashTime <= CRITICAL_PRE_CRASH_TIME) {
@@ -131,22 +145,22 @@ bool DriveController::isDistanceCritical(SensorHandler::Ultrasonic::POSITION pos
 }
 
 
-void DriveController::releaseMotor() {
+void DriveThread::releaseMotor() {
 	motorHandler->releaseMotor();
 }
 
-void DriveController::attachServoMotor() {
+void DriveThread::attachServoMotor() {
 	motorHandler->attachServo();
 }
 
-void DriveController::detachServoMotor() {
+void DriveThread::detachServoMotor() {
 	motorHandler->detachServo();
 }
 
-void DriveController::watchdogDecrement() {
+void DriveThread::watchdogDecrement() {
 	motorHandler->watchdogDecrement();
 }
 
-void DriveController::updateValues() {
+void DriveThread::updateValues() {
 	motorHandler->updateSpeed();
 }

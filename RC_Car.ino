@@ -1,4 +1,3 @@
-
 /*
 	Contains main program.
 	Receives commands through a Communicator object, reads ultrasonic sensor distances.
@@ -6,18 +5,15 @@
 */
 
 #include <pt.h>
-#include "Communicator.hpp"
-#include "DriveController.hpp"
-#include "SensorHandler.hpp"
-
-// counts loop cycles
-static unsigned long CYCLE_COUNTER = 0;
+#include "CommunicatorThread.hpp"
+#include "DriveThread.hpp"
+#include "SensorThread.hpp"
 
 extern RotaryEncoder *motorRotaryEncoder;
 
-Communicator *communicator = new Communicator();
-DriveController *driveController = new DriveController(motorRotaryEncoder);
-extern SensorHandler *sensorHandler;
+CommunicatorThread *communicatorThread = new CommunicatorThread();
+DriveThread *driveThread = new DriveThread(motorRotaryEncoder);
+extern SensorThread *sensorThread;
 
 ISR(TIMER0_COMPA_vect);
 
@@ -33,106 +29,54 @@ void onCommunicationTimedOut();
 */
 static struct pt communicator_pt;
 static struct pt sensor_pt;
-
-int invalidCntr = 0;
+static struct pt drive_pt;
 
 /*
 	Sends data to and receives data from phone.
 */
-static PT_THREAD(communicatorThread(struct pt *pt)) {
+static PT_THREAD(communicator_thread(struct pt *pt)) {
 	PT_BEGIN(pt);
 
-	PT_WAIT_UNTIL(pt, communicator->periodCycleThresholdReached(CYCLE_COUNTER));
+	PT_WAIT_UNTIL(pt, communicatorThread->periodTimeReached());
 
-	// reads available characters - if command end was found, returns true
-	
-	//motorRotaryEncoder->disableInterrupts();
-
-	if (communicator->receiveChars() ) {
-
-		//motorRotaryEncoder->enableInterrupts();
-
-		Command *receivedCommand = communicator->fetchCommand();
-
-		Serial.println(receivedCommand->toString());
-
-		if (receivedCommand->isValid()) {
-				
-			switch (receivedCommand->getCode()) {
-
-			case Command::CODE::Speed:
-				driveController->executeCommand_Speed(*receivedCommand);
-				break;
-
-			case Command::CODE::SteeringAngle:
-				driveController->executeCommand_SteeringAngle(*receivedCommand);
-				break;
-
-			case Command::CODE::ServoRecalibrate:
-				driveController->executeCommand_ServoRecalibrate(*receivedCommand);
-				break;
-
-			case Command::CODE::DriveMode:
-				driveController->executeCommand_DriveMode(*receivedCommand);
-				break;
-			}
-			invalidCntr = 0;
-		} else {
-			Serial.println("invalid command received");
-			
-			if (++invalidCntr >= 3)
-				driveController->releaseMotor();
-		}
-
-		delete receivedCommand;
-	} /*else
-		motorRotaryEncoder->enableInterrupts();*/
+	communicatorThread->start();
 
 	// checks if communication timed out
-	if (communicator->getWatchdog()->timedOut()) {
-		onCommunicationTimedOut();
-	}
-
-	// resets watchdog timer used for checking if connection timed out
-	communicator->getWatchdog()->restart();
+	communicatorThread->checkTimedOut();
 
 	PT_END(pt);
 }
 
 /*
-	Reads, valdiates and stores sensors' data.
+	Reads and validates sensor values.
 */
-static PT_THREAD(sensorThread(struct pt *pt)) {
+static PT_THREAD(sensor_thread(struct pt *pt)) {
 	PT_BEGIN(pt);
 
-	PT_WAIT_UNTIL(pt, sensorHandler->periodCycleThresholdReached(CYCLE_COUNTER));
+	PT_WAIT_UNTIL(pt, sensorThread->periodTimeReached());
 
-	driveController->updateValues();
+	sensorThread->start();
 
-	// gets next ultrasonic sensor distance (will run in background and call an IT routine)
-	if (sensorHandler->ultrasonic->isEnabled() && !sensorHandler->ultrasonic->isBusy()) {
+	// if ping timed out, next sensor needs to be pinged
+	sensorThread->checkTimedOut();
 
-		// checks if all the ultrasonic sensors have been pinged in this cycle
-		if (sensorHandler->ultrasonic->cycleFinished()) {
+	PT_END(pt);
+}
 
-			// stores and validates distances
-			sensorHandler->ultrasonic->updateDistances();
+/*
+	Executes drive commands - handles servo and DC motors.
+*/
+static PT_THREAD(drive_thread(struct pt *pt)) {
+	PT_BEGIN(pt);
 
-			unsigned long distances[ULTRASONIC_NUM_SENSORS];
+	PT_WAIT_UNTIL(pt, driveThread->periodTimeReached());
 
-			sensorHandler->ultrasonic->copyCurrentValidatedDistances(distances);
+	sensorThread->ultrasonic->copyCurrentValidatedDistances(driveThread->distances);
 
-			// sets driving parameters (motors) according to measured distances
-			driveController->handleDistanceData(distances);
-		}
-
-		sensorHandler->ultrasonic->pingNextSensor();
-	}
-
-	// checks if ping timed out - if yes, next sensor needs to be pinged
-	if (sensorHandler->ultrasonic->getWatchdog()->timedOut()) {
-		sensorHandler->ultrasonic->onWatchdogTimedOut();
-	}
+	// TODO take into considerations the measured distances
+	// TODO drive according to DRIVE MODE
+	if (communicatorThread->available())
+		driveThread->start(communicatorThread->getCommand());
 
 	PT_END(pt);
 }
@@ -146,16 +90,13 @@ void setup() {
 
 	Serial.println("setup...");
 
-	communicator->initialize();
-	driveController->initialize();
-	sensorHandler->initialize();
+	PeriodicThread::initializeThreads();
 
 	Common::initTimer();
 
 	PT_INIT(&communicator_pt);
 	PT_INIT(&sensor_pt);
-
-	driveController->setMode(DriveController::MODE::SAFE_DRIVE);		// TODO set from phone
+	PT_INIT(&drive_pt);
 }
 
 /*
@@ -163,36 +104,20 @@ void setup() {
 	Calls threads.
 */
 void loop() {
-
-	++CYCLE_COUNTER;
-
-	communicatorThread(&communicator_pt);
-	sensorThread(&sensor_pt);
+	communicator_thread(&communicator_pt);
+	sensor_thread(&sensor_pt);
+	drive_thread(&drive_pt);
 }
-
 
 /*
 	Timer0 interrupt - called in every 1 ms. Decrements watchdogs.
 */
 ISR(TIMER0_COMPA_vect) {
 
-	++Common::MILLI_SEC_COUNTER;
+	Common::incrementMilliSecs();
 
-	// decreases watchdog timers
+	PeriodicThread::decrementWatchdogs();
 
-	communicator->getWatchdog()->decrement();
-	sensorHandler->watchdogDecrement();
-	driveController->watchdogDecrement();
-
-	driveController->stopTimer = driveController->stopTimer > 0 ? driveController->stopTimer - 1 : 0;
-}
-
-
-void onCommunicationTimedOut() {
-	// TODO
-	driveController->releaseMotor();
-
-	Serial.println("communicator timed out");
-
-	communicator->getWatchdog()->restart();
+	// TODO This is only a temporary solution!
+	driveThread->stopTimer = driveThread->stopTimer > 0 ? driveThread->stopTimer - 1 : 0;
 }

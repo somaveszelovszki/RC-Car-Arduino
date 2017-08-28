@@ -1,18 +1,13 @@
-#ifndef ROTARYENCODER_HPP
-#define ROTARYENCODER_HPP
+#ifndef ROTARY_ENCODER_HPP
+#define ROTARY_ENCODER_HPP
 
 #include "Watchdog.hpp"
-
-#define ROTARY_ENCODER_A_PIN 0
-#define ROTARY_ENCODER_B_PIN 1
-
-#define ROTARY_RESOLUTION 20
 
 class RotaryEncoder {
 public:
 
 	struct Result {
-		uint64_t d_time;	// [ms]
+		unsigned long d_time;	// [ms]
 		int d_pos;
 	};
 
@@ -24,7 +19,7 @@ private:
 	bool B_set = false;
 
 	int position = 0;
-	uint64_t time;
+	unsigned long time;
 
 	Result storedResult;
 
@@ -52,4 +47,4 @@ public:
 void doRotaryEncoderA();
 void doRotaryEncoderB();
 
-#endif	// ROTARYENCODER_HPP
+#endif	// ROTARY_ENCODER_HPP

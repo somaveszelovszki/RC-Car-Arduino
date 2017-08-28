@@ -4,7 +4,13 @@
 #include <Arduino.h>
 #include <math.h>
 
+#include "def.hpp"
+
 class Common {
+
+private:
+	static unsigned long MILLIS;
+
 public:
 	enum ERROR_SIGN {
 		POSITIVE,
@@ -12,18 +18,36 @@ public:
 		BOTH
 	};
 
-	static size_t write(Print& printer, const String& str);
+	enum AccelerationDir {
+		FORWARD, BACKWARD, RELEASE
+	};
+
+	enum SteeringDir {
+		LEFT = 1,
+		RIGHT = -1
+	};
+
+	struct ValidationData {
+		int validationSampleNum;
+		float relativeError;
+	};
+
+	static int write(Print& printer, const String& str);
 
 	static void initTimer();
 
 	template <typename T>
-	static void arrayCopy(T dest[], T src[], size_t size);
+	static void arrayCopy(T dest[], T src[], int size);
 
-	static uint64_t MILLI_SEC_COUNTER;
+	static unsigned long milliSecs() {
+		return MILLIS;
+	}
 
-	static uint64_t milliSecs();
+	static void incrementMilliSecs() {
+		++MILLIS;
+	}
 
-	static bool contains(char array[], size_t arraySize, char item);
+	static bool contains(char array[], int arraySize, char item);
 
 	static double degreeToRadian(double degree);
 	static double radianToDegree(double radian);
@@ -33,6 +57,12 @@ public:
 
 	template <typename T>
 	static bool isBetween(T value, T boundary1, T boundary2);
+
+	/*
+	Checks if value is in a given range of the reference value.
+	*/
+	template <typename T>
+	static bool isInRange(T ref, T value, float relativeError, ERROR_SIGN errorDir);
 };
 
 #endif	// COMMON_HPP

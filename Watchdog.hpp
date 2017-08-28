@@ -10,12 +10,12 @@ class Watchdog {
 
 private:
 	
-	unsigned int TIMEOUT;
-	unsigned int counter;
+	int TIMEOUT;
+	int counter;
 	bool running;
 
 public:
-	Watchdog(unsigned int timeout);
+	Watchdog(int timeout);
 
 	void reset();
 

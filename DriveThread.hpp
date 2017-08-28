@@ -1,17 +1,13 @@
-#ifndef DRIVECONTROLLER_HPP
-#define DRIVECONTROLLER_HPP
+#ifndef DRIVE_THREAD_HPP
+#define DRIVE_THREAD_HPP
 
 #include "MotorHandler.hpp"
-#include "SensorHandler.hpp"
-
-#define EMERGENCY_BREAK_STOP_TIME_MS 3000;
-
-#define CRITICAL_PRE_CRASH_TIME 0.5		// critical time until crash - in [sec]
+#include "SensorThread.hpp"
 
 /**
    Controls motors, responsible for driving car.
 */
-class DriveController {
+class DriveThread : public PeriodicThread {
 
 public:
 
@@ -32,31 +28,49 @@ private:
 	// needed when program in SAFE_DRIVE mode stops car
 	bool isStopped = false;
 
-public:
-	DriveController(RotaryEncoder *rotaryEncoder);
+	const Command *command;
+
+	void onTimedOut();
 
 	/*
-		Initializes motors.
+	Initializes motors.
 	*/
 	void initialize();
+
+public:
+
+	int distances[ULTRASONIC_NUM_SENSORS];
+
+	DriveThread(RotaryEncoder *rotaryEncoder);
+
+	void run();
 
 	/*
 		Sets drive mode.
 	*/
-	void setMode(MODE mode);
+	void setMode(MODE mode) {
+		this->mode = mode;
+	}
+
+	void start(const Command *command) {
+		this->command = command;
+		PeriodicThread::start();
+	}
 
 	/*
 		Gets drive mode.
 	*/
-	MODE getMode();
+	MODE getMode() const {
+		return mode;
+	}
 
 
 	// executor methods
 
-	void executeCommand_Speed(const Command& command);
-	void executeCommand_SteeringAngle(const Command& command);
-	void executeCommand_ServoRecalibrate(const Command& command);
-	void executeCommand_DriveMode(const Command& command);
+	void executeCommand_Speed(const Command *command);
+	void executeCommand_SteeringAngle(const Command *command);
+	void executeCommand_ServoRecalibrate(const Command *command);
+	void executeCommand_DriveMode(const Command *command);
 
 
 	// handler methods
@@ -64,13 +78,13 @@ public:
 	/*
 		Handles measured distances - drive mode defines action.
 	*/
-	void handleDistanceData(const unsigned long distances[ULTRASONIC_NUM_SENSORS]);
+	void handleDistanceData(const int distances[ULTRASONIC_NUM_SENSORS]);
 
 	/*
 		Decides if given distance at given position and at given speed is critical - need to stop the car.
 		TODO replace with DANGER_LEVELs
 	*/
-	bool isDistanceCritical(SensorHandler::Ultrasonic::POSITION pos, unsigned long distance);
+	bool isDistanceCritical(Ultrasonic::POSITION pos, int distance) const;
 
 	/*
 		Stops DC motor.
@@ -85,9 +99,9 @@ public:
 	void updateValues();
 
 	// TODO replace with a better solution for restarting motor
-	unsigned int stopTimer;
+	int stopTimer;
 
 };
 
-#endif	// DRIVECONTROLLER_HPP
+#endif	// DRIVE_THREAD_HPP
 

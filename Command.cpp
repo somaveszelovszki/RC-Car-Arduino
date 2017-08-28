@@ -51,7 +51,7 @@ bool Command::isValid(char c) const {
 
 	if (c >= 'A' && c <= 'Z') return true;
 
-	size_t charsNum = 3;
+	int charsNum = 3;
 	char chars[] = {
 		' ',
 		'_',
@@ -69,18 +69,16 @@ bool Command::isValid(char c) const {
  * output will be: 
  *    Command { code=1 and value=10 }
  */
-Command *Command::fromString(String commandString) {
+void Command::fromString(String commandString, Command& dest) {
 
 	// finds separator in string (separates key from value)
 	int separatorIndex = commandString.indexOf(COMMAND_SEPARATOR_CHAR);
 
 	// code is before separator
-	int code = commandString.substring(0, separatorIndex).toInt();
+	dest.code = static_cast<Command::CODE>(commandString.substring(0, separatorIndex).toInt());
 
 	// value is after separator
-	String value = commandString.substring(separatorIndex + 1, commandString.length() - 1);
-
-	return new Command((CODE) code, value);
+	dest.value = commandString.substring(separatorIndex + 1, commandString.length() - 1);
 }
 
 /**

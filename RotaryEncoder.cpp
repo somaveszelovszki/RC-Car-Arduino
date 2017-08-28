@@ -55,7 +55,7 @@ bool RotaryEncoder::readAndUpdateIfTimedOut(RotaryEncoder::Result *result) {
 	bool timedOut = watchdog->checkTimeOutAndRestart();
 
 	if (timedOut) {
-		uint64_t milliSecs = Common::milliSecs();
+		unsigned long milliSecs = Common::milliSecs();
 
 		storedResult.d_time = milliSecs - time;
 		storedResult.d_pos = position;

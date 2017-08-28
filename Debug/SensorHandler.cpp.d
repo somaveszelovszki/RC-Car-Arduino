@@ -1,6 +1,6 @@
-C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\leonardo\Debug\SensorHandler.cpp.o: \
- C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\leonardo\Debug\SensorHandler.cpp \
- C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\leonardo\Debug\SensorHandler.hpp \
+C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\leonardo\Debug\SensorThread.cpp.o: \
+ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\leonardo\Debug\SensorThread.cpp \
+ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\leonardo\Debug\SensorThread.hpp \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\leonardo\Debug\Watchdog.hpp \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\leonardo\Debug\Common.hpp \
  C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\cores\arduino/Arduino.h \
