@@ -3,19 +3,25 @@
 
 #include "Common.hpp"
 
+// TODO make it template so that stores value does not have to be string
+
 /**
-   Command class contains data about a received command.
+Command class contains data about a received command.
 */
+
 class Command {
 
 public:
+
 	enum CODE {
+		NoNewCommandCode = 0,
 		Speed = 1,           // [0 100] contains direction as well (>50 means FORWARD)
 		SteeringAngle = 2,  // [-100 100] positive means steering to the right
 		ServoRecalibrate = 3,
-		DriveMode = 4		// values from DriveThread::MODE enum
+		DriveMode = 4		// values from Common::DriveMode enum
 	};
 
+	static const Command NoNewCommand;
 
 private:
 	CODE code;
@@ -27,22 +33,62 @@ public:
 
 	Command(CODE code, const String& value);
 
-	Command(const Command& other);
-
 	Command operator=(const Command& other);
 
-	CODE getCode() const;
+	Command(const Command& other) {
+		*this = other;
+	}
 
-	String getValue() const;
+	CODE getCode() const {
+		return code;
+	}
 
-	int getValueAsInt() const;
+	void setCode(CODE _code) {
+		code = _code;
+	}
 
-	bool isValid() const;
+	String getStringValue() const {
+		return value;
+	}
 
-	static void fromString(String commandString, Command& dest);
+	void setStringValue(const String& _value) {
+		value = _value;
+	}
+
+	int getIntValue() const {
+		return value.toInt();
+	}
+
+	void setIntValue(int _value) {
+		value = String(_value);
+	}
+
+	double getDoubleValue() const {
+		return value.toDouble();
+	}
+
+	void setDoubleValue(double _value) {
+		value = String(_value);
+	}
+
+	float getFloatValue() const {
+		return value.toFloat();
+	}
+
+	void setFloatValue(float _value) {
+		value = String(_value);
+	}
+
+	Common::DriveMode getDriveModeValue() const {
+		return static_cast<Common::DriveMode>(value.toInt());
+	}
+
+	static bool isValid(char c);
+
+	static bool isValid(const String& cmdStr);
+
+	static void fromString(const String& cmdStr, Command& dest);
 	String toString() const;
-
-	bool isValid(char c) const;
 };
 
 #endif	// COMMAND_HPP

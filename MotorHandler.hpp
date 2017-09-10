@@ -4,108 +4,87 @@
 #include <Servo.h>
 
 #include "Command.hpp"
-#include "RotaryEncoder.hpp"
+#include "PD_Controller.hpp"
 
 /*
 	Handles motors - acceleration and steering.
 */
 class MotorHandler {
 
-public:
-	
+private:
+
 	/*
 		Handles a servo motor.
 	*/
 	class ServoMotor : public Servo {
+		friend class MotorHandler;
+
 	private:
-		int MIDDLE_POSITION = 77;	// in degrees
-		int MAX_ROTATION = SERVO_DEFAULT_MAX_ROTATION;		// TODO change it to store data
+		int middlePos = 77;	// in degrees
+		int maxRotation = SERVO_DEFAULT_MAX_ROTATION;		// TODO change it to store data
 
 	public:
-
+		ServoMotor() {}
 		/*
 			Resets servo middle position, checks if MAX_ROTATION hurts any restrictions.
 		*/
 		void recalibrate(int newMiddlePos);
-
-		int getMiddlePosition();
-		int getMaxRotation();
 	};
 
 	class DCMotor {
+		friend class MotorHandler;
 
 	private:
-
-		int fwdPin;
-		int bwdPin;
-
 		int prevValue = 0;
 
 	public:
-
-		DCMotor(int fwdPin, int bwdPin);
-
+		DCMotor() {}
+		void initialize();
 		void writeValue(int value);
-
-		int getPreviousValue();
 	};
 
-private:
+	PD_Controller *speedController;
 
-	double prevError = 0.0;
-	double derivative = 0.0;
+	float desiredSpeed;
 
-	int desiredSpeed;
-
-	ServoMotor *servoMotor;
-	DCMotor *DC_Motor;
-
-	RotaryEncoder *rotaryEncoder;
-
-	/*
-	Maps command values to actual DC motor speed values.
-	*/
-	int commandValueToSpeed(int commandValue);
+	ServoMotor servoMotor;
+	DCMotor DC_Motor;
 
 	/*
 	Maps command values to actual servo values.
 	*/
-	int commandValueToSteeringAngle(int commandValue);
-
-	int getDesiredSpeed();
+	int commandValueToSteeringAngle(int commandValue) const;
 
 	//int rotationToSpeed(int rotation, int d_time);
 	//int speedToRotation(int speed, int d_time);
 
 
 public:
-// TODO
-	MotorHandler(RotaryEncoder *rotaryEncoder);
+	MotorHandler() {
+		speedController = new PD_Controller(DC_CONTROL_UPDATE_PERIOD_TIME, DC_CONTROL_Kp, DC_CONTROL_Kd);
+	}
 
 	void initialize();
 
-	void releaseMotor();
+	void updateSpeed(float actualSpeed);
 
-	void updateSpeed();
+	void MotorHandler::setDesiredSpeed(float newDesiredSpeed) {
+		desiredSpeed = newDesiredSpeed;
+	}
 
-	bool getActualSpeed(double *speed);
-
-
+	void setSteeringAngle(int commandAngle);
 	/*
 	Positions servo motor to middle.
 	*/
 	void positionServoMiddle();
-
-	void setDesiredSpeed(int commandSpeed);
-	void setSteeringAngle(int commandAngle);
 	void recalibrateServo(int commandAngle);
 
 	void attachServo();
 	void detachServo();
 
-	void watchdogDecrement();
-
-	Common::AccelerationDir getDirection();
+	~MotorHandler() {
+		delete speedController;
+	}
 };
 
 #endif	// MOTOR_HANDLER_HPP

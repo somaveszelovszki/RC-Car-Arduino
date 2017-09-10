@@ -1,20 +1,33 @@
 #include "Point.hpp"
 
 template <typename T>
-double Point<T>::getSteeringAngle(const Point<T>& origo, const Point<T>& other, Common::SteeringDir dir = Common::SteeringDir::LEFT) {
+float Point<T>::getSteeringAngle(const Point<T>& origo, const Point<T>& other, Common::SteeringDir dir) {
+	float angle;
+
 	switch (dir) {
 	case Common::SteeringDir::LEFT:
 		if (other.X > origo.X)
-			return other.Y >= origo.Y ?
-			atan((other.Y - origo.Y) / (other.X - origo.X))
-			: 2 * M_PI + atan((other.Y - origo.Y) / (other.X - origo.X));
+			angle = other.Y >= origo.Y ?
+			static_cast<float>(atan(static_cast<double>((other.Y - origo.Y) / (other.X - origo.X))))
+			: static_cast<float>(2 * M_PI + atan(static_cast<double>((other.Y - origo.Y) / (other.X - origo.X))));
 		else if (other.X < origo.X)
-			return M_PI + atan((other.Y - origo.Y) / (other.X - origo.X));
+			angle = static_cast<float>(M_PI + atan(static_cast<double>((other.Y - origo.Y) / (other.X - origo.X))));
 		else
-			return other.Y > origo.Y ? M_PI_2 : 3 * M_PI_2;
+			angle = other.Y > origo.Y ? static_cast<float>(M_PI_2) : 3 * static_cast<float>(M_PI_2);
 	case Common::SteeringDir::RIGHT:
-		return (-1) * getSteeringAngle(origo, Point<T>(origo.X - (other.X - origo.X), other.Y), Common::SteeringDir::LEFT);
-	default:
-		throw invalid_argument("'dir' has to be either LEFT or RIGHT");
+		angle = -1 * getSteeringAngle(origo, Point<T>(2 * origo.X - other.X, other.Y), Common::SteeringDir::LEFT);
 	}
+	return angle;
 }
+
+#if(__DEBUG)
+template<typename T>
+void Point<T>::print(bool newLine = true) const {
+	Serial.print("(");
+	Serial.print(X);
+	Serial.print(", ");
+	Serial.print(Y);
+	Serial.print(")");
+	if (newLine) Serial.println();
+}
+#endif // __DEBUG

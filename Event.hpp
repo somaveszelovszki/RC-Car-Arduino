@@ -19,7 +19,7 @@ public:
 
 	Event(WHAT what);
 
-	WHAT getWhat();
+	WHAT getWhat() const;
 };
 
 #endif	// EVENT_HPP

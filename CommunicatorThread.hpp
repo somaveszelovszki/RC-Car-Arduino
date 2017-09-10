@@ -28,33 +28,22 @@ private:
 	*/
 	bool receiveChars();
 
-	/*
-	Parses command from buffer string and clears buffer string content.
-	@returns pointer to parsed command
-	*/
-	void fetchCommand(Command& command);
+	/** @brief Parses command from buffer string and clears buffer string content.
 
-	void onTimedOut();
-
-	/*
-	Intializes connection.
+	@param dest Will contain parsed command.
+	@returns Boolean value indicating if command string was valid.
 	*/
-	void initialize();
+	bool fetchCommand(Command& dest);
+
+	void __initialize() override;
+	void __run() override;
+	void __onTimedOut() override;
 
 public:
 
 	CommunicatorThread();
 
-	void run();
-
-	bool available() {
-		return __available;
-	}
-
-	const Command* getCommand() {
-		__available = false;
-		return hasTimedOut ? static_cast<const Command*>(NULL) : &recvCommand;
-	}
+	Command getCommand();
 
 	/*
 		Sends command as string.

@@ -1,54 +1,43 @@
-#ifndef ULTRASONIC_HPP
-#define ULTRASONIC_HPP
+#ifndef ULTRA_HPP
+#define ULTRA_HPP
 
 #include <NewPing.h>
 #include "Watchdog.hpp"
+#include "Point.hpp"
 
 class Ultrasonic {
 
-public:
-
-	/*
-		NOTE: If you add a position, don't forget to update ULTRASONIC_NUM_SENSORS!
-	*/
-	enum POSITION {
-		FRONT_LEFT_CORNER = 0,
-		FRONT_LEFT = 1,
-		FRONT_RIGHT = 2,
-		FRONT_RIGHT_CORNER = 3,
-		REAR_LEFT_CORNER = 4,
-		REAR_LEFT = 5,
-		REAR_RIGHT = 6,
-		REAR_RIGHT_CORNER = 7,
-		LEFT_FRONT = 8,
-		LEFT_REAR = 9,
-		RIGHT_FRONT = 10,
-		RIGHT_REAR = 11
-	};
-
 private:
 
-	NewPing *sensorConnection = new NewPing(ULTRASONIC_TRIGGER_PIN, ULTRASONIC_ECHO_PIN, ULTRASONIC_MAX_DISTANCE);
+	class Sensor {
+	public:
+		int dist_measured;
+		int dist_stored[ULTRA_NUM_DIST_SAMPLES];
+		int dist_validated[ULTRA_NUM_DIST_SAMPLES];
+		int nonResponsiveCounter;
+
+		Point<float> pos;
+		float viewAngle;
+		Point<float> sensedPoint;
+
+		void validate(int sampleIndex);
+
+		void updatePoint(int sampleIndex);
+	};
+
+	Sensor sensors[ULTRA_NUM_SENSORS];
+
+	NewPing *sensorConnection;
 
 	static const Common::ValidationData maxDistanceValidationData;
 	static const Common::ValidationData defaultValidationData;
 
-	POSITION currentSensorPos;
+	Common::UltrasonicPos currentSensorPos;
 	bool busy;
-	int measuredDistances[ULTRASONIC_NUM_SENSORS];
-	
-	// marks unresponsive sensors, that do not have to be pinged
-	bool responsive[ULTRASONIC_NUM_SENSORS];
 
 	bool enabled;
 
-	int storedDistances[ULTRASONIC_NUM_SENSORS][ULTRASONIC_NUM_DISTANCE_SAMPLES];
-	int validatedDistances[ULTRASONIC_NUM_SENSORS][ULTRASONIC_NUM_DISTANCE_SAMPLES];
 	int currentSampleIndex;
-
-	void updateDistances(POSITION sensorPos);
-
-	void validate(POSITION sensorPos, Common::ValidationData validationData);
 
 	void updateSensorSelection();
 
@@ -58,9 +47,9 @@ public:
 
 	void initialize();
 
-	bool isBusy();
+	bool isBusy() const;
 
-	bool isEnabled();
+	bool isEnabled() const;
 
 	void setEnabled(bool enabled);
 
@@ -68,15 +57,19 @@ public:
 
 	void echoCheck();
 
-	bool cycleFinished();
+	bool cycleFinished() const;
 
-	void onWatchdogTimedOut();
+	void onWatchdoghasTimedOut();
 
-	void updateDistances();
+	void validateAndUpdateSensedPoints();
 
-	void copyCurrentValidatedDistances(int dest[ULTRASONIC_NUM_SENSORS]);
+	void copyCurrentValidatedDistances(int dest[ULTRA_NUM_SENSORS]) const;
+
+	~Ultrasonic() {
+		delete sensorConnection;
+	}
 
 };
 
-#endif	// ULTRASONIC_HPP
+#endif	// ULTRA_HPP
 

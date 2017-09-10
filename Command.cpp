@@ -1,12 +1,10 @@
 #include "Command.hpp"
 
+const Command Command::NoNewCommand(Command::CODE::NoNewCommandCode, "");
+
 Command::Command(Command::CODE code, const String& value) {
   this->code = code;
   this->value = value;
-}
-
-Command::Command(const Command& other) {
-	*this = other;
 }
 
 Command Command::operator=(const Command& other) {
@@ -16,51 +14,28 @@ Command Command::operator=(const Command& other) {
 	return *this;
 }
 
-
-Command::CODE Command::getCode() const {
-	return code;
-}
-
-String Command::getValue() const {
-	return value;
-}
-
-int Command::getValueAsInt() const {
-	return value.toInt();
-}
-
-bool Command::isValid() const {
-	String commandString = this->toString();
-
-	if (commandString == NULL || commandString.length() == 0) return false;
-
-	for (int i = 0; i < commandString.length(); ++i) {
-		if (!isValid(commandString.charAt(i)))
-			return false;
-	}
-
-	return true;
-}
-
-bool Command::isValid(char c) const {
-	if (c >= '0' && c <= '9') return true;
-
-	if (c == COMMAND_SEPARATOR_CHAR || c == COMMAND_END_CHAR) return true;
-
-	if (c >= 'a' && c <= 'b') return true;
-
-	if (c >= 'A' && c <= 'Z') return true;
-
-	int charsNum = 3;
-	char chars[] = {
+bool Command::isValid(char c) {
+	static const char permittedChars[] = {
 		' ',
 		'_',
 		'-'
 	};
+	static const int permittedCharsNum = 3;
 
-	if (Common::contains(chars, charsNum, c)) return true;
+	return (c >= '0' && c <= '9')
+		|| c == COMMAND_SEPARATOR_CHAR || c == COMMAND_END_CHAR
+		|| (c >= 'a' && c <= 'b')
+		|| (c >= 'A' && c <= 'Z')
+		|| Common::contains(permittedChars, permittedCharsNum, c);
+}
 
-	return false;
+bool Command::isValid(const String& cmdStr) {
+	bool valid = cmdStr != NULL && cmdStr.length() > 0;
+
+	for (int i = 0; valid && i < cmdStr.length(); ++i)
+		valid = isValid(cmdStr.charAt(i));
+
+	return valid;
 }
 
 /**
@@ -69,16 +44,16 @@ bool Command::isValid(char c) const {
  * output will be: 
  *    Command { code=1 and value=10 }
  */
-void Command::fromString(String commandString, Command& dest) {
+void Command::fromString(const String& cmdStr, Command& dest) {
 
 	// finds separator in string (separates key from value)
-	int separatorIndex = commandString.indexOf(COMMAND_SEPARATOR_CHAR);
+	int sepIdx = cmdStr.indexOf(COMMAND_SEPARATOR_CHAR);
 
 	// code is before separator
-	dest.code = static_cast<Command::CODE>(commandString.substring(0, separatorIndex).toInt());
+	dest.code = static_cast<Command::CODE>(cmdStr.substring(0, sepIdx).toInt());
 
 	// value is after separator
-	dest.value = commandString.substring(separatorIndex + 1, commandString.length() - 1);
+	dest.value = cmdStr.substring(sepIdx + 1, cmdStr.length() - 1);
 }
 
 /**
@@ -87,8 +62,6 @@ void Command::fromString(String commandString, Command& dest) {
  * output will be "1:10;"
  */
 String Command::toString() const {
-	String codeStr(code);
-
-	return codeStr + COMMAND_SEPARATOR_CHAR + value + COMMAND_END_CHAR;
+	return String(code) + COMMAND_SEPARATOR_CHAR + value + COMMAND_END_CHAR;
 }
 

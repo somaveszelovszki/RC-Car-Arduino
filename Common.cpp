@@ -12,7 +12,7 @@ int Common::write(Print& printer, const String& str) {
 	return numPrintedBytes;
 }
 
-void Common::initTimer() {
+void Common::initializeTimer() {
 	noInterrupts();
 
 	// Timer0 is already used for millis() - we'll just interrupt somewhere in the middle
@@ -23,7 +23,8 @@ void Common::initTimer() {
 	interrupts();
 }
 
-bool Common::contains(char array[], int arraySize, char item) {
+template <typename T>
+bool Common::contains(const T array[], int arraySize, T item) {
 	for (int i = 0; i < arraySize; ++i) {
 		if (array[i] == item)
 			return true;
@@ -31,18 +32,9 @@ bool Common::contains(char array[], int arraySize, char item) {
 	return false;
 }
 
-double Common::degreeToRadian(double degree) {
-	return degree * DEG_TO_RAD;
-
-}
-
-double Common::radianToDegree(double radian) {
-	return radian * RAD_TO_DEG;
-}
-
-template <typename T>
-double Common::pythagoreanHypotenuse(T a, T b) {
-	return sqrt(static_cast<double>(a) * static_cast<double>(a) + static_cast<double>(b) * static_cast<double>(b));
+template <typename T, typename R = T>
+R Common::pythagoreanHypotenuse(T a, T b) {
+	return static_cast<R>(sqrtf(static_cast<float>(a * a + b * b));
 }
 
 template<typename T>
@@ -59,12 +51,12 @@ static void Common::arrayCopy(T dest[], T src[], int size) {
 }
 
 template <typename T>
-bool Common::isInRange(T ref, T value, float relativeError, Common::ERROR_SIGN errorDir) {
+bool Common::isInRange(T ref, T value, float relativeError, Common::ErrorSign errorDir = Common::ErrorSign::BOTH) {
 
-	T max = errorDir == ERROR_SIGN::NEGATIVE ?
+	T max = errorDir == ErrorSign::NEGATIVE ?
 		ref : static_cast<T>(ref * (1.0F + relativeError));
 
-	T min = errorDir == ERROR_SIGN::POSITIVE ?
+	T min = errorDir == ErrorSign::POSITIVE ?
 		ref : static_cast<T>(ref * (1.0F - relativeError));
 
 	return isBetween(value, min, max);

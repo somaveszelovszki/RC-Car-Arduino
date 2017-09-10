@@ -8,30 +8,45 @@
 */
 class Watchdog {
 
+public:
+	enum State {
+		RESET, RUNNING, PAUSED, TIMED_OUT
+	};
+
 private:
-	
 	int TIMEOUT;
 	int counter;
-	bool running;
+	State state;
+
+	static Watchdog *instances[WD_MAX_NUM_WATCHDOGS];
+	static int numInstances;
 
 public:
-	Watchdog(int timeout);
+	Watchdog(int _timeout);
 
 	void reset();
 
 	void restart();
 
-	void pause();
+	void pause() {
+		state = PAUSED;
+	}
 
-	void resume();
+	void resume() {
+		state = RUNNING;
+	}
 
-	bool isRunning();
+	bool isRunning() const {
+		return state == RUNNING;
+	}
+
+	bool hasTimedOut() const {
+		return state == TIMED_OUT;
+	}
 
 	void decrement();
 
-	bool timedOut();
-
-	bool checkTimeOutAndRestart();
+	static void decrementAll();
 };
 
 #endif	// WATCHDOG_HPP

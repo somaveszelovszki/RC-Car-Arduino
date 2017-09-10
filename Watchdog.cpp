@@ -1,57 +1,34 @@
 #include "Watchdog.hpp"
 
-Watchdog::Watchdog(int timeout) {
-	TIMEOUT = timeout;
-	running = false;
+int Watchdog::numInstances = 0;
+
+Watchdog::Watchdog(int _timeout) {
+	TIMEOUT = _timeout;
+	reset();
+
+	instances[numInstances++] = this;
 }
 
 void Watchdog::reset() {
+	noInterrupts();
 	counter = TIMEOUT;
-	pause();
+	state = RESET;
+	interrupts();
 }
 
 void Watchdog::restart() {
 	noInterrupts();
-	reset();
-	resume();
+	counter = TIMEOUT;
+	state = RUNNING;
 	interrupts();
-}
-
-void Watchdog::pause() {
-	running = false;
-}
-
-void Watchdog::resume() {
-	running = true;
-}
-
-bool Watchdog::isRunning() {
-	return running;
 }
 
 void Watchdog::decrement() {
-	if (isRunning()) {
-		counter = counter > 0 ? counter - 1 : 0;
-	}
-	
+	if (state == RUNNING && counter > 0 && --counter == 0)
+		state = TIMED_OUT;
 }
 
-bool Watchdog::timedOut() {
-	bool result = false;
-	noInterrupts();
-	if (counter == 0) {
-		reset();
-		result = true;
-	}
-	interrupts();
-	return result;
-}
-
-bool Watchdog::checkTimeOutAndRestart() {
-
-	if (timedOut()) {
-		restart();
-		return true;
-	}
-	return false;
+void Watchdog::decrementAll() {
+	for (int i = 0; i < numInstances; ++i)
+		instances[i]->decrement();
 }

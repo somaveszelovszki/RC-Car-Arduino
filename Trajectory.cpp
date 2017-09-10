@@ -5,65 +5,55 @@ void Trajectory::updateRadiuses() {
 	if (steeringAngleRad == 0)
 		R_frontMiddle = R_rearMiddle = R_middle = R_outer = R_inner = 0;
 	else {
-		double sin_Angle = sin(steeringAngleRad), cos_Angle = cos(steeringAngleRad), tan_Angle = sin_Angle / cos_Angle;
+		float sin_Angle = sin(steeringAngleRad), cos_Angle = cos(steeringAngleRad), tan_Angle = sin_Angle / cos_Angle;
 
-		R_frontMiddle = CAR_PIVOT_DISTANCE_FRONT_REAR / sin_Angle;
-		R_rearMiddle = CAR_PIVOT_DISTANCE_FRONT_REAR / tan_Angle;
-		R_middle = Common::pythagoreanHypotenuse(R_rearMiddle, CAR_PIVOT_DISTANCE_MIDDLE)
+		R_frontMiddle = CAR_PIVOT_DIST_FRONT_REAR / sin_Angle;
+		R_rearMiddle = CAR_PIVOT_DIST_FRONT_REAR / tan_Angle;
+		R_middle = Common::pythagoreanHypotenuse(R_rearMiddle, CAR_PIVOT_DIST_MID)
 			* static_cast<int>(steeringDir);
 
 		R_outer = Common::pythagoreanHypotenuse(R_rearMiddle + CAR_PIVOT_LENGTH_FRONT * static_cast<int>(steeringDir),
-			CAR_PIVOT_DISTANCE_FRONT_REAR + CAR_PIVOT_FRONT_DISTANCE)
+			CAR_PIVOT_DIST_FRONT_REAR + CAR_PIVOT_FRONT_DISTANCE)
 			* static_cast<int>(steeringDir);
 
 		R_inner = R_rearMiddle - CAR_PIVOT_LENGTH_REAR * static_cast<int>(steeringDir);
 
-		R_frontNear = Common::pythagoreanHypotenuse(R_inner, CAR_PIVOT_DISTANCE_FRONT_REAR) * static_cast<int>(steeringDir);
+		R_frontNear = Common::pythagoreanHypotenuse(R_inner, CAR_PIVOT_DIST_FRONT_REAR) * static_cast<int>(steeringDir);
 		R_rearFar = R_rearMiddle + CAR_PIVOT_LENGTH_REAR * static_cast<int>(steeringDir);
 	}
 }
 
-void Trajectory::updateValues(int steeringAngle, double speed) {
-	steeringAngleRad = Common::degreeToRadian(static_cast<double>(steeringAngle));
+void Trajectory::updateValues(int steeringAngle, float speed) {
+	steeringAngleRad = Common::degreeToRadian(static_cast<float>(steeringAngle));
 	steeringDir = steeringAngleRad > 0 ? Common::SteeringDir::LEFT : Common::SteeringDir::RIGHT;
 	this->speed = speed;
 
 	updateRadiuses();
 }
 
-Trajectory::TrackDistance Trajectory::trackDistanceFromPoint(Point<double> relativePos, bool forceCalcRemainingTime) {
+Trajectory::TrackDistance Trajectory::trackDistanceFromPoint(Point<float> relativePos, bool forceCalcRemainingTime) const {
 	// origo	center of the trajectory circle of the rear pivot's center
 	// obs		position of the obstacle relative to the rear pivot's center
 	// inner	inner position of car when it is nearest to the object
 	// outer	outer position of car when it is nearest to the object
-	Point<double> origo(0.0, 0.0), obs, inner, outer;
-
-	cout << "\n\nrelativePos" << relativePos << endl;
+	Point<float> origo(0.0, 0.0), obs, inner, outer;
 
 	obs.X = relativePos.X + R_rearMiddle;
-	obs.Y = relativePos.Y + CAR_PIVOT_DISTANCE_MIDDLE;
+	obs.Y = relativePos.Y + CAR_PIVOT_DIST_MID;
 
-	cout << "posFromOrigo" << obs << endl;
+	float obsAngle = origo.getSteeringAngle(obs, steeringDir);
 
-	double obsAngle = origo.getSteeringAngle(obs, steeringDir);
-
-	//double cos_ObsAngle = cos(obsAngle), sin_ObsAngle = sin(obsAngle);
+	//float cos_ObsAngle = cos(obsAngle), sin_ObsAngle = sin(obsAngle);
 
 	//inner.X = R_inner / cos_ObsAngle, inner.Y = R_inner / sin_ObsAngle,
 	//outer.X = R_outer / cos_ObsAngle, outer.Y = R_outer / sin_ObsAngle;
 
-	//double innerDist = inner.distanceFrom(obs),
+	//float innerDist = inner.distanceFrom(obs),
 	//outerDist = outer.distanceFrom(obs);
 
-	double obsDist = obs.distanceFrom(origo),
+	float obsDist = obs.distanceFrom(origo),
 		innerDist = abs(obsDist - abs(R_inner)),
 		outerDist = abs(obsDist - abs(R_outer));
-
-	cout << "obsDist: " << obsDist << endl;
-	cout << "innerDist: " << innerDist << endl;
-	cout << "outerDist: " << outerDist << endl;
-
-	cout << "isBetween: " << (Common::isBetween(obsDist, abs(R_inner), abs(R_outer)) ? "yes" : "no") << endl;
 
 	TrackDistance td;
 	// checks if car hits obstacle - if yes, minimum distance is negative
@@ -76,25 +66,21 @@ Trajectory::TrackDistance Trajectory::trackDistanceFromPoint(Point<double> relat
 		// delta angle on the trajectory
 		// -> the given part of the car that hits the obstacle will reach it before the rear pivot does
 		// this angle specifies this difference
-		double dAngle = 0.0;
+		float dAngle = 0.0;
 
 		if (td.isCritical()) {
 			if (innerDist < outerDist) {
 				if (innerDist < abs(R_frontNear - R_inner))
-					dAngle = atan(CAR_PIVOT_DISTANCE_FRONT_REAR / R_inner)
+					dAngle = atan(CAR_PIVOT_DIST_FRONT_REAR / R_inner)
 					* (innerDist / abs(R_frontNear - R_inner));
 				else
-					dAngle = atan(CAR_PIVOT_DISTANCE_FRONT_REAR / R_inner);
+					dAngle = atan(CAR_PIVOT_DIST_FRONT_REAR / R_inner);
 			} else
-				dAngle = atan(CAR_PIVOT_DISTANCE_FRONT_REAR / R_inner);
+				dAngle = atan(CAR_PIVOT_DIST_FRONT_REAR / R_inner);
 		}
 
 
-		double hitAngle = obsAngle - dAngle;
-
-		cout << "obsAngle: " << obsAngle << endl;
-		cout << "dAngle: " << dAngle << endl;
-		cout << "hitAngle: " << hitAngle << endl;
+		float hitAngle = obsAngle - dAngle;
 
 		td.remainingTime = R_rearFar * hitAngle / speed;
 	}

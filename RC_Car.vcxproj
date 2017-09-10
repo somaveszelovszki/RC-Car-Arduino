@@ -48,7 +48,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>F:\Program Files (x86)\Arduino\libraries\pt;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\libraries\SoftwareSerial\src;F:\Program Files (x86)\Arduino\libraries\AltSoftSerial;F:\Program Files (x86)\Arduino\libraries\Servo\src;F:\Program Files (x86)\Arduino\libraries\NewPing;F:\Program Files (x86)\Arduino\libraries;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\libraries;C:\Users\Soma\Documents\Arduino\libraries;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\cores\arduino;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\variants\leonardo;$(ProjectDir)..\RC_Car;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\4.9.2-atmel3.5.4-arduino2\avr\include\;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\4.9.2-atmel3.5.4-arduino2\avr\include\avr\;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\4.9.2-atmel3.5.4-arduino2\lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Program Files (x86)\Arduino\libraries\pt;F:\Program Files (x86)\Arduino\libraries\AltSoftSerial;F:\Program Files (x86)\Arduino\libraries\Servo\src;F:\Program Files (x86)\Arduino\libraries\NewPing;F:\Program Files (x86)\Arduino\libraries;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\libraries;C:\Users\Soma\Documents\Arduino\libraries;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\cores\arduino;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\variants\leonardo;$(ProjectDir)..\RC_Car;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\4.9.2-atmel3.5.4-arduino2\avr\include\;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\4.9.2-atmel3.5.4-arduino2\avr\include\avr\;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\4.9.2-atmel3.5.4-arduino2\lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>$(ProjectDir)__vm\.RC_Car.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <PreprocessorDefinitions>__AVR_ATmega32u4__;__AVR_ATmega32U4__;F_CPU=16000000L;ARDUINO=10801;ARDUINO_AVR_LEONARDO;ARDUINO_ARCH_AVR;USB_VID=0x2341;USB_PID=0x8036;__cplusplus=201103L;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -87,10 +87,13 @@
     <ClInclude Include="DriveThread.hpp" />
     <ClInclude Include="Event.hpp" />
     <ClInclude Include="MotorHandler.hpp" />
+    <ClInclude Include="PD_Controller.hpp" />
+    <ClInclude Include="Periodic.hpp" />
+    <ClInclude Include="PeriodicTask.hpp" />
     <ClInclude Include="PeriodicThread.hpp" />
     <ClInclude Include="Point.hpp" />
-    <ClInclude Include="RotaryEncoder.hpp" />
-    <ClInclude Include="SensorThread.hpp" />
+    <ClInclude Include="RotaryThread.hpp" />
+    <ClInclude Include="UltrasonicThread.hpp" />
     <ClInclude Include="Trajectory.hpp" />
     <ClInclude Include="Ultrasonic.hpp" />
     <ClInclude Include="Watchdog.hpp" />
@@ -103,10 +106,11 @@
     <ClCompile Include="DriveThread.cpp" />
     <ClCompile Include="Event.cpp" />
     <ClCompile Include="MotorHandler.cpp" />
+    <ClCompile Include="PD_Controller.cpp" />
     <ClCompile Include="PeriodicThread.cpp" />
     <ClCompile Include="Point.cpp" />
-    <ClCompile Include="RotaryEncoder.cpp" />
-    <ClCompile Include="SensorThread.cpp" />
+    <ClCompile Include="RotaryThread.cpp" />
+    <ClCompile Include="UltrasonicThread.cpp" />
     <ClCompile Include="Trajectory.cpp" />
     <ClCompile Include="Ultrasonic.cpp" />
     <ClCompile Include="Watchdog.cpp" />

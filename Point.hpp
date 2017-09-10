@@ -3,8 +3,6 @@
 
 #include "Common.hpp"
 
-using namespace std;
-
 template <typename T>
 class Point {
 public:
@@ -18,20 +16,19 @@ public:
 		return Common::pythagoreanHypotenuse(X - other.X, Y - other.Y);
 	}
 
-	static double getSteeringAngle(const Point<T>& origo, const Point<T>& other, Common::SteeringDir dir = Common::SteeringDir::LEFT);
+	static float getSteeringAngle(const Point<T>& origo, const Point<T>& other, Common::SteeringDir dir);
+
 	/*
 	Calculates steering angle of given point using this point as the origo.
 	NOTE: Steering angle is always positive for LEFT, and always negative for RIGHT steering direction!
 	*/
-	double getSteeringAngle(const Point<T>& other, Common::SteeringDir dir = Common::SteeringDir::LEFT) {
+	float getSteeringAngle(const Point<T>& other, Common::SteeringDir dir) {
 		return getSteeringAngle(*this, other, dir);
 	}
-};
 
-template <typename T>
-ostream& operator << (ostream& os, const Point<T>& point) {
-	os << "(" << point.X << ", " << point.Y << ")";
-	return os;
-}
+#if(__DEBUG)
+	void print(bool newLine = true) const;
+#endif	// __DEBUG
+};
 
 #endif	// POINT_HPP
