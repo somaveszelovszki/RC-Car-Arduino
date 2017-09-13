@@ -19,24 +19,15 @@ protected:
 
 public:
 
-	PeriodicThread::PeriodicThread(int _periodTime, int _watchDogTimeout) : Periodic(_periodTime) {
-		this->watchdog = new Watchdog(_watchDogTimeout);
-
-		instances[numInstances++] = this;
-	}
+	PeriodicThread::PeriodicThread(int _periodTime, int _watchDogTimeout);
 
 	void checkhasTimedOut();
 
 	static void initializeThreads();
 
-	void run() {
-		__run();
-		prevTime = Common::milliSecs();
-	}
+	void run();
 
-	~PeriodicThread() {
-		delete watchdog;
-	}
+	~PeriodicThread();
 };
 
 #endif	// PERIODIC_THREAD_HPP

@@ -18,17 +18,8 @@ private:
 	*/
 	class ServoMotor : public Servo {
 		friend class MotorHandler;
-
-	private:
-		int middlePos = 77;	// in degrees
-		int maxRotation = SERVO_DEFAULT_MAX_ROTATION;		// TODO change it to store data
-
 	public:
-		ServoMotor() {}
-		/*
-			Resets servo middle position, checks if MAX_ROTATION hurts any restrictions.
-		*/
-		void recalibrate(int newMiddlePos);
+		void writeAngle(float angle);
 	};
 
 	class DCMotor {
@@ -46,18 +37,10 @@ private:
 	PD_Controller *speedController;
 
 	float desiredSpeed;
+	float steeringAngle;
 
 	ServoMotor servoMotor;
 	DCMotor DC_Motor;
-
-	/*
-	Maps command values to actual servo values.
-	*/
-	int commandValueToSteeringAngle(int commandValue) const;
-
-	//int rotationToSpeed(int rotation, int d_time);
-	//int speedToRotation(int speed, int d_time);
-
 
 public:
 	MotorHandler() {
@@ -72,12 +55,15 @@ public:
 		desiredSpeed = newDesiredSpeed;
 	}
 
-	void setSteeringAngle(int commandAngle);
+	void updateSteeringAngle(float _steeringAngle);
+
+	float getSteeringAngle() {
+		return steeringAngle;
+	}
 	/*
 	Positions servo motor to middle.
 	*/
 	void positionServoMiddle();
-	void recalibrateServo(int commandAngle);
 
 	void attachServo();
 	void detachServo();

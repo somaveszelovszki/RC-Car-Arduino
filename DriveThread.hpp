@@ -2,10 +2,12 @@
 #define DRIVE_THREAD_HPP
 
 #include "MotorHandler.hpp"
+#include "Trajectory.hpp"
+#include "Environment.hpp"
 
-class UltrasonicThread;
-class CommunicatorThread;
-class RotaryThread;
+#include "CommunicatorThread.hpp"
+#include "UltrasonicThread.hpp"
+#include "RotaryThread.hpp"
 
 /**
    Controls motors, responsible for driving car.
@@ -19,9 +21,9 @@ private:
 
 	Watchdog *forceStopWatchdog;
 
-	Command command;
+	Command cmd;
 
-	int distances[ULTRA_NUM_SENSORS];
+	Environment environment;
 
 	void __initialize() override;
 	void __run() override;
@@ -40,9 +42,7 @@ private:
 public:
 	DriveThread();
 
-	~DriveThread() {
-		delete forceStopWatchdog;
-	}
+	~DriveThread();
 };
 
 #endif	// DRIVE_THREAD_HPP

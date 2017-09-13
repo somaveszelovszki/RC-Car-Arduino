@@ -20,7 +20,7 @@ public:
 private:
 
 	float speed;
-	float steeringAngleRad;
+	float steeringAngle;
 	Common::SteeringDir steeringDir;
 
 	float R_frontMiddle;

@@ -6,7 +6,7 @@ Watchdog::Watchdog(int _timeout) {
 	TIMEOUT = _timeout;
 	reset();
 
-	instances[numInstances++] = this;
+	instances[numInstances++] = *this;
 }
 
 void Watchdog::reset() {
@@ -30,5 +30,5 @@ void Watchdog::decrement() {
 
 void Watchdog::decrementAll() {
 	for (int i = 0; i < numInstances; ++i)
-		instances[i]->decrement();
+		instances[i].decrement();
 }

@@ -1,5 +1,69 @@
 #include "Point.hpp"
 
+template<typename T>
+Point<float>& Point<T>::operator=(const Point<float>& other) {
+	X = other.X;
+	Y = other.Y;
+}
+
+template<typename T>
+Point<T> Point<T>::operator+(const Point<T>& other) const {
+	return Point<T>(X + other.X, Y + other.Y);
+}
+
+template<typename T>
+Point<T> Point<T>::operator-(const Point<T>& other) const {
+	return Point<T>(X - other.X, Y - other.Y);
+}
+
+template<typename T>
+Point<T>& Point<T>::operator+=(const Point<T>& other) {
+	X += other.X;
+	Y += other.Y;
+	return *this;
+}
+
+template<typename T>
+Point<T>& Point<T>::operator-=(const Point<T>& other) {
+	X -= other.X;
+	Y -= other.Y;
+	return *this;
+}
+
+template<typename T>
+Point<T> Point<T>::operator*(const T & c) const {
+	return Point<T>(X * c, Y * c);
+}
+
+template<typename T>
+Point<T> Point<T>::operator/(const T & c) const {
+	return Point<T>(X / c, Y / c);
+}
+
+template<typename T>
+Point<T>& Point<T>::operator*=(const T & c) {
+	X *= c;
+	Y *= c;
+	return *this;
+}
+
+template<typename T>
+Point<T>& Point<T>::operator/=(const T & c) {
+	X /= c;
+	Y /= c;
+	return *this;
+}
+
+template<typename T>
+T Point<T>::distanceFrom(Point<T> other) {
+	return Common::pythagoreanHypotenuse(X - other.X, Y - other.Y);
+}
+
+template<typename T>
+T Point<T>::length() {
+	return Common::pythagoreanHypotenuse(X, Y);
+}
+
 template <typename T>
 float Point<T>::getSteeringAngle(const Point<T>& origo, const Point<T>& other, Common::SteeringDir dir) {
 	float angle;
@@ -22,6 +86,10 @@ float Point<T>::getSteeringAngle(const Point<T>& origo, const Point<T>& other, C
 
 #if(__DEBUG)
 template<typename T>
+Point<T> Point<T>::average(const Point<T>& p1, const Point<T>& p2) {
+	return Point<T>((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2);
+}
+template<typename T>
 void Point<T>::print(bool newLine = true) const {
 	Serial.print("(");
 	Serial.print(X);
@@ -31,3 +99,8 @@ void Point<T>::print(bool newLine = true) const {
 	if (newLine) Serial.println();
 }
 #endif // __DEBUG
+
+template <typename T>
+Point<T> operator*(const T & c, const Point<T>& p) {
+	return p * c;
+}

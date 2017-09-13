@@ -1,6 +1,8 @@
 #ifndef PERIODIC_HPP
 #define PERIODIC_HPP
 
+#include "Common.hpp"
+
 class Periodic {
 
 protected:

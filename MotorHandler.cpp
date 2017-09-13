@@ -1,23 +1,7 @@
 #include "MotorHandler.hpp"
 
-/*
-Value is in [-100 +100]
-0 means middle position
-
-Position is in [0 +180]
-*/
-int MotorHandler::commandValueToSteeringAngle(int commandValue) const {
-	return map(commandValue, SERVO_COMMAND_VALUE_MIN, SERVO_COMMAND_VALUE_MAX,
-		servoMotor.middlePos - servoMotor.maxRotation, servoMotor.middlePos + servoMotor.maxRotation);
-}
-
-void MotorHandler::ServoMotor::recalibrate(int newMiddlePos) {
-	middlePos = newMiddlePos;
-
-	// motor cannot be set to <0 or >MAX_VALUE degrees
-	int managableRotation = min(newMiddlePos - SERVO_POSITION_MIN, SERVO_POSITION_MAX - newMiddlePos);
-
-	maxRotation = min(managableRotation, SERVO_DEFAULT_MAX_ROTATION);
+void MotorHandler::ServoMotor::writeAngle(float angle) {
+	this->write(Common::incarcerate(static_cast<int>((angle + M_PI_2) * RAD_TO_DEG), SERVO_POS_MIN, SERVO_POS_MAX));
 }
 
 void MotorHandler::DCMotor::initialize() {
@@ -27,14 +11,12 @@ void MotorHandler::DCMotor::initialize() {
 
 void MotorHandler::DCMotor::writeValue(int value) {
 
-	if (value > DC_MAX_VALUE)
-		value = DC_MAX_VALUE;
+	value = Common::incarcerate(value, DC_MIN_VALUE, DC_MAX_VALUE);
 
-	if (value < DC_MIN_VALUE)
-		value = DC_MIN_VALUE;
+	bool isFwd = value >= 0;
 
-	analogWrite(DC_MOTOR_FORWARD_PIN, value >= 0 ? value : 0);
-	analogWrite(DC_MOTOR_BACKWARD_PIN, value >= 0 ? 0 : (-1 * value));
+	analogWrite(DC_MOTOR_FORWARD_PIN, isFwd ? value : 0);
+	analogWrite(DC_MOTOR_BACKWARD_PIN, isFwd ? 0 : -value);
 }
 
 void MotorHandler::initialize() {
@@ -52,16 +34,13 @@ void MotorHandler::updateSpeed(float actualSpeed) {
 		DC_Motor.writeValue(speedController->run(desiredSpeed - actualSpeed));
 }
 
-void MotorHandler::setSteeringAngle(int commandAngle) {
-	servoMotor.write(commandValueToSteeringAngle(commandAngle));
+void MotorHandler::updateSteeringAngle(float _steeringAngle) {
+	steeringAngle = _steeringAngle;
+	servoMotor.writeAngle(steeringAngle);
 }
 
 void MotorHandler::positionServoMiddle() {
-	setSteeringAngle(0);
-}
-
-void MotorHandler::recalibrateServo(int commandAngle) {
-	servoMotor.recalibrate(commandValueToSteeringAngle(commandAngle));
+	updateSteeringAngle(0.0f);
 }
 
 void MotorHandler::attachServo() {

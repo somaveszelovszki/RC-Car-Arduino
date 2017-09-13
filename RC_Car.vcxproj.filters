@@ -48,9 +48,6 @@
     <ClInclude Include="def.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Ultrasonic.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DriveThread.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -70,6 +67,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PeriodicTask.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Environment.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vec.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -101,9 +104,6 @@
     <ClCompile Include="Watchdog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Ultrasonic.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DriveThread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -117,6 +117,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PD_Controller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Environment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

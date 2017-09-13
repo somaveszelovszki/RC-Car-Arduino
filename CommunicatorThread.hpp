@@ -1,10 +1,10 @@
 #ifndef COMMUNICATOR_THREAD_HPP
 #define COMMUNICATOR_THREAD_HPP
 
+#include "PeriodicThread.hpp"
 //#include <SoftwareSerial.h>
 #include "AltSoftSerial.h"
 #include "Command.hpp"
-#include "PeriodicThread.hpp"
 #include "Watchdog.hpp"
 
 /*

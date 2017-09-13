@@ -17,8 +17,7 @@ public:
 		NoNewCommandCode = 0,
 		Speed = 1,           // [0 100] contains direction as well (>50 means FORWARD)
 		SteeringAngle = 2,  // [-100 100] positive means steering to the right
-		ServoRecalibrate = 3,
-		DriveMode = 4		// values from Common::DriveMode enum
+		DriveMode = 3		// values from Common::DriveMode enum
 	};
 
 	static const Command NoNewCommand;

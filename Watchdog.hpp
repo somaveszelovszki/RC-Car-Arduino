@@ -18,7 +18,7 @@ private:
 	int counter;
 	State state;
 
-	static Watchdog *instances[WD_MAX_NUM_WATCHDOGS];
+	static Watchdog instances[WD_MAX_NUM_WATCHDOGS];
 	static int numInstances;
 
 public:

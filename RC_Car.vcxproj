@@ -85,6 +85,7 @@
     <ClInclude Include="Common.hpp" />
     <ClInclude Include="CommunicatorThread.hpp" />
     <ClInclude Include="DriveThread.hpp" />
+    <ClInclude Include="Environment.hpp" />
     <ClInclude Include="Event.hpp" />
     <ClInclude Include="MotorHandler.hpp" />
     <ClInclude Include="PD_Controller.hpp" />
@@ -95,7 +96,7 @@
     <ClInclude Include="RotaryThread.hpp" />
     <ClInclude Include="UltrasonicThread.hpp" />
     <ClInclude Include="Trajectory.hpp" />
-    <ClInclude Include="Ultrasonic.hpp" />
+    <ClInclude Include="Vec.hpp" />
     <ClInclude Include="Watchdog.hpp" />
     <ClInclude Include="__vm\.RC_Car.vsarduino.h" />
   </ItemGroup>
@@ -104,6 +105,7 @@
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="CommunicatorThread.cpp" />
     <ClCompile Include="DriveThread.cpp" />
+    <ClCompile Include="Environment.cpp" />
     <ClCompile Include="Event.cpp" />
     <ClCompile Include="MotorHandler.cpp" />
     <ClCompile Include="PD_Controller.cpp" />
@@ -112,7 +114,6 @@
     <ClCompile Include="RotaryThread.cpp" />
     <ClCompile Include="UltrasonicThread.cpp" />
     <ClCompile Include="Trajectory.cpp" />
-    <ClCompile Include="Ultrasonic.cpp" />
     <ClCompile Include="Watchdog.cpp" />
   </ItemGroup>
   <PropertyGroup>

@@ -2,10 +2,10 @@
 
 void Trajectory::updateRadiuses() {
 
-	if (steeringAngleRad == 0)
+	if (steeringAngle == 0)
 		R_frontMiddle = R_rearMiddle = R_middle = R_outer = R_inner = 0;
 	else {
-		float sin_Angle = sin(steeringAngleRad), cos_Angle = cos(steeringAngleRad), tan_Angle = sin_Angle / cos_Angle;
+		float sin_Angle = sin(steeringAngle), cos_Angle = cos(steeringAngle), tan_Angle = sin_Angle / cos_Angle;
 
 		R_frontMiddle = CAR_PIVOT_DIST_FRONT_REAR / sin_Angle;
 		R_rearMiddle = CAR_PIVOT_DIST_FRONT_REAR / tan_Angle;
@@ -23,10 +23,10 @@ void Trajectory::updateRadiuses() {
 	}
 }
 
-void Trajectory::updateValues(int steeringAngle, float speed) {
-	steeringAngleRad = Common::degreeToRadian(static_cast<float>(steeringAngle));
-	steeringDir = steeringAngleRad > 0 ? Common::SteeringDir::LEFT : Common::SteeringDir::RIGHT;
-	this->speed = speed;
+void Trajectory::updateValues(int _steeringAngle, float _speed) {
+	steeringAngle = _steeringAngle;
+	steeringDir = steeringAngle > 0 ? Common::SteeringDir::LEFT : Common::SteeringDir::RIGHT;
+	speed = _speed;
 
 	updateRadiuses();
 }

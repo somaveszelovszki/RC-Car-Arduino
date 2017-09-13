@@ -2,6 +2,7 @@
 #define COMMON_HPP
 
 #include <Arduino.h>
+#include <Print.h>
 #include <math.h>
 
 #include "def.hpp"
@@ -10,6 +11,9 @@
 
 #define radToDeg(deg) ((deg) * (DEG_TO_RAD))
 #define degToRad(rad) ((rad) * (RAD_TO_DEG))
+
+#define dirAngleToXY(angle) ((angle) + M_PI_2)
+#define XYAngleToDir(angle) ((angle) - M_PI_2)
 
 #define SEC_TO_MSEC 1000
 
@@ -45,24 +49,25 @@ public:
 		RIGHT = -1
 	};
 
-	/*
+	/** @ brief Ultrasonic sensor positions.
 	NOTE: If you add a position, don't forget to update ULTRA_NUM_SENSORS!
 	*/
 	enum UltrasonicPos {
-		FRONT_LEFT_CORNER = 0,
-		FRONT_LEFT = 1,
-		FRONT_RIGHT = 2,
-		FRONT_RIGHT_CORNER = 3,
+		FRONT_RIGHT_CORNER = 0,
+		FRONT_RIGHT,
+		FRONT_LEFT,
+		FRONT_LEFT_CORNER,
 
-		REAR_LEFT_CORNER = 4,
-		REAR_LEFT = 5,
-		REAR_RIGHT = 6,
-		REAR_RIGHT_CORNER = 7,
+		LEFT_FRONT,
+		LEFT_REAR,
+		
+		REAR_LEFT_CORNER,
+		REAR_LEFT,
+		REAR_RIGHT,
+		REAR_RIGHT_CORNER,
 
-		LEFT_FRONT = 8,
-		LEFT_REAR = 9,
-		RIGHT_FRONT = 10,
-		RIGHT_REAR = 11
+		RIGHT_REAR,
+		RIGHT_FRONT
 	};
 
 	struct ValidationData {
@@ -73,9 +78,6 @@ public:
 	static int write(Print& printer, const String& str);
 
 	static void initializeTimer();
-
-	template <typename T>
-	static void arrayCopy(T dest[], T src[], int size);
 
 	static unsigned long milliSecs() {
 		return MILLIS;
@@ -88,11 +90,17 @@ public:
 	template <typename T>
 	static bool contains(const T array[], int arraySize, T item);
 
-	template <typename T, typename R = T>
-	static R pythagoreanHypotenuse(T a, T b);
+	template <typename T>
+	static T pythagoreanHypotenuse(T a, T b);
 
 	template <typename T>
-	static bool isBetween(T value, T boundary1, T boundary2);
+	static bool isBetween(T value, T boundaryLow, T boundaryHigh);
+
+	template <typename T>
+	static T incarcerate(T value, T boundaryLow, T boundaryHigh);
+
+	template <typename T>
+	static void arrayCopy(const T src[], T dest[], int size);
 
 	/*
 	Checks if value is in a given range of the reference value.

@@ -23,12 +23,12 @@ void DriveThread::__run() {
 		break;
 	case Common::SAFE_DRIVE:
 		// if measured distance is critical, forces car to stop
-		for (int sensorPos = 0; !forceStopWatchdog->isRunning() && sensorPos < ULTRA_NUM_SENSORS; ++sensorPos)
-			if (isDistanceCritical(static_cast<Common::UltrasonicPos>(sensorPos), distances[sensorPos]))
-				forceStopWatchdog->restart();
+		/*for (int pos = 0; !forceStopWatchdog->isRunning() && pos < ULTRA_NUM_SENSORS; ++pos)
+			if (isDistanceCritical(static_cast<Common::UltrasonicPos>(pos), distances[pos]))
+				forceStopWatchdog->restart();*/
 
-		if (command.getCode() == Command::CODE::Speed && forceStopWatchdog->isRunning())
-			command.setIntValue(0);
+		if (cmd.getCode() == Command::CODE::Speed && forceStopWatchdog->isRunning())
+			cmd.setIntValue(0);
 
 		break;
 	case Common::AUTOPILOT:
@@ -48,80 +48,82 @@ void DriveThread::__onTimedOut() {
 
 bool DriveThread::isDistanceCritical(Common::UltrasonicPos pos, int distance) const {
 
-	float speed;
-	motorHandler.getActualSpeed(&speed);
+	//float speed;
+	//motorHandler.getActualSpeed(&speed);
 
-	//Serial.print("speed: ");
-	//Serial.println(speed);
+	////Serial.print("speed: ");
+	////Serial.println(speed);
 
-	if (speed == 0) return false;
+	//if (speed == 0) return false;
 
-	// time until crash with given speed
-	float preCrashTime = distance / abs(speed);
+	//// time until crash with given speed
+	//float preCrashTime = distance / abs(speed);
 
-	Serial.print("pre crash time: ");
-	Serial.println(preCrashTime);
+	//Serial.print("pre crash time: ");
+	//Serial.println(preCrashTime);
 
-	if (speed > 0) {		// FORWARD
-		if (pos == Common::UltrasonicPos::FRONT_LEFT || pos == Common::UltrasonicPos::FRONT_RIGHT) {
-			/*Serial.print("distance: ");
-			Serial.print(distance);
-			Serial.print(" cm");
-			Serial.print("\t\tspeed: ");
-			Serial.println(speed);
-			Serial.print(" cm/sec");
-			Serial.print(preCrashTime);
-			Serial.print(" <= ");
-			Serial.println(CRITICAL_PRE_CRASH_TIME);
-			Serial.println();*/
+	//if (speed > 0) {		// FORWARD
+	//	if (pos == Common::UltrasonicPos::FRONT_LEFT || pos == Common::UltrasonicPos::FRONT_RIGHT) {
+	//		/*Serial.print("distance: ");
+	//		Serial.print(distance);
+	//		Serial.print(" cm");
+	//		Serial.print("\t\tspeed: ");
+	//		Serial.println(speed);
+	//		Serial.print(" cm/sec");
+	//		Serial.print(preCrashTime);
+	//		Serial.print(" <= ");
+	//		Serial.println(CRITICAL_PRE_CRASH_TIME);
+	//		Serial.println();*/
 
-			// checks if time until crash is below critical
-			if (preCrashTime <= CRITICAL_PRE_CRASH_TIME) {
-				/*Serial.print("\t->\t");
-				Serial.println("CRITICAL!");*/
-				return true;
-			}
-		}
-	} else {		// BACKWARD
-		if (pos == Common::UltrasonicPos::REAR_LEFT || pos == Common::UltrasonicPos::REAR_RIGHT) {
+	//		// checks if time until crash is below critical
+	//		if (preCrashTime <= CRITICAL_PRE_CRASH_TIME) {
+	//			/*Serial.print("\t->\t");
+	//			Serial.println("CRITICAL!");*/
+	//			return true;
+	//		}
+	//	}
+	//} else {		// BACKWARD
+	//	if (pos == Common::UltrasonicPos::REAR_LEFT || pos == Common::UltrasonicPos::REAR_RIGHT) {
 
-			// checks if time until crash is below critical
-			if (preCrashTime <= CRITICAL_PRE_CRASH_TIME) {
-				return true;
-			}
-		}
-	}
+	//		// checks if time until crash is below critical
+	//		if (preCrashTime <= CRITICAL_PRE_CRASH_TIME) {
+	//			return true;
+	//		}
+	//	}
+	//}
 
 	return false;
 }
 
 void DriveThread::updateValues() {
-	ultrasonicThread.getDistances(distances);
+	ultrasonicThread.getSensedPoints(environment.points);
+	environment.fwdDir = ultrasonicThread.calculateForwardDirection(motorHandler.getSteeringAngle());
+	environment.calculateCombinedSections();
 
 	float actualSpeed = rotaryThread.getSpeed();
 	motorHandler.updateSpeed(actualSpeed);
 
-	command = communicatorThread.getCommand();
+	cmd = communicatorThread.getCommand();
 }
 
 void DriveThread::executeCommand() {
-	switch (command.getCode()) {
+	switch (cmd.getCode()) {
 
 	case Command::CODE::Speed:
-		motorHandler.setDesiredSpeed(command.getFloatValue());
+		motorHandler.setDesiredSpeed(cmd.getFloatValue());
 		break;
 
 	case Command::CODE::SteeringAngle:
-		motorHandler.setSteeringAngle(command.getIntValue());
-		break;
-
-	case Command::CODE::ServoRecalibrate:
-		motorHandler.recalibrateServo(command.getIntValue());
+		motorHandler.updateSteeringAngle(cmd.getFloatValue());
 		break;
 
 	case Command::CODE::DriveMode:
-		mode = command.getDriveModeValue();
+		mode = cmd.getDriveModeValue();
 		// TODO notification
 		break;
 	}
+}
+
+DriveThread::~DriveThread() {
+	delete forceStopWatchdog;
 }

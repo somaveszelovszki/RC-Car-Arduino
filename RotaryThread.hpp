@@ -1,6 +1,8 @@
 #ifndef ROTARY_THREAD_HPP
 #define ROTARY_THREAD_HPP
 
+#include "PeriodicThread.hpp"
+
 class RotaryThread : public PeriodicThread {
 
 private:

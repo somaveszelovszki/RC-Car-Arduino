@@ -5,9 +5,8 @@ int Common::write(Print& printer, const String& str) {
 	int numPrintedBytes = 0;
 
 	// prints all characters
-	for (int i = 0; i < str.length(); i++) {
+	for (int i = 0; i < str.length(); i++)
 		numPrintedBytes += printer.print(str.charAt(i));
-	}
 
 	return numPrintedBytes;
 }
@@ -32,19 +31,24 @@ bool Common::contains(const T array[], int arraySize, T item) {
 	return false;
 }
 
-template <typename T, typename R = T>
-R Common::pythagoreanHypotenuse(T a, T b) {
-	return static_cast<R>(sqrtf(static_cast<float>(a * a + b * b));
+template <typename T>
+T Common::pythagoreanHypotenuse(T a, T b) {
+	return static_cast<T>(sqrt(static_cast<float>(a * a + b * b)));
 }
 
 template<typename T>
-bool Common::isBetween(T value, T boundary1, T boundary2) {
-	return boundary2 >= boundary1 ? value >= boundary1 && value <= boundary2
-		: value >= boundary2 && value <= boundary1;
+bool Common::isBetween(T value, T boundaryLow, T boundaryHigh) {
+	return boundaryHigh >= boundaryLow ? value >= boundaryLow && value <= boundaryHigh
+		: value >= boundaryHigh && value <= boundaryLow;
+}
+
+template<typename T>
+T Common::incarcerate(T value, T boundaryLow, T boundaryHigh) {
+	return min(max(value, boundaryLow), boundaryHigh);
 }
 
 template <typename T>
-static void Common::arrayCopy(T dest[], T src[], int size) {
+static void Common::arrayCopy(const T src[], T dest[], int size) {
 	for (int i = 0; i < size; ++i) {
 		dest[i] = src[i];
 	}
