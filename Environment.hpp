@@ -4,18 +4,22 @@
 #include "Point.hpp"
 #include "Vec.hpp"
 
-typedef Vec<Point<float>, ENV_SECTION_POINTS_MAX_NUM> EnvSectionVec;
+namespace rc_car {
+	/** @brief Calculates environment around car from the measured data of the ultrasonic sensors.
+	*/
+	class Environment {
+	private:
+		Point<float> currentPos;
+		Point<float> absPoints[ENV_ABS_POINTS_NUM_X][ENV_ABS_POINTS_NUM_Y];
 
-class Environment {
-private:
-	void calculateSectionPoints(Common::UltrasonicPos pos, EnvSectionVec& dest);
+		void calculateSectionPoints(Common::UltrasonicPos pos, int *pDestStartIndex);
 
-public:
-	Common::UltrasonicPos fwdDir;
-	Point<float> points[ULTRA_NUM_SENSORS];
-	EnvSectionVec combinedSections[ENV_COMBINED_SECTIONS_NUM][ENV_COMBINED_SECTION_SENSORS_NUM];
+	public:
+		Point<float> measuredPoints[ULTRA_NUM_SENSORS];
+		Point<float> estimatedPoints[ENV_POINTS_NUM];
 
-	void calculateCombinedSections();
-};
+		void calculate();
+	};
+}
 
 #endif // ENVIRONMENT_HPP

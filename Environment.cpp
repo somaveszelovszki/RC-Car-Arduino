@@ -1,25 +1,24 @@
 #include "Environment.hpp"
 
-void Environment::calculateSectionPoints(Common::UltrasonicPos pos, EnvSectionVec& dest) {
-	Point<float> start = points[pos], end = points[(pos + 1) % ULTRA_NUM_SENSORS];
+using namespace rc_car;
 
+void Environment::calculateSectionPoints(Common::UltrasonicPos pos, int *pDestStartIndex) {
+	Point<float> start = measuredPoints[pos],
+		end = measuredPoints[Common::nextUltrasonicPos(pos)];
 
-	Point<float> diff = (end - start) / ENV_SECTION_POINTS_MAX_NUM;
-	dest.length = ENV_SECTION_POINTS_MAX_NUM;
+	float diffAngle = abs(Point<float>::ORIGO.getAngle(start, Common::SteeringDir::LEFT)
+		- Point<float>::ORIGO.getAngle(end, Common::SteeringDir::LEFT));
 
-	float len = diff.length();
-	if (len < ENV_SECTION_POINTS_MIN_DIST) {
-		diff *= ENV_SECTION_POINTS_MIN_DIST / len;
-		dest.length *= len / ENV_SECTION_POINTS_MIN_DIST;
-	}
-	
-	for (int i = 0; i < dest.length; ++i)
-		dest[i] = start + i * diff;
+	// rounds down angle ratio -> gets number of middle points
+	int middlePointsNum = static_cast<int>(diffAngle / ENV_POINTS_DELTA_ANGLE);
+
+	Point<float> diff = (end - start) / (middlePointsNum + 1);
+	for (int i = 0; i < middlePointsNum; ++i)
+		estimatedPoints[(*pDestStartIndex)++] = start + i * diff;
 }
 
-void Environment::calculateCombinedSections() {
-	for (int i = 0; i < ULTRA_NUM_SENSORS; ++i) {
-		calculateSectionPoints(static_cast<Common::UltrasonicPos>((fwdDir + i) % ULTRA_NUM_SENSORS),
-			combinedSections[i / ENV_COMBINED_SECTION_SENSORS_NUM][i % ENV_COMBINED_SECTION_SENSORS_NUM]);
-	}
+void Environment::calculate() {
+	int currentIndex = 0;
+	for (int i = 0; i < ULTRA_NUM_SENSORS; ++i)
+		calculateSectionPoints(static_cast<Common::UltrasonicPos>(i), &currentIndex);
 }

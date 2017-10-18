@@ -3,21 +3,25 @@
 
 #include "PeriodicTask.hpp"
 
-class PD_Controller : public PeriodicTask<float, int> {
-private:
-	float Kp, Kd;
-	float prevError = 0.0f;
-	float output = 0.0f;
+namespace rc_car {
+	/** @brief PD controller implementation.
+	*/
+	class PD_Controller : public Periodic {
+	private:
+		float Kp, Kd;
+		float prevError = 0.0f;
+		float output = 0.0f;
 
-	virtual int __run(const float& error) override;
+	public:
 
-public:
+		PD_Controller(int _periodTime, float _Kp, float _Kd) : Periodic(_periodTime), Kp(_Kp), Kd(_Kd) {}
 
-	PD_Controller(int _periodTime, float _Kp, float _Kd) : PeriodicTask(_periodTime), Kp(_Kp), Kd(_Kd) {}
+		float update(const float& error);
 
-	float getOutput() const {
-		return output;
-	}
-};
+		float getOutput() const {
+			return output;
+		}
+	};
+}
 
 #endif // PD_CONTROLLER_HPP

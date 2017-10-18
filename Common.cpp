@@ -1,13 +1,11 @@
 #include "Common.hpp"
 
-int Common::write(Print& printer, const String& str) {
+using namespace rc_car;
 
+int Common::print(Print& printer, const String& str) {
 	int numPrintedBytes = 0;
-
-	// prints all characters
-	for (int i = 0; i < str.length(); i++)
+	for (int i = 0; i < str.length(); ++i)
 		numPrintedBytes += printer.print(str.charAt(i));
-
 	return numPrintedBytes;
 }
 
@@ -22,48 +20,30 @@ void Common::initializeTimer() {
 	interrupts();
 }
 
-template <typename T>
-bool Common::contains(const T array[], int arraySize, T item) {
-	for (int i = 0; i < arraySize; ++i) {
-		if (array[i] == item)
-			return true;
-	}
-	return false;
+int Common::bytesToInt(const byte bytes[], int startIndex = 0) {
+	return (bytes[startIndex] << 24)
+		| (bytes[startIndex + 1] << 16)
+		| (bytes[startIndex + 2] << 8)
+		| bytes[startIndex + 3];
 }
 
-template <typename T>
-T Common::pythagoreanHypotenuse(T a, T b) {
-	return static_cast<T>(sqrt(static_cast<float>(a * a + b * b)));
+float Common::bytesToFloat(const byte bytes[], int startIndex = 0) {
+	const float *floatPtr = reinterpret_cast<const float*>(&bytes[startIndex]);
+	return *floatPtr;
 }
 
-template<typename T>
-bool Common::isBetween(T value, T boundaryLow, T boundaryHigh) {
-	return boundaryHigh >= boundaryLow ? value >= boundaryLow && value <= boundaryHigh
-		: value >= boundaryHigh && value <= boundaryLow;
+byte* Common::intToBytes(int value, byte dest[4]) {
+	dest[0] = static_cast<byte>(value >> 24);
+	dest[1] = static_cast<byte>(value >> 16);
+	dest[2] = static_cast<byte>(value >> 8);
+	dest[3] = static_cast<byte>(value);
 }
 
-template<typename T>
-T Common::incarcerate(T value, T boundaryLow, T boundaryHigh) {
-	return min(max(value, boundaryLow), boundaryHigh);
-}
-
-template <typename T>
-static void Common::arrayCopy(const T src[], T dest[], int size) {
-	for (int i = 0; i < size; ++i) {
-		dest[i] = src[i];
-	}
-}
-
-template <typename T>
-bool Common::isInRange(T ref, T value, float relativeError, Common::ErrorSign errorDir = Common::ErrorSign::BOTH) {
-
-	T max = errorDir == ErrorSign::NEGATIVE ?
-		ref : static_cast<T>(ref * (1.0F + relativeError));
-
-	T min = errorDir == ErrorSign::POSITIVE ?
-		ref : static_cast<T>(ref * (1.0F - relativeError));
-
-	return isBetween(value, min, max);
+byte* Common::floatToBytes(int value, byte dest[4]) {
+	byte res[4];
+	const byte *bytePtr = reinterpret_cast<const byte*>(&value);
+	Common::arrayCopy<4>(bytePtr, res);
+	return res;
 }
 
 unsigned long Common::MILLIS = 0;

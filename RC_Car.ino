@@ -1,24 +1,26 @@
 /*
 	Contains main program.
-	Receives commands through a Communicator object, reads ultrasonic sensor distances.
+	Receives messages through a Communicator object, reads ultrasonic sensor distances.
 	Handles motors according to drive mode.
 */
 
 #include <pt.h>
-#include "CommunicatorThread.hpp"
-#include "DriveThread.hpp"
-#include "UltrasonicThread.hpp"
-#include "RotaryThread.hpp"
+#include "CommunicatorTask.hpp"
+#include "DriveTask.hpp"
+#include "UltrasonicTask.hpp"
+#include "RotaryTask.hpp"
 
-CommunicatorThread communicatorThread;
-DriveThread driveThread;
-UltrasonicThread ultrasonicThread;
-RotaryThread rotaryThread;
+using namespace rc_car;
+
+CommunicatorTask communicatorTask;
+DriveTask driveTask;
+UltrasonicTask ultrasonicTask;
+RotaryTask rotaryTask;
 
 ISR(TIMER0_COMPA_vect);
 
 /*
-	Handling communicator and sensors uses Protothreads.
+	Handling communicator and sensors uses Prototasks.
 	@see http://dunkels.com/adam/pt/
 */
 static struct pt communicator_pt;
@@ -26,38 +28,38 @@ static struct pt ultrasonic_pt;
 static struct pt drive_pt;
 static struct pt rotary_pt;
 
-#define PT_THREAD_BODY(thread)					\
+#define PT_TASK_BODY(task)					\
 PT_BEGIN(_pt);									\
-PT_WAIT_UNTIL(_pt, thread.periodTimeReached());	\
-thread.run();									\
-thread.checkhasTimedOut();						\
+PT_WAIT_UNTIL(_pt, task.periodTimeReached());	\
+task.checkIfTimedOut();						\
+task.run();									\
 PT_END(_pt);
 
 /** @brief Sends data to and receives data from phone.
 */
-static PT_THREAD(communicator_thread(struct pt *_pt)) {
-	PT_THREAD_BODY(communicatorThread);
+static PT_THREAD(communicator_task(struct pt *_pt)) {
+	PT_TASK_BODY(communicatorTask);
 }
 
 /** @brief Reads and validates sensor values.
 */
-static PT_THREAD(ultrasonic_thread(struct pt *_pt)) {
-	PT_THREAD_BODY(ultrasonicThread);
+static PT_THREAD(ultrasonic_task(struct pt *_pt)) {
+	PT_TASK_BODY(ultrasonicTask);
 }
 
-/** @brief Executes drive commands - handles servo and DC motors.
+/** @brief Executes drive messages - handles servo and DC motors.
 */
-static PT_THREAD(drive_thread(struct pt *_pt)) {
-	PT_THREAD_BODY(driveThread);
+static PT_THREAD(drive_task(struct pt *_pt)) {
+	PT_TASK_BODY(driveTask);
 }
 
 /** @brief Reads rotary encoder values.
 */
-static PT_THREAD(rotary_thread(struct pt *_pt)) {
-	PT_THREAD_BODY(rotaryThread);
+static PT_THREAD(rotary_task(struct pt *_pt)) {
+	PT_TASK_BODY(rotaryTask);
 }
 
-/** @brief Initializes timers and threads.
+/** @brief Initializes timers and tasks.
 */
 void setup() {
 
@@ -66,7 +68,7 @@ void setup() {
 	Serial.println("setup...");
 #endif // __DEBUG
 
-	PeriodicThread::initializeThreads();
+	PeriodicTask::initializeTasks();
 	Common::initializeTimer();
 
 	PT_INIT(&communicator_pt);
@@ -76,10 +78,10 @@ void setup() {
 }
 
 void loop() {
-	communicator_thread(&communicator_pt);
-	ultrasonic_thread(&ultrasonic_pt);
-	drive_thread(&drive_pt);
-	rotary_thread(&rotary_pt);
+	communicator_task(&communicator_pt);
+	ultrasonic_task(&ultrasonic_pt);
+	drive_task(&drive_pt);
+	rotary_task(&rotary_pt);
 }
 
 /*

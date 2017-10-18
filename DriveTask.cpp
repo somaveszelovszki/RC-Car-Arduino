@@ -1,20 +1,22 @@
-#include "DriveThread.hpp"
+#include "DriveTask.hpp"
 
-extern CommunicatorThread communicatorThread;
-extern UltrasonicThread ultrasonicThread;
-extern RotaryThread rotaryThread;
+using namespace rc_car;
 
-DriveThread::DriveThread() : PeriodicThread(PT_PERIOD_TIME_DRIVE, PT_WATCHDOG_TIMEOUT_DRIVE) {
+extern CommunicatorTask communicatorTask;
+extern UltrasonicTask ultrasonicTask;
+extern RotaryTask rotaryTask;
+
+DriveTask::DriveTask() : PeriodicTask(PT_PERIOD_TIME_DRIVE, PT_WATCHDOG_TIMEOUT_DRIVE) {
 	forceStopWatchdog = new Watchdog(DRIVE_FORCE_STOP_TIME);
 
 	mode = Common::DriveMode::FREE_DRIVE;		// default mode
 }
 
-void DriveThread::__initialize() {
+void DriveTask::__initialize() {
 	motorHandler.initialize();
 }
 
-void DriveThread::__run() {
+void DriveTask::__run() {
 
 	updateValues();
 
@@ -27,8 +29,8 @@ void DriveThread::__run() {
 			if (isDistanceCritical(static_cast<Common::UltrasonicPos>(pos), distances[pos]))
 				forceStopWatchdog->restart();*/
 
-		if (cmd.getCode() == Command::CODE::Speed && forceStopWatchdog->isRunning())
-			cmd.setIntValue(0);
+		if (msg.getCode() == Message::CODE::Speed && forceStopWatchdog->isRunning())
+			msg.setValue(0);
 
 		break;
 	case Common::AUTOPILOT:
@@ -39,14 +41,14 @@ void DriveThread::__run() {
 
 
 
-	executeCommand();
+	executeMessage();
 }
 
-void DriveThread::__onTimedOut() {
+void DriveTask::__onTimedOut() {
 	// TODO
 }
 
-bool DriveThread::isDistanceCritical(Common::UltrasonicPos pos, int distance) const {
+bool DriveTask::isDistanceCritical(Common::UltrasonicPos pos, int distance) const {
 
 	//float speed;
 	//motorHandler.getActualSpeed(&speed);
@@ -95,35 +97,34 @@ bool DriveThread::isDistanceCritical(Common::UltrasonicPos pos, int distance) co
 	return false;
 }
 
-void DriveThread::updateValues() {
-	ultrasonicThread.getSensedPoints(environment.points);
-	environment.fwdDir = ultrasonicThread.calculateForwardDirection(motorHandler.getSteeringAngle());
-	environment.calculateCombinedSections();
+void DriveTask::updateValues() {
+	ultrasonicTask.getMeasuredPoints(environment.measuredPoints);
+	environment.calculate();
 
-	float actualSpeed = rotaryThread.getSpeed();
+	float actualSpeed = rotaryTask.getSpeed();
 	motorHandler.updateSpeed(actualSpeed);
 
-	cmd = communicatorThread.getCommand();
+	msg = communicatorTask.getMessage();
 }
 
-void DriveThread::executeCommand() {
-	switch (cmd.getCode()) {
+void DriveTask::executeMessage() {
+	switch (msg.getCode()) {
 
-	case Command::CODE::Speed:
-		motorHandler.setDesiredSpeed(cmd.getFloatValue());
+	case Message::CODE::Speed:
+		motorHandler.setDesiredSpeed(msg.getValueAsFloat());
 		break;
 
-	case Command::CODE::SteeringAngle:
-		motorHandler.updateSteeringAngle(cmd.getFloatValue());
+	case Message::CODE::SteeringAngle:
+		motorHandler.updateSteeringAngle(msg.getValueAsFloat());
 		break;
 
-	case Command::CODE::DriveMode:
-		mode = cmd.getDriveModeValue();
+	case Message::CODE::DriveMode:
+		mode = static_cast<Common::DriveMode>(msg.getValueAsInt());
 		// TODO notification
 		break;
 	}
 }
 
-DriveThread::~DriveThread() {
+DriveTask::~DriveTask() {
 	delete forceStopWatchdog;
 }

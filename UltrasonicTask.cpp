@@ -1,16 +1,18 @@
-#include "UltrasonicThread.hpp"
+#include "UltrasonicTask.hpp"
 
-extern UltrasonicThread ultrasonicThread;
+using namespace rc_car;
 
-const Common::ValidationData UltrasonicThread::maxDistanceValidationData = {
+extern UltrasonicTask ultrasonicTask;
+
+const Common::ValidationData UltrasonicTask::maxDistanceValidationData = {
 	ULTRA_VALID_MAX_DIST_SAMPLE_NUM, ULTRA_VALID_MAX_DIST_RELATIVE_ERROR
 };
 
-const Common::ValidationData UltrasonicThread::defaultValidationData = {
+const Common::ValidationData UltrasonicTask::defaultValidationData = {
 	ULTRA_VALID_DEFAULT_SAMPLE_NUM, ULTRA_VALID_DEFAULT_RELATIVE_ERROR
 };
 
-UltrasonicThread::UltrasonicThread() : PeriodicThread(PT_PERIOD_TIME_ULTRASONIC, PT_WATCHDOG_TIMEOUT_ULTRASONIC) {
+UltrasonicTask::UltrasonicTask() : PeriodicTask(PT_PERIOD_TIME_ULTRASONIC, PT_WATCHDOG_TIMEOUT_ULTRASONIC) {
 
 	sensorConnection = new NewPing(ULTRA_TRIGGER_PIN, ULTRA_ECHO_PIN, ULTRA_MAX_DISTANCE);
 	setEnabled(false);
@@ -70,7 +72,7 @@ UltrasonicThread::UltrasonicThread() : PeriodicThread(PT_PERIOD_TIME_ULTRASONIC,
 	sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_FRONT)].viewAngle = ULTRA_VIEW_ANGLE_RF;
 }
 
-void UltrasonicThread::initialize() {
+void UltrasonicTask::initialize() {
 
 	pinMode(ULTRA_SEL_0_PIN, OUTPUT);
 	pinMode(ULTRA_SEL_1_PIN, OUTPUT);
@@ -95,20 +97,20 @@ void UltrasonicThread::initialize() {
 	currentSampleIndex = ULTRA_NUM_DIST_SAMPLES - 1;
 }
 
-bool UltrasonicThread::isBusy() const {
+bool UltrasonicTask::isBusy() const {
 	return busy;
 }
 
-bool UltrasonicThread::isEnabled() const {
+bool UltrasonicTask::isEnabled() const {
 	return enabled;
 }
 
-void UltrasonicThread::setEnabled(bool enabled) {
+void UltrasonicTask::setEnabled(bool enabled) {
 	this->enabled = enabled;
 }
 
 
-void UltrasonicThread::pingNextSensor() {
+void UltrasonicTask::pingNextSensor() {
 	if (cycleFinished()) {
 		currentSampleIndex = (currentSampleIndex + 1) % ULTRA_NUM_DIST_SAMPLES;
 
@@ -122,7 +124,7 @@ void UltrasonicThread::pingNextSensor() {
 	}
 
 	// increases sensor position
-	currentSensorPos = static_cast<Common::UltrasonicPos>((static_cast<int>(currentSensorPos) + 1) % ULTRA_NUM_SENSORS);
+	currentSensorPos = Common::nextUltrasonicPos(currentSensorPos);
 
 	// if sensor is not responsive, does not ping it
 	if (sensors[static_cast<int>(currentSensorPos)].nonResponsiveCounter <= ULTRA_VALID_MAX_NON_RESPONSIVE_COUNT) {
@@ -135,7 +137,7 @@ void UltrasonicThread::pingNextSensor() {
 	}
 }
 
-void UltrasonicThread::echoCheck() { // If ping received, set the sensor distance to array.
+void UltrasonicTask::echoCheck() { // If ping received, set the sensor distance to array.
 
 	if (sensorConnection->check_timer()) {
 		sensors[static_cast<int>(currentSensorPos)].dist_measured = sensorConnection->ping_result / US_ROUNDTRIP_CM;
@@ -148,7 +150,7 @@ void UltrasonicThread::echoCheck() { // If ping received, set the sensor distanc
 	}
 }
 
-void UltrasonicThread::validateAndUpdateSensedPoints() {
+void UltrasonicTask::validateAndUpdateSensedPoints() {
 	for (int pos = 0; pos < ULTRA_NUM_SENSORS; ++pos) {
 		sensors[static_cast<Common::UltrasonicPos>(pos)].validate(currentSampleIndex);
 		sensors[static_cast<Common::UltrasonicPos>(pos)].updatePoint(currentSampleIndex);
@@ -166,14 +168,14 @@ void UltrasonicThread::validateAndUpdateSensedPoints() {
 	//Serial.println(validatedDistances[Common::UltrasonicPos::FRONT_LEFT][currentSampleIndex]);
 }
 
-void UltrasonicThread::getSensedPoints(Point<float> dest[ULTRA_NUM_SENSORS]) {
+void UltrasonicTask::getMeasuredPoints(Point<float> dest[ULTRA_NUM_SENSORS]) {
 	noInterrupts();
 	for (int pos = 0; pos < ULTRA_NUM_SENSORS; ++pos)
 		dest[pos] = sensors[pos].pos;
 	interrupts();
 }
 
-void UltrasonicThread::updateSensorSelection() {
+void UltrasonicTask::updateSensorSelection() {
 
 	uint8_t pos = static_cast<uint8_t>(currentSensorPos);
 
@@ -184,26 +186,26 @@ void UltrasonicThread::updateSensorSelection() {
 	digitalWrite(ULTRA_SEL_3_PIN, (pos & 0x08) ? HIGH : LOW);
 }
 
-Common::UltrasonicPos UltrasonicThread::calculateForwardDirection(float steeringAngle) {
-	float min = abs(steeringAngle - sensors[0].viewAngle);
-	int minPos = 0;
+//Common::UltrasonicPos UltrasonicTask::calculateForwardDirection(float steeringAngle) {
+//	float min = abs(steeringAngle - sensors[0].viewAngle);
+//	int minPos = 0;
+//
+//	for (int pos = 1; pos < ULTRA_NUM_SENSORS; ++pos) {
+//		float current = abs(steeringAngle - sensors[pos].viewAngle);
+//		if (current < min) {
+//			min = current;
+//			minPos = pos;
+//		}
+//	}
+//
+//	return static_cast<Common::UltrasonicPos>(minPos);
+//}
 
-	for (int pos = 1; pos < ULTRA_NUM_SENSORS; ++pos) {
-		float current = abs(steeringAngle - sensors[pos].viewAngle);
-		if (current < min) {
-			min = current;
-			minPos = pos;
-		}
-	}
-
-	return static_cast<Common::UltrasonicPos>(minPos);
-}
-
-bool UltrasonicThread::cycleFinished() const {
+bool UltrasonicTask::cycleFinished() const {
 	return currentSensorPos == ULTRA_NUM_SENSORS - 1;
 }
 
-void UltrasonicThread::onWatchdoghasTimedOut() {
+void UltrasonicTask::onWatchdoghasTimedOut() {
 	//responsive[static_cast<int>(currentSensorPos)] = false;
 	sensorConnection->timer_stop();
 
@@ -213,11 +215,11 @@ void UltrasonicThread::onWatchdoghasTimedOut() {
 	busy = false;
 }
 
-void UltrasonicThread::Sensor::validate(int sampleIndex) {
+void UltrasonicTask::Sensor::validate(int sampleIndex) {
 	dist_stored[sampleIndex] = dist_measured;
 
 	Common::ValidationData validationData = dist_measured == ULTRA_MAX_DISTANCE ?
-		UltrasonicThread::maxDistanceValidationData : UltrasonicThread::defaultValidationData;
+		UltrasonicTask::maxDistanceValidationData : UltrasonicTask::defaultValidationData;
 
 	int prevValidatedValue = dist_validated[(sampleIndex + ULTRA_NUM_DIST_SAMPLES - 1) % ULTRA_NUM_DIST_SAMPLES];
 	int currentStoredValue = dist_stored[sampleIndex];
@@ -254,17 +256,17 @@ void UltrasonicThread::Sensor::validate(int sampleIndex) {
 	}
 }
 
-void UltrasonicThread::Sensor::updatePoint(int sampleIndex) {
+void UltrasonicTask::Sensor::updatePoint(int sampleIndex) {
 	sensedPoint.X = pos.X + dist_validated[sampleIndex] * cos(dirAngleToXY(viewAngle));
 	sensedPoint.Y = pos.Y + dist_validated[sampleIndex] * sin(dirAngleToXY(viewAngle));
 }
 
 
-void UltrasonicThread::__initialize() {
+void UltrasonicTask::__initialize() {
 	initialize();
 }
 
-void UltrasonicThread::__run() {
+void UltrasonicTask::__run() {
 	// gets next ultrasonic sensor distance (will run in background and call an IT routine)
 	if (isEnabled() && !isBusy()) {
 
@@ -278,13 +280,13 @@ void UltrasonicThread::__run() {
 	}
 }
 
-void UltrasonicThread::__onTimedOut() {
+void UltrasonicTask::__onTimedOut() {
 	onWatchdoghasTimedOut();
 }
 
 /*
 	Timer2 interrupt calls this function every 24uS where we check the ping status.
 */
-void ultrasonicEchoCheckIT() {
-	ultrasonicThread.echoCheck();
+void rc_car::ultrasonicEchoCheckIT() {
+	ultrasonicTask.echoCheck();
 }

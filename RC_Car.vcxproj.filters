@@ -21,19 +21,10 @@
     <ClInclude Include="__vm\.RC_Car.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Command.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Common.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Event.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MotorHandler.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PeriodicThread.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Point.hpp">
@@ -45,28 +36,10 @@
     <ClInclude Include="Watchdog.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="def.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DriveThread.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CommunicatorThread.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UltrasonicThread.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Periodic.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RotaryThread.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PD_Controller.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PeriodicTask.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Environment.hpp">
@@ -75,27 +48,39 @@
     <ClInclude Include="Vec.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ByteArray.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DriveFactor.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RotaryTask.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UltrasonicTask.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PeriodicTask.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DriveTask.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CommunicatorTask.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Message.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Command.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Common.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DriveThread.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Event.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MotorHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PeriodicThread.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Point.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Trajectory.cpp">
@@ -104,22 +89,28 @@
     <ClCompile Include="Watchdog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DriveThread.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CommunicatorThread.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UltrasonicThread.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RotaryThread.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PD_Controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Environment.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CommunicatorTask.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DriveTask.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PeriodicTask.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RotaryTask.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UltrasonicTask.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Message.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

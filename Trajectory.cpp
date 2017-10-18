@@ -1,5 +1,7 @@
 #include "Trajectory.hpp"
 
+using namespace rc_car;
+
 void Trajectory::updateRadiuses() {
 
 	if (steeringAngle == 0)
@@ -41,7 +43,7 @@ Trajectory::TrackDistance Trajectory::trackDistanceFromPoint(Point<float> relati
 	obs.X = relativePos.X + R_rearMiddle;
 	obs.Y = relativePos.Y + CAR_PIVOT_DIST_MID;
 
-	float obsAngle = origo.getSteeringAngle(obs, steeringDir);
+	float obsAngle = origo.getAngle(obs, steeringDir);
 
 	//float cos_ObsAngle = cos(obsAngle), sin_ObsAngle = sin(obsAngle);
 

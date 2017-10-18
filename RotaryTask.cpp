@@ -1,6 +1,8 @@
-# include "RotaryThread.hpp"
+# include "RotaryTask.hpp"
 
-void RotaryThread::__initialize() {
+using namespace rc_car;
+
+void RotaryTask::__initialize() {
 	// TODO initialize pins
 	pinMode(ROTARY_D0_PIN, INPUT);
 	pinMode(ROTARY_D1_PIN, INPUT);
@@ -20,7 +22,7 @@ void RotaryThread::__initialize() {
 	diff.pos = 0;
 }
 
-void RotaryThread::__run() {
+void RotaryTask::__run() {
 	_Value current;
 
 	current.time = Common::milliSecs();
@@ -42,11 +44,11 @@ void RotaryThread::__run() {
 	Serial.println((int)storedValue.d_pos);*/
 }
 
-void RotaryThread::__onTimedOut() {
+void RotaryTask::__onTimedOut() {
 	// TODO
 }
 
-int RotaryThread::readPosition() const {
+int RotaryTask::readPosition() const {
 	return static_cast<int>(static_cast<int8_t>(
 		(digitalRead(ROTARY_D7_PIN) << 7)
 		+ (digitalRead(ROTARY_D6_PIN) << 6)
@@ -58,7 +60,7 @@ int RotaryThread::readPosition() const {
 		+ digitalRead(ROTARY_D0_PIN)));
 }
 
-void RotaryThread::updateOverflowPos(int *newPos) const {
+void RotaryTask::updateOverflowPos(int *newPos) const {
 	int d = *newPos - prev.pos;
 
 	if (abs(d) > ROTARY_OVERFLOW_PREV_MAX_D_POS) {
@@ -68,12 +70,12 @@ void RotaryThread::updateOverflowPos(int *newPos) const {
 	}
 }
 
-float RotaryThread::getSpeed() const {
+float RotaryTask::getSpeed() const {
 	return (1 / MOTOR_ROTARY_TRANSFER_RATE) * MOTOR_WHEEL_TRANSFER_RATE
 		* ((diff.pos / static_cast<float>(ROTARY_RESOLUTION)) * WHEEL_CIRCUMFERENCE) / diff.time * SEC_TO_MSEC;
 }
 
-Common::AccelerationDir RotaryThread::getDirection() const {
+Common::AccelerationDir RotaryTask::getDirection() const {
 	float speed = getSpeed();
 	return speed > 0 ? Common::AccelerationDir::FORWARD
 		: speed < 0 ? Common::AccelerationDir::BACKWARD
