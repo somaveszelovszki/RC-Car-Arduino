@@ -14,11 +14,10 @@ namespace rc_car {
 		static int numInstances;
 
 		virtual void __initialize() = 0;
-		virtual void __run() = 0;
 		virtual void __onTimedOut() = 0;
 
 	protected:
-		Watchdog *watchdog;
+		Watchdog timeoutCheckWatchdog;
 
 	public:
 
@@ -26,11 +25,9 @@ namespace rc_car {
 
 		void checkIfTimedOut();
 
+		void run(void *data = NULL);
+
 		static void initializeTasks();
-
-		void run();
-
-		~PeriodicTask();
 	};
 }
 

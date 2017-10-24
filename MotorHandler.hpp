@@ -34,7 +34,7 @@ namespace rc_car {
 			void writeValue(int value);
 		};
 
-		PD_Controller *speedController;
+		PD_Controller speedCtrl;
 
 		float desiredSpeed;
 		float steeringAngle;
@@ -43,9 +43,7 @@ namespace rc_car {
 		DCMotor DC_Motor;
 
 	public:
-		MotorHandler() {
-			speedController = new PD_Controller(DC_CONTROL_UPDATE_PERIOD_TIME, DC_CONTROL_Kp, DC_CONTROL_Kd);
-		}
+		MotorHandler() : speedCtrl(DC_CONTROL_UPDATE_PERIOD_TIME, DC_CONTROL_Kp, DC_CONTROL_Kd) {}
 
 		void initialize();
 
@@ -67,10 +65,6 @@ namespace rc_car {
 
 		void attachServo();
 		void detachServo();
-
-		~MotorHandler() {
-			delete speedController;
-		}
 	};
 }
 

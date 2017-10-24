@@ -3,6 +3,7 @@
 
 namespace rc_car {
 	/** @brief Template vector implementation with static maximum length.
+	TODO remove if not needed!
 	*/
 	template <typename T, int maxLength>
 	class Vec {

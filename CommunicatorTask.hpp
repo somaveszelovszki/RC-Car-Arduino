@@ -2,7 +2,7 @@
 #define COMMUNICATOR_TASK_HPP
 
 #include "PeriodicTask.hpp"
-#include <SoftwareSerial.h>
+//#include <SoftwareSerial.h>
 //#include <AltSoftSerial.h>
 #include "Message.hpp"
 #include "Watchdog.hpp"
@@ -13,14 +13,14 @@ namespace rc_car {
 	*/
 	class CommunicatorTask : public PeriodicTask {
 	private:
-		SoftwareSerial *commSerial;
+		//SoftwareSerial *commSerial;
 		//AltSoftSerial *commSerial;
 
 		ByteArray<COMM_MESSAGE_SIZE> recvBuffer;
 		int curByteIdx;
 
-		Message recvMessage;
-		bool __available = false;
+		Message recvMsg, sendMsg;
+		bool __recvAvailable = false, __sendAvailable = false;
 		bool hasTimedOut = false;	// TODO find a more elegant and effective way
 
 		/*
@@ -29,29 +29,27 @@ namespace rc_car {
 		*/
 		bool receiveChars();
 
-		/** @brief Parses message from buffer string and clears buffer string content.
-
-		@param dest Will contain parsed message.
+		/** @brief Parses message from buffer byte array.
 		*/
-		void fetchMessage(Message& dest);
+		void fetchMessage();
 
 		void __initialize() override;
-		void __run() override;
+		void __run(void *unused) override;
 		void __onTimedOut() override;
+
+		/*
+		Sends message as string.
+		@returns number of bytes sent
+		*/
+		int sendMessage();
 
 	public:
 
 		CommunicatorTask();
 
-		Message getMessage();
+		bool getReceivedMessage(Message& msg);
 
-		/*
-			Sends message as string.
-			@returns number of bytes sent
-		*/
-		int sendMessage(const Message& message);
-
-		~CommunicatorTask();
+		void setMessageToSend(const Message& msg);
 	};
 
 }

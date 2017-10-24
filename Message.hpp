@@ -11,13 +11,13 @@ namespace rc_car {
 	public:
 
 		enum CODE {
-			NoNewMessageCode = 0,
-			Speed = 1,           // [cm/sec] (>0 means FORWARD)
+			ACK_ = 0,			// for acknowledgements
+			Speed = 1,          // [cm/sec] (>0 means FORWARD)
 			SteeringAngle = 2,  // [rad] (>0 means LEFT)
 			DriveMode = 3		// values in Common::DriveMode
 		};
 
-		static const Message NoNewMessage;
+		static const Message ACK;
 
 	private:
 		CODE code;
@@ -33,7 +33,11 @@ namespace rc_car {
 
 		Message(CODE _code, float _value);
 
-		Message operator=(const Message& other);
+		Message& operator=(const Message& other) {
+			setCode(other.code);
+			setValue(other.value);
+			return *this;
+		}
 
 		Message(const Message& other) {
 			*this = other;
@@ -91,14 +95,10 @@ namespace rc_car {
 
 		static void fromBytes(const ByteArray<COMM_MESSAGE_SIZE>& bytes, Message& dest);
 
-		/*static bool isValid(char c);
-		static bool isValid(const String& msgStr);
-		static void fromString(const String& msgStr, Message& dest);*/
-
+#if __DEBUG
 		String toString() const;
+#endif // __DEBUG
 	};
-
-	int print(Print& printer, const Message& msg);
 }
 
 

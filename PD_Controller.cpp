@@ -2,15 +2,12 @@
 
 using namespace rc_car;
 
-float PD_Controller::update(const float& error) {
-	unsigned long d_time = Common::milliSecs() - prevTime;
-	float derivative = (error - prevError) / d_time;
+void PD_Controller::__run(void *pError) {
+	float currentError = *(static_cast<float*>(pError));
+	unsigned long d_time = millis() - getPrevCalledTime();
+	float derivative = (currentError - prevError) / d_time;
 
-	prevError = error;
-	output = output + error * Kp + derivative * Kd;
-
-	prevTime = Common::milliSecs();
-
-	return getOutput();
+	output = output + currentError * Kp + derivative * Kd;
+	prevError = currentError;
 }
 

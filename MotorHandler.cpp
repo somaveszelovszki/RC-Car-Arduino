@@ -3,7 +3,7 @@
 using namespace rc_car;
 
 void MotorHandler::ServoMotor::writeAngle(float angle) {
-	this->write(Common::incarcerate(static_cast<int>((angle + M_PI_2) * RAD_TO_DEG), SERVO_POS_MIN, SERVO_POS_MAX));
+	write(Common::incarcerate(static_cast<int>((angle + M_PI_2) * RAD_TO_DEG), SERVO_POS_MIN, SERVO_POS_MAX));
 }
 
 void MotorHandler::DCMotor::initialize() {
@@ -26,14 +26,18 @@ void MotorHandler::initialize() {
 	attachServo();
 	positionServoMiddle();
 	setDesiredSpeed(0.0f);
+	speedCtrl.restartPeriodCheck();
 }
 
 void MotorHandler::updateSpeed(float actualSpeed) {
 
 	// if controller's period time has been reached, speed has to be updated
 	// -> controller's 'run' method is called with the error (difference between desired and actual speed)
-	if (speedController->periodTimeReached())
-		DC_Motor.writeValue(speedController->update(desiredSpeed - actualSpeed));
+	if (speedCtrl.periodTimeReached()) {
+		float error = desiredSpeed - actualSpeed;
+		speedCtrl.run(&error);
+		DC_Motor.writeValue(speedCtrl.getOutput());
+	}
 }
 
 void MotorHandler::updateSteeringAngle(float _steeringAngle) {

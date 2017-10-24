@@ -15,17 +15,17 @@ void RotaryTask::__initialize() {
 
 	pinMode(ROTARY_EN_PIN, OUTPUT);
 
-	prev.time = Common::milliSecs();
+	prev.time = millis();
 	prev.pos = 0;
 
 	diff.time = static_cast<unsigned long>(0);
 	diff.pos = 0;
 }
 
-void RotaryTask::__run() {
+void RotaryTask::__run(void *unused) {
 	_Value current;
 
-	current.time = Common::milliSecs();
+	current.time = millis();
 
 	setEnabled(false);
 	current.pos = readPosition();
@@ -38,10 +38,16 @@ void RotaryTask::__run() {
 
 	prev = current;
 
-	/*Serial.print("time: ");
-	Serial.print((int)storedValue.d_time);
-	Serial.print("\tpos: ");
-	Serial.println((int)storedValue.d_pos);*/
+	/*#if __DEBUG
+Common::debug_print("time: ");
+#endif // __DEBUG
+	Common::debug_print((int)storedValue.d_time);
+#if __DEBUG
+	Common::debug_print("\tpos: ");
+#endif // __DEBUG
+#if __DEBUG
+	Common::debug_println((int);
+#endif // __DEBUGstoredValue.d_pos);*/
 }
 
 void RotaryTask::__onTimedOut() {
@@ -72,7 +78,7 @@ void RotaryTask::updateOverflowPos(int *newPos) const {
 
 float RotaryTask::getSpeed() const {
 	return (1 / MOTOR_ROTARY_TRANSFER_RATE) * MOTOR_WHEEL_TRANSFER_RATE
-		* ((diff.pos / static_cast<float>(ROTARY_RESOLUTION)) * WHEEL_CIRCUMFERENCE) / diff.time * SEC_TO_MSEC;
+		* ((diff.pos / static_cast<float>(ROTARY_RESOLUTION)) * CAR_WHEEL_CIRCUMFERENCE) / diff.time * SEC_TO_MSEC;
 }
 
 Common::AccelerationDir RotaryTask::getDirection() const {

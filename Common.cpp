@@ -2,22 +2,22 @@
 
 using namespace rc_car;
 
-int Common::print(Print& printer, const String& str) {
-	int numPrintedBytes = 0;
-	for (int i = 0; i < str.length(); ++i)
-		numPrintedBytes += printer.print(str.charAt(i));
-	return numPrintedBytes;
-}
+unsigned long Common::MILLIS = 0;
 
 void Common::initializeTimer() {
-	noInterrupts();
+	//noInterrupts();
+
+	// TODO check if this clashes with Servo!!!
 
 	// Timer0 is already used for millis() - we'll just interrupt somewhere in the middle
 	// and call the ISR(TIMER0_COMPA_vect) function defined in RC_Car.ino
-	OCR0A = 0xAF;
-	TIMSK0 |= _BV(OCIE0A);
+	/*OCR0A = 0xAF;
+	TIMSK0 |= _BV(OCIE0A);*/
 
-	interrupts();
+	OCR1B = 0x3F;
+	TIMSK1 |= _BV(OCIE1B);
+
+	//interrupts();
 }
 
 int Common::bytesToInt(const byte bytes[], int startIndex = 0) {
@@ -46,5 +46,21 @@ byte* Common::floatToBytes(int value, byte dest[4]) {
 	return res;
 }
 
-unsigned long Common::MILLIS = 0;
+void Common::debug_print(const String& str, bool addNewLine = false) {
+	uint8_t en = digitalRead(COMM_EN_PIN);
+	digitalWrite(COMM_EN_PIN, !COMM_EN_SIGNAL_LEVEL);
+	addNewLine ? Serial.println(str) : Serial.print(str);
+	digitalWrite(COMM_EN_PIN, en);
+}
 
+void Common::debug_println(const String& str) {
+	debug_print(str, true);
+}
+
+bool rc_car::Common::testAndSet(bool *value, bool valueToSet = true) {
+	noInterrupts();
+	bool res = *value;
+	*value = valueToSet;
+	interrupts();
+	return res;
+}

@@ -4,8 +4,6 @@
 #include "Common.hpp"
 
 namespace rc_car {
-	/** @brief Template class for storing 2-dimensional points.
-	*/
 	template <typename T>
 	class Point {
 	public:
@@ -14,12 +12,12 @@ namespace rc_car {
 
 		static const Point<T> ORIGO;
 
-		Point() {}
-		Point(T x, T y) : X(x), Y(y) {}
+		Point<T>() {}
+		Point<T>(T x, T y) : X(x), Y(y) {}
 
 		Point<T>& operator=(const Point<T>& other);
 
-		Point(const Point<float>& other) {
+		Point(const Point<T>& other) {
 			*this = other;
 		}
 
@@ -54,7 +52,7 @@ namespace rc_car {
 		static Point<T> average(const Point<T>& p1, const Point<T>& p2);
 
 #if(__DEBUG)
-		void print(bool newLine = true) const;
+		String toString() const;
 #endif	// __DEBUG
 	};
 
@@ -154,15 +152,9 @@ namespace rc_car {
 
 #if(__DEBUG)
 	template<typename T>
-	void Point<T>::print(bool newLine = true) const {
-		Serial.print("(");
-		Serial.print(X);
-		Serial.print(", ");
-		Serial.print(Y);
-		Serial.print(")");
-		if (newLine) Serial.println();
+	String Point<T>::toString() const {
+		return String("(") + String(X) + String(", ") + String(Y) + String(")");
 	}
 #endif // __DEBUG
-
 }
 #endif	// POINT_HPP

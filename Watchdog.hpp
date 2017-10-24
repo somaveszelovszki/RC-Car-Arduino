@@ -4,49 +4,30 @@
 #include "Common.hpp"
 
 namespace rc_car {
-	/** @brief Watchdog implementation for countdowns.
+	/** @brief Watchdog implementation.
 	*/
 	class Watchdog {
 
 	public:
-		enum State {
-			RESET, RUNNING, PAUSED, TIMED_OUT
-		};
 
 	private: 
-		int TIMEOUT;
-		int counter;
-		State state;
-
-		static Watchdog *instances[WD_MAX_NUM_WATCHDOGS];
-		static int numInstances;
+		const int TIMEOUT;
+		unsigned long startTime;
 
 	public:
-		Watchdog(int _timeout);
+		Watchdog(int _timeout) : TIMEOUT(_timeout) {}
 
-		void reset();
-
-		void restart();
-
-		void pause() {
-			state = PAUSED;
-		}
-
-		void resume() {
-			state = RUNNING;
-		}
-
-		bool isRunning() const {
-			return state == RUNNING;
+		void restart() {
+			startTime = millis();
 		}
 
 		bool hasTimedOut() const {
-			return state == TIMED_OUT;
+			return millis() >= startTime + static_cast<unsigned long>(TIMEOUT);
 		}
 
-		void decrement();
-
-		static void decrementAll();
+		unsigned long getStartTime() const {
+			return startTime;
+		}
 	};
 
 }

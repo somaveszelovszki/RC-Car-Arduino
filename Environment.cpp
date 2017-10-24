@@ -3,18 +3,18 @@
 using namespace rc_car;
 
 void Environment::calculateSectionPoints(Common::UltrasonicPos pos, int *pDestStartIndex) {
-	Point<float> start = measuredPoints[pos],
-		end = measuredPoints[Common::nextUltrasonicPos(pos)];
+	//Point<float> start = measuredPoints[pos],
+	//	end = measuredPoints[Common::nextUltrasonicPos(pos)];
 
-	float diffAngle = abs(Point<float>::ORIGO.getAngle(start, Common::SteeringDir::LEFT)
-		- Point<float>::ORIGO.getAngle(end, Common::SteeringDir::LEFT));
+	//float diffAngle = abs(Point<float>::ORIGO.getAngle(start, Common::SteeringDir::LEFT)
+	//	- Point<float>::ORIGO.getAngle(end, Common::SteeringDir::LEFT));
 
-	// rounds down angle ratio -> gets number of middle points
-	int middlePointsNum = static_cast<int>(diffAngle / ENV_POINTS_DELTA_ANGLE);
+	//// rounds down angle ratio -> gets number of middle points
+	//int middlePointsNum = static_cast<int>(diffAngle / ENV_POINTS_DELTA_ANGLE);
 
-	Point<float> diff = (end - start) / (middlePointsNum + 1);
-	for (int i = 0; i < middlePointsNum; ++i)
-		estimatedPoints[(*pDestStartIndex)++] = start + i * diff;
+	//Point<float> diff = (end - start) / (middlePointsNum + 1);
+	//for (int i = 0; i < middlePointsNum; ++i)
+	//	estimatedPoints[(*pDestStartIndex)++] = start + i * diff;
 }
 
 void Environment::calculate() {

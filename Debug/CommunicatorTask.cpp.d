@@ -4,6 +4,7 @@ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\CommunicatorTask.cpp.
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\PeriodicTask.hpp \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\Watchdog.hpp \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\Common.hpp \
+ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\config.hpp \
  C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\cores\arduino/Arduino.h \
  C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\cores\arduino/binary.h \
  C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\cores\arduino/WCharacter.h \
@@ -15,10 +16,6 @@ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\CommunicatorTask.cpp.
  C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\cores\arduino/USBAPI.h \
  C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\cores\arduino/Arduino.h \
  C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\variants\standard/pins_arduino.h \
- C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\cores\arduino/Print.h \
- C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\config.hpp \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\Periodic.hpp \
- C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\libraries\SoftwareSerial\src/SoftwareSerial.h \
- C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\cores\arduino/Stream.h \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\Message.hpp \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\ByteArray.hpp

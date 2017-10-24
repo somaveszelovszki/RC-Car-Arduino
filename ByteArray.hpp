@@ -1,7 +1,6 @@
 #ifndef BYTE_ARRAY_HPP
 #define BYTE_ARRAY_HPP
 
-#include <Print.h>
 #include "Common.hpp"
 
 namespace rc_car {
@@ -93,25 +92,21 @@ namespace rc_car {
 			return ByteArray<1>(&b) + bytes;
 		}
 
-		friend int print(Print& printer, const ByteArray<size>& bytes) {
-			for (int i = 0; i < size; ++i)
-				printer.print(static_cast<char>(bytes[i]));
-			return size;
-		}
-
-		String toString() const {
-			String str("[");
-			for (int i = 0; i < size - 1; ++i) {
-				str += value[i];
-				str += ", ";
-			}
-			if (size > 0)
-				str += value[size - 1];
-
-			str += "]";
-			return str;
-		}
+		String toString() const;
 	};
+	template<int size>
+	String ByteArray<size>::toString() const {
+		String str("[ ");
+		for (int i = 0; i < size - 1; ++i) {
+			str += value[i];
+			str += ", ";
+		}
+		if (size > 0)
+			str += value[size - 1];
+
+		str += " ]";
+		return str;
+	}
 }
 
 #endif // BYTE_ARRAY_HPP

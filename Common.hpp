@@ -1,17 +1,11 @@
 #ifndef COMMON_HPP
 #define COMMON_HPP
 
-#include <Arduino.h>
-#include <Print.h>
 #include <math.h>
 
 #include "config.hpp"
 
 namespace rc_car {
-#define __DEBUG true
-
-#define radToDeg(deg) ((deg) * (DEG_TO_RAD))
-#define degToRad(rad) ((rad) * (RAD_TO_DEG))
 
 #define dirAngleToXY(angle) ((angle) + M_PI_2)
 #define XYAngleToDir(angle) ((angle) - M_PI_2)
@@ -82,8 +76,6 @@ namespace rc_car {
 			float relativeError;
 		};
 
-		static int print(Print& printer, const String& str);
-
 		static void initializeTimer();
 
 		static unsigned long milliSecs() {
@@ -148,6 +140,11 @@ namespace rc_car {
 		static byte* intToBytes(int value, byte dest[4]);
 
 		static byte* floatToBytes(int value, byte dest[4]);
+
+		static void debug_print(const String& str, bool addNewLine = false);
+		static void debug_println(const String& str);
+
+		static bool testAndSet(bool *value, bool valueToSet = true);
 	};
 
 }

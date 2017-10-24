@@ -30,7 +30,7 @@ namespace rc_car {
 
 		Sensor sensors[ULTRA_NUM_SENSORS];
 
-		NewPing *sensorConnection;
+		NewPing sensorConnection;
 
 		static const Common::ValidationData maxDistanceValidationData;
 		static const Common::ValidationData defaultValidationData;
@@ -48,8 +48,6 @@ namespace rc_car {
 
 	public:
 		UltrasonicTask();
-
-		void initialize();
 
 		bool isBusy() const;
 
@@ -70,12 +68,8 @@ namespace rc_car {
 		void getMeasuredPoints(Point<float> dest[ULTRA_NUM_SENSORS]);
 
 		void __initialize() override;
-		void __run() override;
+		void __run(void *unused) override;
 		void __onTimedOut() override;
-
-		~UltrasonicTask() {
-			delete sensorConnection;
-		}
 	};
 }
 

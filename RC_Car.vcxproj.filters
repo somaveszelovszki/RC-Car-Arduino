@@ -75,6 +75,9 @@
     <ClInclude Include="Message.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BoolGrid.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common.cpp">
@@ -84,9 +87,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Trajectory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Watchdog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PD_Controller.cpp">
@@ -111,6 +111,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Message.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Periodic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

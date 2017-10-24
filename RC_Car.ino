@@ -6,18 +6,18 @@
 
 #include <pt.h>
 #include "CommunicatorTask.hpp"
-#include "DriveTask.hpp"
 #include "UltrasonicTask.hpp"
 #include "RotaryTask.hpp"
+#include "DriveTask.hpp"
 
 using namespace rc_car;
 
 CommunicatorTask communicatorTask;
-DriveTask driveTask;
 UltrasonicTask ultrasonicTask;
 RotaryTask rotaryTask;
+DriveTask driveTask;
 
-ISR(TIMER0_COMPA_vect);
+//ISR(TIMER1_COMPB_vect);
 
 /*
 	Handling communicator and sensors uses Prototasks.
@@ -28,11 +28,11 @@ static struct pt ultrasonic_pt;
 static struct pt drive_pt;
 static struct pt rotary_pt;
 
-#define PT_TASK_BODY(task)					\
+#define PT_TASK_BODY(task)						\
 PT_BEGIN(_pt);									\
 PT_WAIT_UNTIL(_pt, task.periodTimeReached());	\
-task.checkIfTimedOut();						\
-task.run();									\
+task.checkIfTimedOut();							\
+task.run();										\
 PT_END(_pt);
 
 /** @brief Sends data to and receives data from phone.
@@ -62,14 +62,11 @@ static PT_THREAD(rotary_task(struct pt *_pt)) {
 /** @brief Initializes timers and tasks.
 */
 void setup() {
-
-#if __DEBUG
-	Serial.begin(115200);
-	Serial.println("setup...");
-#endif // __DEBUG
-
 	PeriodicTask::initializeTasks();
-	Common::initializeTimer();
+
+	//Common::initializeTimer();
+
+	// TODO maybe use millis() instead - skip custom timer manipulations
 
 	PT_INIT(&communicator_pt);
 	PT_INIT(&ultrasonic_pt);
@@ -80,14 +77,14 @@ void setup() {
 void loop() {
 	communicator_task(&communicator_pt);
 	ultrasonic_task(&ultrasonic_pt);
-	drive_task(&drive_pt);
 	rotary_task(&rotary_pt);
+	drive_task(&drive_pt);
 }
 
 /*
 	Timer0 interrupt - called in every 1 ms. Decrements watchdogs.
 */
-ISR(TIMER0_COMPA_vect) {
-	Common::incrementMilliSecs();
-	Watchdog::decrementAll();
-}
+//ISR(TIMER1_COMPB_vect) {
+//	Common::incrementMilliSecs();
+//	Watchdog::decrementAll();
+//}

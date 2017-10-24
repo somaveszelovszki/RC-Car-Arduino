@@ -10,13 +10,14 @@ namespace rc_car {
 	class Environment {
 	private:
 		Point<float> currentPos;
-		Point<float> absPoints[ENV_ABS_POINTS_NUM_X][ENV_ABS_POINTS_NUM_Y];
+		//Point<float> absPoints[ENV_ABS_POINTS_NUM_X][ENV_ABS_POINTS_NUM_Y];
 
 		void calculateSectionPoints(Common::UltrasonicPos pos, int *pDestStartIndex);
 
 	public:
 		Point<float> measuredPoints[ULTRA_NUM_SENSORS];
-		Point<float> estimatedPoints[ENV_POINTS_NUM];
+		
+		//float estimatedPoints[70];
 
 		void calculate();
 	};

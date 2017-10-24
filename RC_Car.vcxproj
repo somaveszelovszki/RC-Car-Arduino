@@ -48,7 +48,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>F:\Program Files (x86)\Arduino\libraries\pt;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\libraries\SoftwareSerial\src;F:\Program Files (x86)\Arduino\libraries\Servo\src;F:\Program Files (x86)\Arduino\libraries\NewPing;F:\Program Files (x86)\Arduino\libraries;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\libraries;C:\Users\Soma\Documents\Arduino\libraries;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\cores\arduino;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\variants\standard;$(ProjectDir)..\RC_Car;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\4.9.2-atmel3.5.4-arduino2\avr\include\;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\4.9.2-atmel3.5.4-arduino2\avr\include\avr\;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\4.9.2-atmel3.5.4-arduino2\lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Program Files (x86)\Arduino\libraries\pt;F:\Program Files (x86)\Arduino\libraries\NewPing;F:\Program Files (x86)\Arduino\libraries\Servo\src;F:\Program Files (x86)\Arduino\libraries;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\libraries;C:\Users\Soma\Documents\Arduino\libraries;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\cores\arduino;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\variants\standard;$(ProjectDir)..\RC_Car;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\4.9.2-atmel3.5.4-arduino2\avr\include\;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\4.9.2-atmel3.5.4-arduino2\avr\include\avr\;C:\Users\Soma\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\4.9.2-atmel3.5.4-arduino2\lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>$(ProjectDir)__vm\.RC_Car.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <PreprocessorDefinitions>__AVR_ATmega328p__;__AVR_ATmega328P__;F_CPU=16000000L;ARDUINO=10801;ARDUINO_AVR_UNO;ARDUINO_ARCH_AVR;__cplusplus=201103L;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -80,6 +80,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BoolGrid.hpp" />
     <ClInclude Include="ByteArray.hpp" />
     <ClInclude Include="config.hpp" />
     <ClInclude Include="Message.hpp" />
@@ -108,11 +109,11 @@
     <ClCompile Include="Environment.cpp" />
     <ClCompile Include="MotorHandler.cpp" />
     <ClCompile Include="PD_Controller.cpp" />
+    <ClCompile Include="Periodic.cpp" />
     <ClCompile Include="PeriodicTask.cpp" />
     <ClCompile Include="RotaryTask.cpp" />
     <ClCompile Include="UltrasonicTask.cpp" />
     <ClCompile Include="Trajectory.cpp" />
-    <ClCompile Include="Watchdog.cpp" />
   </ItemGroup>
   <PropertyGroup>
     <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>

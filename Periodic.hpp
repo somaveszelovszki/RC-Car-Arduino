@@ -1,24 +1,33 @@
 #ifndef PERIODIC_HPP
 #define PERIODIC_HPP
 
-#include "Common.hpp"
+#include "Watchdog.hpp"
 
 namespace rc_car {
 	/** @brief Base class for all objects that need to run periodically.
 	*/
 	class Periodic {
 
-	protected:
-		int periodTime;		// period time [ms]
-		unsigned long prevTime;		// previous time of execution [ms]
+	private:
+		Watchdog periodWatchdog;
+
+		virtual void __run(void *data) = 0;
 
 	public:
-		Periodic(int _periodTime) : periodTime(_periodTime) {
-			prevTime = Common::milliSecs();
+		Periodic(int _periodTime) : periodWatchdog(_periodTime) {}
+
+		virtual void run(void *data = NULL);
+
+		void restartPeriodCheck() {
+			periodWatchdog.restart();
 		}
 
 		bool periodTimeReached() const {
-			return Common::milliSecs() - prevTime >= static_cast<unsigned long>(periodTime);
+			return periodWatchdog.hasTimedOut();
+		}
+
+		unsigned long getPrevCalledTime() const {
+			return periodWatchdog.getStartTime();
 		}
 	};
 }

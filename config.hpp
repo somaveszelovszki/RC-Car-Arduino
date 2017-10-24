@@ -1,7 +1,11 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
+#include <Arduino.h>
+
 namespace rc_car {
+
+#define __DEBUG true
 
 /** @brief Configurations - car specifications, task period times, communication parameters, Arduino pinout, etc.
 */
@@ -19,6 +23,8 @@ namespace rc_car {
 #define CAR_PIVOT_FRONT_DISTANCE		7.2f		// distance between car front and front pivot
 #define CAR_PIVOT_REAR_DISTANCE			7.2f		// distance between car rear and rear pivot
 
+#define CAR_WHEEL_CIRCUMFERENCE			20.3f		// circumference of motor-powered wheels [cm]
+
 // Periodic tasks
 
 #define PT_MAX_NUM_TASKS				4
@@ -26,7 +32,7 @@ namespace rc_car {
 	// frequencies [ms]
 
 #define PT_PERIOD_TIME_ULTRASONIC		1
-#define PT_PERIOD_TIME_COMMUNICATOR		1
+#define PT_PERIOD_TIME_COMMUNICATOR		20
 #define PT_PERIOD_TIME_DRIVE			1
 #define PT_PERIOD_TIME_ROTARY			50
 
@@ -41,14 +47,13 @@ namespace rc_car {
 
 #define WD_MAX_NUM_WATCHDOGS PT_MAX_NUM_TASKS
 
-
 // Communication
 
-#define COMM_BLUETOOTH_RX_PIN		6
-#define COMM_BLUETOOTH_TX_PIN		13
-
+#define COMM_RX_PIN					0
+#define COMM_TX_PIN					1
+#define COMM_EN_PIN					13
+#define COMM_EN_SIGNAL_LEVEL		LOW
 #define COMM_BLUETOOTH_BAUD_RATE	9600
-
 #define COMM_MESSAGE_SIZE			5
 
 // DriveTask
@@ -64,8 +69,6 @@ namespace rc_car {
 // MotorHandler
 
 	// ServoMotor
-
-// servo pin
 #define SERVO_PIN 9
 
 #define DC_MOTOR_FORWARD_PIN		3
@@ -90,22 +93,21 @@ namespace rc_car {
 
 // motor transfer rates
 
-#define MOTOR_ROTARY_TRANSFER_RATE	3.0f	// transfer rate between motor and rotary encoder
+#define MOTOR_ROTARY_TRANSFER_RATE	1.0f	// transfer rate between motor and rotary encoder
 #define MOTOR_WHEEL_TRANSFER_RATE	1.0f	// transfer rate between motor and wheels
-#define WHEEL_CIRCUMFERENCE			20.3f		// circumference of motor-powered wheels [cm]
 
 // Rotary encoder
 
-#define ROTARY_EN_PIN		0
+#define ROTARY_EN_PIN		A5
 
-#define ROTARY_D0_PIN		0
-#define ROTARY_D1_PIN		0
-#define ROTARY_D2_PIN		0
-#define ROTARY_D3_PIN		0
-#define ROTARY_D4_PIN		0
-#define ROTARY_D5_PIN		0
-#define ROTARY_D6_PIN		0
-#define ROTARY_D7_PIN		0
+#define ROTARY_D0_PIN		2
+#define ROTARY_D1_PIN		4
+#define ROTARY_D2_PIN		5
+#define ROTARY_D3_PIN		A0
+#define ROTARY_D4_PIN		A1
+#define ROTARY_D5_PIN		A2
+#define ROTARY_D6_PIN		A3
+#define ROTARY_D7_PIN		A4
 
 #define ROTARY_RESOLUTION	100
 
@@ -116,13 +118,13 @@ namespace rc_car {
 
 // Ultrasonic sensors
 
-#define ULTRA_TRIGGER_PIN	A4
+#define ULTRA_TRIGGER_PIN	12
 #define ULTRA_ECHO_PIN		ULTRA_TRIGGER_PIN
 
-#define ULTRA_SEL_0_PIN		A0
-#define ULTRA_SEL_1_PIN		A1
-#define ULTRA_SEL_2_PIN		A2
-#define ULTRA_SEL_3_PIN		A3
+#define ULTRA_SEL_0_PIN		8
+#define ULTRA_SEL_1_PIN		7
+#define ULTRA_SEL_2_PIN		6
+#define ULTRA_SEL_3_PIN		10
 
 #define ULTRA_NUM_SENSORS		12
 #define ULTRA_NUM_DIST_SAMPLES	10
@@ -143,7 +145,7 @@ namespace rc_car {
 	// Sensor positions and view angles
 // TODO update this number, I just made it up
 // view angle defines the angle of the sensor relative to the RIGHT direction
-#define __ULTRA_VIEW_ANGLE		0.5f
+#define __ULTRA_VIEW_ANGLE		static_cast<float>(18.435f * RAD_TO_DEG)
 
 #define __ULTRA_POS_X_MID		3.0f
 #define __ULTRA_POS_Y_MID		CAR_PIVOT_DIST_MID
@@ -224,8 +226,8 @@ namespace rc_car {
 // Absolute position is measured from the start position
 // (the moment the car is powered on, its position is saved as absolute origo)
 #define ENV_ABS_POINTS_DIST			10	// distance between stored absoulte points [cm]
-#define ENV_ABS_POINTS_NUM_X		50	// number of absolute points stored in x direction
-#define ENV_ABS_POINTS_NUM_Y		50	// number of absolute points stored in y direction
+#define ENV_ABS_POINTS_NUM_X		32	// number of absolute points stored in x direction
+#define ENV_ABS_POINTS_NUM_Y		32	// number of absolute points stored in y direction
 
 // Defines maximum number of points in a sensor direction section
 //#define ENV_SECTION_POINTS_MAX_NUM 8 

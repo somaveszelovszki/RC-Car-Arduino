@@ -23,7 +23,7 @@ namespace rc_car {
 		_Value diff;
 
 		void __initialize() override;
-		void __run() override;
+		void __run(void *unused) override;
 		void __onTimedOut() override;
 
 		int readPosition() const;

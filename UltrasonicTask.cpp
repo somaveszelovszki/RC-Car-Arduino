@@ -12,9 +12,9 @@ const Common::ValidationData UltrasonicTask::defaultValidationData = {
 	ULTRA_VALID_DEFAULT_SAMPLE_NUM, ULTRA_VALID_DEFAULT_RELATIVE_ERROR
 };
 
-UltrasonicTask::UltrasonicTask() : PeriodicTask(PT_PERIOD_TIME_ULTRASONIC, PT_WATCHDOG_TIMEOUT_ULTRASONIC) {
+UltrasonicTask::UltrasonicTask() : PeriodicTask(PT_PERIOD_TIME_ULTRASONIC, PT_WATCHDOG_TIMEOUT_ULTRASONIC),
+		sensorConnection(ULTRA_TRIGGER_PIN, ULTRA_ECHO_PIN, ULTRA_MAX_DISTANCE) {
 
-	sensorConnection = new NewPing(ULTRA_TRIGGER_PIN, ULTRA_ECHO_PIN, ULTRA_MAX_DISTANCE);
 	setEnabled(false);
 
 	sensors[static_cast<int>(Common::UltrasonicPos::FRONT_RIGHT_CORNER)].pos.X = ULTRA_POS_X_FRC;
@@ -72,8 +72,7 @@ UltrasonicTask::UltrasonicTask() : PeriodicTask(PT_PERIOD_TIME_ULTRASONIC, PT_WA
 	sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_FRONT)].viewAngle = ULTRA_VIEW_ANGLE_RF;
 }
 
-void UltrasonicTask::initialize() {
-
+void UltrasonicTask::__initialize() {
 	pinMode(ULTRA_SEL_0_PIN, OUTPUT);
 	pinMode(ULTRA_SEL_1_PIN, OUTPUT);
 	pinMode(ULTRA_SEL_2_PIN, OUTPUT);
@@ -97,6 +96,19 @@ void UltrasonicTask::initialize() {
 	currentSampleIndex = ULTRA_NUM_DIST_SAMPLES - 1;
 }
 
+void UltrasonicTask::__run(void *unused) {
+	// gets next ultrasonic sensor distance (will run in background and call an IT routine)
+	if (isEnabled() && !isBusy()) {
+
+		// checks if all the ultrasonic sensors have been pinged in this cycle
+		// and if yes, stores and validates distances
+		if (cycleFinished())
+			validateAndUpdateSensedPoints();
+
+		pingNextSensor();
+	}
+}
+
 bool UltrasonicTask::isBusy() const {
 	return busy;
 }
@@ -117,10 +129,14 @@ void UltrasonicTask::pingNextSensor() {
 		/*for (int i = 0; i < ULTRA_NUM_SENSORS; ++i) {
 
 		char s[4];
-		Serial.print(itoa(measuredDistances[i], s, 10));
-		Serial.print(", ");
+		Common::debug_print(itoa(measuredDistances[i], s, 10));
+#if __DEBUG
+		Common::debug_print(", ");
+#endif // __DEBUG
 		}
-		Serial.println("");*/
+#if __DEBUG
+		Common::debug_println("");
+#endif // __DEBUG*/
 	}
 
 	// increases sensor position
@@ -129,18 +145,18 @@ void UltrasonicTask::pingNextSensor() {
 	// if sensor is not responsive, does not ping it
 	if (sensors[static_cast<int>(currentSensorPos)].nonResponsiveCounter <= ULTRA_VALID_MAX_NON_RESPONSIVE_COUNT) {
 		busy = true;
-		sensorConnection->timer_stop();
+		sensorConnection.timer_stop();
 		sensors[static_cast<int>(currentSensorPos)].dist_measured = ULTRA_MAX_DISTANCE;	// in case there is no echo
 		updateSensorSelection();
 		// Pings sensor (processing continues, interrupt will call echoCheck to look for echo).
-		sensorConnection->ping_timer(ultrasonicEchoCheckIT);
+		sensorConnection.ping_timer(ultrasonicEchoCheckIT);
 	}
 }
 
 void UltrasonicTask::echoCheck() { // If ping received, set the sensor distance to array.
 
-	if (sensorConnection->check_timer()) {
-		sensors[static_cast<int>(currentSensorPos)].dist_measured = sensorConnection->ping_result / US_ROUNDTRIP_CM;
+	if (sensorConnection.check_timer()) {
+		sensors[static_cast<int>(currentSensorPos)].dist_measured = sensorConnection.ping_result / US_ROUNDTRIP_CM;
 
 		// sensor response is 0 if (measured distance > ULTRA_MAX_DISTANCE)
 		if (sensors[static_cast<int>(currentSensorPos)].dist_measured == 0)
@@ -154,18 +170,7 @@ void UltrasonicTask::validateAndUpdateSensedPoints() {
 	for (int pos = 0; pos < ULTRA_NUM_SENSORS; ++pos) {
 		sensors[static_cast<Common::UltrasonicPos>(pos)].validate(currentSampleIndex);
 		sensors[static_cast<Common::UltrasonicPos>(pos)].updatePoint(currentSampleIndex);
-
-		//Serial.print(sensors[pos].dist_validated[currentSampleIndex]);
-		//if (pos != ULTRA_NUM_SENSORS - 1) Serial.print(", ");
 	}
-
-	//Serial.println();
-
-	//Serial.print("stored: ");
-	//Serial.print(storedDistances[Common::UltrasonicPos::FRONT_LEFT][currentSampleIndex]);
-	//Serial.print("\t\t");
-	//Serial.print("validated: ");
-	//Serial.println(validatedDistances[Common::UltrasonicPos::FRONT_LEFT][currentSampleIndex]);
 }
 
 void UltrasonicTask::getMeasuredPoints(Point<float> dest[ULTRA_NUM_SENSORS]) {
@@ -207,11 +212,15 @@ bool UltrasonicTask::cycleFinished() const {
 
 void UltrasonicTask::onWatchdoghasTimedOut() {
 	//responsive[static_cast<int>(currentSensorPos)] = false;
-	sensorConnection->timer_stop();
+	sensorConnection.timer_stop();
 
-	/*Serial.print("not responsive: ");
+	/*#if __DEBUG
+Common::debug_print("not responsive: ");
+#endif // __DEBUG
 	char s[1];
-	Serial.println(itoa((int)currentSensorPos, s, 10));*/
+#if __DEBUG
+	Common::debug_println(itoa((int);
+#endif // __DEBUGcurrentSensorPos, s, 10));*/
 	busy = false;
 }
 
@@ -259,25 +268,6 @@ void UltrasonicTask::Sensor::validate(int sampleIndex) {
 void UltrasonicTask::Sensor::updatePoint(int sampleIndex) {
 	sensedPoint.X = pos.X + dist_validated[sampleIndex] * cos(dirAngleToXY(viewAngle));
 	sensedPoint.Y = pos.Y + dist_validated[sampleIndex] * sin(dirAngleToXY(viewAngle));
-}
-
-
-void UltrasonicTask::__initialize() {
-	initialize();
-}
-
-void UltrasonicTask::__run() {
-	// gets next ultrasonic sensor distance (will run in background and call an IT routine)
-	if (isEnabled() && !isBusy()) {
-
-		// checks if all the ultrasonic sensors have been pinged in this cycle
-		// and if yes, stores and validates distances
-		if (cycleFinished())
-			validateAndUpdateSensedPoints();
-
-		pingNextSensor();
-		watchdog->restart();
-	}
 }
 
 void UltrasonicTask::__onTimedOut() {

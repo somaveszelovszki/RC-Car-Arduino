@@ -5,10 +5,6 @@
 #include "Trajectory.hpp"
 #include "Environment.hpp"
 
-#include "CommunicatorTask.hpp"
-#include "UltrasonicTask.hpp"
-#include "RotaryTask.hpp"
-
 namespace rc_car {
 	/** @brief Makes driving decisions from sensor data and car state. Controls motors via the MotorHandler.
 	*/
@@ -16,18 +12,17 @@ namespace rc_car {
 
 	private:
 		Common::DriveMode mode;
-
 		MotorHandler motorHandler;
-
-		Watchdog *forceStopWatchdog;
-
+		Watchdog forceStopWatchdog;
+		bool isNewMsgAvailable = false;
 		Message msg;
-
 		Environment environment;
 
 		void __initialize() override;
-		void __run() override;
+		void __run(void *unused) override;
 		void __onTimedOut() override;
+
+		bool forceStopActive = false;
 
 		/*
 			Decides if given distance at given position and at given speed is critical - need to stop the car.
@@ -40,9 +35,12 @@ namespace rc_car {
 		void executeMessage();
 
 	public:
-		DriveTask();
+		DriveTask() : PeriodicTask(PT_PERIOD_TIME_DRIVE, PT_WATCHDOG_TIMEOUT_DRIVE),
+			forceStopWatchdog(DRIVE_FORCE_STOP_TIME),
 
-		~DriveTask();
+			// TODO remove this line, initialize mode from phone
+			mode(Common::DriveMode::FREE_DRIVE) {
+		}
 	};
 
 }
