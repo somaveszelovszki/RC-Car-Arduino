@@ -4,7 +4,7 @@
 #include "ByteArray.hpp"
 
 namespace rc_car {
-	/** @brief Stores code and value of a message.
+	/** @brief Stores code and data of a message.
 	*/
 	class Message {
 
@@ -14,28 +14,30 @@ namespace rc_car {
 			ACK_ = 0,			// for acknowledgements
 			Speed = 1,          // [cm/sec] (>0 means FORWARD)
 			SteeringAngle = 2,  // [rad] (>0 means LEFT)
-			DriveMode = 3		// values in Common::DriveMode
+			DriveMode = 3		// datas in Common::DriveMode
 		};
+
+		static const ByteArray<COMM_MSG_SEPARATOR_LENGTH> SEPARATOR;
 
 		static const Message ACK;
 
 	private:
 		CODE code;
-		ByteArray<4> value;
+		ByteArray<COMM_MSG_DATA_LENGTH> data;
 
 	public:
 
 		Message() {}
 
-		Message(CODE _code, const ByteArray<4>& _value);
+		Message(CODE _code, const ByteArray<4>& _data);
 
-		Message(CODE _code, int _value);
+		Message(CODE _code, int32_t _data);
 
-		Message(CODE _code, float _value);
+		Message(CODE _code, float _data);
 
 		Message& operator=(const Message& other) {
 			setCode(other.code);
-			setValue(other.value);
+			setData(other.data);
 			return *this;
 		}
 
@@ -55,32 +57,32 @@ namespace rc_car {
 			return static_cast<byte>(code);
 		}
 
-		ByteArray<4> getValue() const {
-			return value;
+		ByteArray<4> getData() const {
+			return data;
 		}
 
-		void setValue(const ByteArray<4>& _value) {
-			value = _value;
+		void setData(const ByteArray<4>& _data) {
+			data = _data;
 		}
 
-		void setValue(const byte _value[]) {
-			value = ByteArray<4>(_value);
+		void setData(const byte _data[]) {
+			data = ByteArray<4>(_data);
 		}
 
-		int getValueAsInt() const {
-			return value.asInteger();
+		int32_t getDataAsInt() const {
+			return data.asInteger();
 		}
 
-		void setValue(int _value) {
-			ByteArray<4>::fromInteger(_value, value);
+		void setData(int32_t _data) {
+			ByteArray<4>::fromInteger(_data, data);
 		}
 
-		float getValueAsFloat() const {
-			return value.asFloat();
+		float getDataAsFloat() const {
+			return data.asFloat();
 		}
 
-		void setValue(float _value) {
-			ByteArray<4>::fromFloat(_value, value);
+		void setData(float _data) {
+			ByteArray<4>::fromFloat(_data, data);
 		}
 
 		static byte codeToByte(CODE _code) {
@@ -91,9 +93,9 @@ namespace rc_car {
 			return static_cast<CODE>(b);
 		}
 
-		ByteArray<COMM_MESSAGE_SIZE> toBytes() const;
+		ByteArray<COMM_MSG_LENGTH> toBytes() const;
 
-		static void fromBytes(const ByteArray<COMM_MESSAGE_SIZE>& bytes, Message& dest);
+		static void fromBytes(const ByteArray<COMM_MSG_LENGTH>& bytes, Message& dest);
 
 #if __DEBUG
 		String toString() const;
@@ -101,6 +103,4 @@ namespace rc_car {
 	};
 }
 
-
 #endif	// MESSAGE_HPP
-

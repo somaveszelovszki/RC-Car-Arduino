@@ -15,7 +15,7 @@ void CommunicatorTask::__initialize() {
 	while (!Serial) {}
 	digitalWrite(COMM_EN_PIN, COMM_EN_SIGNAL_LEVEL);	// enables communication
 
-	curByteIdx = 0;
+	recvByteIdx = 0;
 }
 
 void CommunicatorTask::__run(void *unused) {
@@ -49,11 +49,54 @@ void rc_car::CommunicatorTask::setMessageToSend(const Message & msg) {
 }
 
 bool CommunicatorTask::receiveChars() {
+	int availableBytesNum = Serial.available();
+
 	bool msgReceived = false;
-	if (Serial.available() >= COMM_MESSAGE_SIZE) {
-		Serial.readBytes(static_cast<byte*>(recvBuffer), COMM_MESSAGE_SIZE);
-		msgReceived = true;
+
+	if (availableBytesNum) {
+		int bytesNum = min(availableBytesNum, COMM_MSG_LENGTH - recvByteIdx);
+
+		for (int i = 0; i < bytesNum; ++i) {
+			byte b = static_cast<byte>(Serial.read());
+			switch (recvState) {
+			case READ_SEPARATOR:
+				if (b == Message::SEPARATOR[recvByteIdx]) {
+					recvBuffer[recvByteIdx++] = b;
+					if (recvByteIdx == COMM_MSG_SEPARATOR_LENGTH)
+						recvState = READ_CODE;
+				} else
+					recvByteIdx = 0;
+				break;
+			case READ_CODE:
+				recvBuffer[recvByteIdx++] = b;
+				if (recvByteIdx == COMM_MSG_SEPARATOR_LENGTH + COMM_MSG_CODE_LENGTH)
+					recvState = READ_DATA;
+				break;
+			case READ_DATA:
+				recvBuffer[recvByteIdx++] = b;
+				if (recvByteIdx == COMM_MSG_LENGTH) {
+					recvByteIdx = 0;
+					recvState = READ_SEPARATOR;
+					msgReceived = true;
+				}
+				break;
+			}
+		}
+
+		//Serial.readBytes(static_cast<byte*>(recvBuffer) + recvByteIdx, bytesNum);
+		//recvByteIdx += bytesNum;
+
+		//// if SEPARATOR is not at the beginning of the byte array, shifts it
+		//int sepIndex = recvBuffer.indexOf(COMM_MSG_SEPARATOR);
+
+		//if (sepIndex > 0) {
+		//	recvBuffer.shiftBytesLeft(sepIndex);
+		//	recvByteIdx -= sepIndex;
+		//} else if (sepIndex == -1)
+		//	recvByteIdx = 0;
 	}
+
+	//return recvByteIdx == COMM_MSG_LENGTH;
 
 	return msgReceived;
 }
@@ -67,12 +110,10 @@ void CommunicatorTask::fetchMessage() {
 	//recvBuffer = "";
 
 	Message::fromBytes(recvBuffer, recvMsg);
+//	recvByteIdx = 0;
 }
 
 int CommunicatorTask::sendMessage() {
-	//Common::debug_print("Sending: ");
-	//Common::debug_println(sendMsg.toBytes().toString());
 	//TODO sending not working properly!
-	return Serial.write(static_cast<const byte*>(sendMsg.toBytes()), COMM_MESSAGE_SIZE);
+	return Serial.write(static_cast<const byte*>(sendMsg.toBytes()), COMM_MSG_LENGTH);
 }
-

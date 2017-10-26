@@ -2,6 +2,7 @@
 #define CONFIG_HPP
 
 #include <Arduino.h>
+#include <stdint.h>
 
 namespace rc_car {
 
@@ -54,7 +55,13 @@ namespace rc_car {
 #define COMM_EN_PIN					13
 #define COMM_EN_SIGNAL_LEVEL		LOW
 #define COMM_BLUETOOTH_BAUD_RATE	9600
-#define COMM_MESSAGE_SIZE			5
+
+#define COMM_MSG_SEPARATOR_LENGTH	4
+#define COMM_MSG_CODE_LENGTH		1
+#define COMM_MSG_DATA_LENGTH		4
+#define COMM_MSG_LENGTH				(COMM_MSG_SEPARATOR_LENGTH + COMM_MSG_CODE_LENGTH + COMM_MSG_DATA_LENGTH)
+
+#define COMM_MSG_SEPARATOR			static_cast<int32_t>(0x7fffffff)	// forbidden as data value
 
 // DriveTask
 

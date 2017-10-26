@@ -20,30 +20,31 @@ void Common::initializeTimer() {
 	//interrupts();
 }
 
-int Common::bytesToInt(const byte bytes[], int startIndex = 0) {
-	return (bytes[startIndex] << 24)
-		| (bytes[startIndex + 1] << 16)
-		| (bytes[startIndex + 2] << 8)
-		| bytes[startIndex + 3];
+int32_t Common::bytesToInt(const byte bytes[], int startIndex = 0) {
+	//return *reinterpret_cast<const int32_t*>(&bytes[startIndex]);
+	return (static_cast<int32_t>(bytes[startIndex]) << 24)
+		| (static_cast<int32_t>(bytes[startIndex + 1]) << 16)
+		| (static_cast<int32_t>(bytes[startIndex + 2]) << 8)
+		| static_cast<int32_t>(bytes[startIndex + 3]);
 }
 
 float Common::bytesToFloat(const byte bytes[], int startIndex = 0) {
-	const float *floatPtr = reinterpret_cast<const float*>(&bytes[startIndex]);
-	return *floatPtr;
+	// TODO
+	return 0.0f;
+	//return *reinterpret_cast<const float*>(&bytes[startIndex]);
 }
 
-byte* Common::intToBytes(int value, byte dest[4]) {
+void Common::intToBytes(int32_t value, byte dest[4]) {
+	//*reinterpret_cast<int32_t*>(dest) = value;
 	dest[0] = static_cast<byte>(value >> 24);
 	dest[1] = static_cast<byte>(value >> 16);
 	dest[2] = static_cast<byte>(value >> 8);
 	dest[3] = static_cast<byte>(value);
 }
 
-byte* Common::floatToBytes(int value, byte dest[4]) {
-	byte res[4];
-	const byte *bytePtr = reinterpret_cast<const byte*>(&value);
-	Common::arrayCopy<4>(bytePtr, res);
-	return res;
+void Common::floatToBytes(float value, byte dest[4]) {
+	//*reinterpret_cast<float*>(dest) = value;
+	// TODO
 }
 
 void Common::debug_print(const String& str, bool addNewLine = false) {

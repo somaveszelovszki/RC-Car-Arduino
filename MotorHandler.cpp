@@ -13,6 +13,7 @@ void MotorHandler::DCMotor::initialize() {
 
 void MotorHandler::DCMotor::writeValue(int value) {
 
+	// TODO define DC motor value bit length
 	value = Common::incarcerate(value, DC_MIN_VALUE, DC_MAX_VALUE);
 
 	bool isFwd = value >= 0;

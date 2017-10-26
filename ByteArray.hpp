@@ -16,6 +16,14 @@ namespace rc_car {
 	public:
 		ByteArray() {}
 
+		explicit ByteArray(int32_t _value) {
+			fromInteger(_value, *this);
+		}
+
+		explicit ByteArray(float _value) {
+			fromFloat(_value, *this);
+		}
+
 		explicit ByteArray(const byte _value[size]) {
 			setValue(_value);
 		}
@@ -49,7 +57,7 @@ namespace rc_car {
 			return value[pos];
 		}
 
-		static void fromInteger(int _value, ByteArray<size>& dest) {
+		static void fromInteger(int32_t _value, ByteArray<size>& dest) {
 			Common::intToBytes(_value, dest.value);
 		}
 
@@ -57,7 +65,7 @@ namespace rc_car {
 			Common::floatToBytes(_value, dest.value);
 		}
 
-		int asInteger() const {
+		int32_t asInteger() const {
 			return Common::bytesToInt(value);
 		}
 
@@ -71,7 +79,7 @@ namespace rc_car {
 		}
 
 		void append(byte b, ByteArray<size + 1>& dest) const {
-			Common::arrayCopy<size>(this->value, dest.value);
+			Common::arrayCopy<size>(value, static_cast<byte*>(dest));
 			dest[size] = b;
 		}
 
@@ -92,8 +100,54 @@ namespace rc_car {
 			return ByteArray<1>(&b) + bytes;
 		}
 
+		void shiftBytesLeft(int byteShift) {
+			for (int i = size - 1; i >= byteShift; --i)
+				(*this)[i] = (*this)[i - byteShift];
+
+			for (int i = byteShift - 1; i >= 0; --i)
+				(*this)[i] = static_cast<byte>(0);
+		}
+
+		void shiftBytesRight(int byteShift) {
+			for (int i = 0; i < size - byteShift; ++i)
+				(*this)[i] = (*this)[i + byteShift];
+
+			for (int i = byteShift; i < size; ++i)
+				(*this)[i] = static_cast<byte>(0);
+		}
+
+		/** @brief Finds index of first occurence of integer value.
+		NOTE: Length of the byte array must be at least 4!
+
+		@param _value The integer value to look for in the byte array.
+		*/
+		int indexOf(int32_t _value) const {
+			int index = -1;
+			for (int i = 0; index == -1 && i <= size - 4; ++i)
+				if (Common::bytesToInt(value, i) == _value)
+					index = i;
+			return index;
+		}
+
+		/** @brief Finds index of first occurence of float value.
+		NOTE: Length of the byte array must be at least 4!
+
+		@param _value The float value to look for in the byte array.
+		*/
+		int indexOf(float _value) const {
+			int index = -1;
+			for (int i = 0; index > -1 && i < size - 4; ++i)
+				if (Common::bytesToFloat(value, i) == _value)
+					index = i;
+			return index;
+		}
+
+#if __DEBUG
 		String toString() const;
+#endif // __DEBUG
 	};
+
+#if __DEBUG
 	template<int size>
 	String ByteArray<size>::toString() const {
 		String str("[ ");
@@ -107,6 +161,7 @@ namespace rc_car {
 		str += " ]";
 		return str;
 	}
+#endif // __DEBUG
 }
 
 #endif // BYTE_ARRAY_HPP

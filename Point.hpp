@@ -11,7 +11,6 @@ namespace rc_car {
 		T Y;
 
 		static const Point<T> ORIGO;
-
 		Point<T>() {}
 		Point<T>(T x, T y) : X(x), Y(y) {}
 

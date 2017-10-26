@@ -40,7 +40,7 @@ void DriveTask::__run(void *unused) {
 			if (forceStopWatchdog.hasTimedOut())
 				forceStopActive = false;
 			else
-				msg.setValue(0);
+				msg.setData(static_cast<int32_t>(0));
 		}
 
 		break;
@@ -114,8 +114,6 @@ void DriveTask::updateValues() {
 	isNewMsgAvailable = communicatorTask.getReceivedMessage(msg);
 	if (isNewMsgAvailable) {
 #if __DEBUG
-		//Common::debug_print("received: ");
-		//Common::debug_println(msg.toString());
 		communicatorTask.setMessageToSend(Message(Message::ACK));
 #endif // __DEBUG);
 	}
@@ -125,15 +123,15 @@ void DriveTask::executeMessage() {
 	switch (msg.getCode()) {
 
 	case Message::CODE::Speed:
-		motorHandler.setDesiredSpeed(msg.getValueAsFloat());
+		motorHandler.setDesiredSpeed(msg.getDataAsFloat());
 		break;
 
 	case Message::CODE::SteeringAngle:
-		motorHandler.updateSteeringAngle(msg.getValueAsFloat());
+		motorHandler.updateSteeringAngle(msg.getDataAsFloat());
 		break;
 
 	case Message::CODE::DriveMode:
-		mode = static_cast<Common::DriveMode>(msg.getValueAsInt());
+		mode = static_cast<Common::DriveMode>(msg.getDataAsInt());
 		// TODO notification
 		break;
 	}

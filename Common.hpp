@@ -133,13 +133,13 @@ namespace rc_car {
 			Common::arrayCopy<size2>(ar2, &res[size1]);
 		}
 
-		static int bytesToInt(const byte bytes[], int startIndex = 0);
+		static int32_t bytesToInt(const byte bytes[], int startIndex = 0);
 
 		static float bytesToFloat(const byte bytes[], int startIndex = 0);
 
-		static byte* intToBytes(int value, byte dest[4]);
+		static void intToBytes(int32_t value, byte dest[4]);
 
-		static byte* floatToBytes(int value, byte dest[4]);
+		static void floatToBytes(float value, byte dest[4]);
 
 		static void debug_print(const String& str, bool addNewLine = false);
 		static void debug_println(const String& str);

@@ -16,10 +16,15 @@ namespace rc_car {
 		//SoftwareSerial *commSerial;
 		//AltSoftSerial *commSerial;
 
-		ByteArray<COMM_MESSAGE_SIZE> recvBuffer;
-		int curByteIdx;
+		enum RecvState {
+			READ_SEPARATOR, READ_CODE, READ_DATA
+		};
+
+		ByteArray<COMM_MSG_LENGTH> recvBuffer;
+		int recvByteIdx;
 
 		Message recvMsg, sendMsg;
+		RecvState recvState = READ_SEPARATOR;
 		bool __recvAvailable = false, __sendAvailable = false;
 		bool hasTimedOut = false;	// TODO find a more elegant and effective way
 
