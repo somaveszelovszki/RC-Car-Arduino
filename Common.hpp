@@ -16,9 +16,6 @@ namespace rc_car {
 	*/
 	class Common {
 
-	private:
-		static unsigned long MILLIS;
-
 	public:
 		/*
 		Drive mode defines if the program should override user's messages.
@@ -78,14 +75,6 @@ namespace rc_car {
 
 		static void initializeTimer();
 
-		static unsigned long milliSecs() {
-			return MILLIS;
-		}
-
-		static void incrementMilliSecs() {
-			++MILLIS;
-		}
-
 		template <typename T>
 		static bool contains(const T array[], int arraySize, T item) {
 			bool c = false;
@@ -121,17 +110,10 @@ namespace rc_car {
 		Checks if value is in a given range of the reference value.
 		*/
 		template <typename T>
-		static bool isInRange(T ref, T value, float relativeError, ErrorSign errorDir = Common::ErrorSign::BOTH) {
-			T max = errorDir == ErrorSign::NEGATIVE ? ref : static_cast<T>(ref * (1.0F + relativeError));
-			T min = errorDir == ErrorSign::POSITIVE ? ref : static_cast<T>(ref * (1.0F - relativeError));
-			return isBetween(value, min, max);
-		}
+		static bool isInRange(T ref, T value, float relativeError, ErrorSign errorDir = Common::ErrorSign::BOTH);
 
 		template <int size1, int size2, typename T>
-		static void arrayConcat(const T ar1[], const T ar2[], T res[]) {
-			Common::arrayCopy<size1>(ar1, res);
-			Common::arrayCopy<size2>(ar2, &res[size1]);
-		}
+		static void arrayConcat(const T ar1[], const T ar2[], T res[]);
 
 		static int32_t bytesToInt(const byte bytes[], int startIndex = 0);
 
@@ -145,7 +127,34 @@ namespace rc_car {
 		static void debug_println(const String& str);
 
 		static bool testAndSet(bool *value, bool valueToSet = true);
+
+		template <typename T>
+		static T map(T value, T fromLow, T fromHigh, T toLow, T toHigh);
 	};
+
+	template<typename T>
+	inline bool Common::isInRange(T ref, T value, float relativeError, ErrorSign errorDir) {
+		T max = errorDir == ErrorSign::NEGATIVE ? ref : static_cast<T>(ref * (1.0F + relativeError));
+		T min = errorDir == ErrorSign::POSITIVE ? ref : static_cast<T>(ref * (1.0F - relativeError));
+		return isBetween(value, min, max);
+	}
+
+	template<int size1, int size2, typename T>
+	inline void Common::arrayConcat(const T ar1[], const T ar2[], T res[]) {
+		Common::arrayCopy<size1>(ar1, res);
+		Common::arrayCopy<size2>(ar2, &res[size1]);
+	}
+
+	template<typename T>
+	inline T Common::map(T value, T fromLow, T fromHigh, T toLow, T toHigh) {
+		if (value <= fromLow)
+			return toLow;
+
+		if (value >= fromHigh)
+			return toHigh;
+
+		return toLow + (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow);
+	}
 
 }
 #endif	// COMMON_HPP

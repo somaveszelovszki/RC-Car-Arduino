@@ -1,8 +1,11 @@
 #include "UltrasonicTask.hpp"
 
+#include "CommunicatorTask.hpp"
+
 using namespace rc_car;
 
 extern UltrasonicTask ultrasonicTask;
+extern CommunicatorTask communicatorTask;
 
 const Common::ValidationData UltrasonicTask::maxDistanceValidationData = {
 	ULTRA_VALID_MAX_DIST_SAMPLE_NUM, ULTRA_VALID_MAX_DIST_RELATIVE_ERROR
@@ -102,8 +105,23 @@ void UltrasonicTask::__run(void *unused) {
 
 		// checks if all the ultrasonic sensors have been pinged in this cycle
 		// and if yes, stores and validates distances
-		if (cycleFinished())
+		if (cycleFinished()) {
 			validateAndUpdateSensedPoints();
+
+			//ultrasonicTask.getMeasuredPoints(environment.measuredPoints);
+			environment.calculate();
+		}
+
+		if (communicatorTask.getReceivedMessage(msg, getId()))
+			executeMessage();
+
+		if (sendEnvironmentEnabled && currentSensorPos % 2) {
+			msg.setCode(ultraPosToMsgCode(currentSensorPos));
+			msg.setData(sensors[static_cast<int>(currentSensorPos) - 1].sensedPoint.toByteArray()
+				+ sensors[static_cast<int>(currentSensorPos)].sensedPoint.toByteArray());
+
+			communicatorTask.setMessageToSend(msg, getId());
+		}
 
 		pingNextSensor();
 	}
@@ -191,6 +209,10 @@ void UltrasonicTask::updateSensorSelection() {
 	digitalWrite(ULTRA_SEL_3_PIN, (pos & 0x08) ? HIGH : LOW);
 }
 
+const Message::CODE rc_car::UltrasonicTask::ultraPosToMsgCode(Common::UltrasonicPos pos) {
+	return static_cast<Message::CODE>(static_cast<int>(Message::CODE::Ultra0_1_EnvPoint) + static_cast<int>(pos) / 2);
+}
+
 //Common::UltrasonicPos UltrasonicTask::calculateForwardDirection(float steeringAngle) {
 //	float min = abs(steeringAngle - sensors[0].viewAngle);
 //	int minPos = 0;
@@ -268,6 +290,15 @@ void UltrasonicTask::Sensor::validate(int sampleIndex) {
 void UltrasonicTask::Sensor::updatePoint(int sampleIndex) {
 	sensedPoint.X = pos.X + dist_validated[sampleIndex] * cos(dirAngleToXY(viewAngle));
 	sensedPoint.Y = pos.Y + dist_validated[sampleIndex] * sin(dirAngleToXY(viewAngle));
+}
+
+void UltrasonicTask::executeMessage() {
+	switch (msg.getCode()) {
+
+	case Message::CODE::EnableEnvironment:
+		sendEnvironmentEnabled = static_cast<bool>(msg.getDataAsInt());
+		break;
+	}
 }
 
 void UltrasonicTask::__onTimedOut() {

@@ -23,9 +23,9 @@ namespace rc_car {
 		ByteArray<COMM_MSG_LENGTH> recvBuffer;
 		int recvByteIdx;
 
-		Message recvMsg, sendMsg;
+		Message recvMsg, sendMsg[PT_NUM_TASKS];
 		RecvState recvState = READ_SEPARATOR;
-		bool __recvAvailable = false, __sendAvailable = false;
+		bool __recvAvailable[PT_NUM_TASKS], __sendAvailable[PT_NUM_TASKS];
 		bool hasTimedOut = false;	// TODO find a more elegant and effective way
 
 		/*
@@ -42,19 +42,15 @@ namespace rc_car {
 		void __run(void *unused) override;
 		void __onTimedOut() override;
 
-		/*
-		Sends message as string.
-		@returns number of bytes sent
-		*/
-		int sendMessage();
+		int sendMessage(int taskId);
 
 	public:
 
 		CommunicatorTask();
 
-		bool getReceivedMessage(Message& msg);
+		bool getReceivedMessage(Message& msg, int taskId);
 
-		void setMessageToSend(const Message& msg);
+		void setMessageToSend(const Message& msg, int taskId);
 	};
 
 }

@@ -13,13 +13,13 @@ namespace rc_car {
 
 // Car specifications [cm]
 
-#define CAR_PIVOT_DIST_FRONT_REAR	20.0f		// distance between front and rear pivots
-#define CAR_PIVOT_DIST_MID		(CAR_PIVOT_DIST_FRONT_REAR / 2)		// distance between pivot and car middle
+#define CAR_PIVOT_DIST_FRONT_REAR		20.0f		// distance between front and rear pivots
+#define CAR_PIVOT_DIST_MID				(CAR_PIVOT_DIST_FRONT_REAR / 2)		// distance between pivot and car middle
 
 #define CAR_PIVOT_LENGTH_FRONT			8.0f			// length of front pivot (middle to wheel)
 #define CAR_PIVOT_LENGTH_REAR			8.0f			// length of rear pivot (middle to wheel)
 
-#define CAR_PIVOT_LENGTH_MID ((CAR_PIVOT_LENGTH_FRONT + CAR_PIVOT_LENGTH_REAR) / 2)
+#define CAR_PIVOT_LENGTH_MID			((CAR_PIVOT_LENGTH_FRONT + CAR_PIVOT_LENGTH_REAR) / 2)
 
 #define CAR_PIVOT_FRONT_DISTANCE		7.2f		// distance between car front and front pivot
 #define CAR_PIVOT_REAR_DISTANCE			7.2f		// distance between car rear and rear pivot
@@ -28,7 +28,7 @@ namespace rc_car {
 
 // Periodic tasks
 
-#define PT_MAX_NUM_TASKS				4
+#define PT_NUM_TASKS					4
 
 	// frequencies [ms]
 
@@ -46,7 +46,7 @@ namespace rc_car {
 
 // Watchdog
 
-#define WD_MAX_NUM_WATCHDOGS PT_MAX_NUM_TASKS
+#define WD_MAX_NUM_WATCHDOGS PT_NUM_TASKS
 
 // Communication
 
@@ -135,7 +135,7 @@ namespace rc_car {
 
 #define ULTRA_NUM_SENSORS		12
 #define ULTRA_NUM_DIST_SAMPLES	10
-#define ULTRA_MAX_DISTANCE		200
+#define ULTRA_MAX_DISTANCE		200u
 
 // defines how many stored measured values need to be ULTRA_MAX_DISTANCE, so that we can validate value
 // 	->	many times the sensors do not respond, which equals ULTRA_MAX_DISTANCE as a value,
@@ -154,14 +154,15 @@ namespace rc_car {
 // view angle defines the angle of the sensor relative to the RIGHT direction
 #define __ULTRA_VIEW_ANGLE		static_cast<float>(18.435f * RAD_TO_DEG)
 
-#define __ULTRA_POS_X_MID		3.0f
-#define __ULTRA_POS_Y_MID		CAR_PIVOT_DIST_MID
+#define __ULTRA_POS_X_MID			2.4f
+#define __ULTRA_POS_Y_MID			CAR_PIVOT_DIST_MID
 
-#define __ULTRA_POS_X_CORNER	8.0f
-#define __ULTRA_POS_Y_CORNER	CAR_PIVOT_DIST_MID
+#define __ULTRA_POS_X_CORNER		7.2f
+#define __ULTRA_POS_Y_CORNER		CAR_PIVOT_DIST_MID
 
-#define __ULTRA_POS_X_SIDE		(CAR_PIVOT_LENGTH_MID / 2)
-#define __ULTRA_POS_Y_SIDE		3.0f
+#define __ULTRA_POS_X_SIDE			(CAR_PIVOT_LENGTH_MID / 2)
+#define __ULTRA_POS_Y_SIDE_FRONT	2.0f
+#define __ULTRA_POS_Y_SIDE_REAR		3.6f
 
 
 
@@ -184,11 +185,11 @@ namespace rc_car {
 
 
 #define ULTRA_POS_X_LF			(-__ULTRA_POS_X_SIDE)
-#define ULTRA_POS_Y_LF			__ULTRA_POS_Y_SIDE
+#define ULTRA_POS_Y_LF			__ULTRA_POS_Y_SIDE_FRONT
 #define ULTRA_VIEW_ANGLE_LF		static_cast<float>(M_PI_2 - __ULTRA_VIEW_ANGLE)
 
 #define ULTRA_POS_X_LR			(-__ULTRA_POS_X_SIDE)
-#define ULTRA_POS_Y_LR			__ULTRA_POS_Y_SIDE
+#define ULTRA_POS_Y_LR			__ULTRA_POS_Y_SIDE_REAR
 #define ULTRA_VIEW_ANGLE_LR		static_cast<float>(M_PI_2 + __ULTRA_VIEW_ANGLE)
 
 
@@ -212,11 +213,11 @@ namespace rc_car {
 
 
 #define ULTRA_POS_X_RiR			__ULTRA_POS_X_SIDE
-#define ULTRA_POS_Y_RiR			__ULTRA_POS_Y_SIDE
+#define ULTRA_POS_Y_RiR			__ULTRA_POS_Y_SIDE_REAR
 #define ULTRA_VIEW_ANGLE_RiR	static_cast<float>(-M_PI_2 - __ULTRA_VIEW_ANGLE)
 
 #define ULTRA_POS_X_RF			__ULTRA_POS_X_SIDE
-#define ULTRA_POS_Y_RF			__ULTRA_POS_Y_SIDE
+#define ULTRA_POS_Y_RF			__ULTRA_POS_Y_SIDE_FRONT
 #define ULTRA_VIEW_ANGLE_RF		static_cast<float>(-M_PI_2 + __ULTRA_VIEW_ANGLE)
 
 // Environment

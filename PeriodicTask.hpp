@@ -10,7 +10,8 @@ namespace rc_car {
 	class PeriodicTask : public Periodic {
 
 	private:
-		static PeriodicTask *instances[PT_MAX_NUM_TASKS];
+		int id;
+		static PeriodicTask *instances[PT_NUM_TASKS];
 		static int numInstances;
 
 		virtual void __initialize() = 0;
@@ -18,6 +19,10 @@ namespace rc_car {
 
 	protected:
 		Watchdog timeoutCheckWatchdog;
+
+		int getId() const {
+			return id;
+		}
 
 	public:
 

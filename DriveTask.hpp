@@ -3,7 +3,6 @@
 
 #include "MotorHandler.hpp"
 #include "Trajectory.hpp"
-#include "Environment.hpp"
 
 namespace rc_car {
 	/** @brief Makes driving decisions from sensor data and car state. Controls motors via the MotorHandler.
@@ -16,7 +15,6 @@ namespace rc_car {
 		Watchdog forceStopWatchdog;
 		bool isNewMsgAvailable = false;
 		Message msg;
-		Environment environment;
 
 		void __initialize() override;
 		void __run(void *unused) override;

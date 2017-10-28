@@ -2,11 +2,11 @@
 
 using namespace rc_car;
 
-PeriodicTask *PeriodicTask::instances[PT_MAX_NUM_TASKS];
+PeriodicTask *PeriodicTask::instances[PT_NUM_TASKS];
 int PeriodicTask::numInstances = 0;
 
 PeriodicTask::PeriodicTask(int _periodTime, int _watchDogTimeout) : Periodic(_periodTime), timeoutCheckWatchdog(_watchDogTimeout) {
-	instances[numInstances++] = this;
+	instances[id = numInstances++] = this;
 }
 
 void PeriodicTask::checkIfTimedOut() {

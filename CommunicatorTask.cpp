@@ -8,6 +8,10 @@ CommunicatorTask::CommunicatorTask() : PeriodicTask(PT_PERIOD_TIME_COMMUNICATOR,
 	pinMode(COMM_EN_PIN, OUTPUT);
 	pinMode(COMM_RX_PIN, INPUT);
 	pinMode(COMM_TX_PIN, OUTPUT);
+
+	for (int i = 0; i < PT_NUM_TASKS; ++i) {
+		__recvAvailable[i] = __sendAvailable[i] = false;
+	}
 }
 
 void CommunicatorTask::__initialize() {
@@ -22,13 +26,13 @@ void CommunicatorTask::__run(void *unused) {
 	if (!hasTimedOut) {
 		if (receiveChars()) {
 			fetchMessage();
-			__recvAvailable = true;
+			for (int i = 0; i < PT_NUM_TASKS; ++i)
+				__recvAvailable[i] = true;
 		}
 
-		if (__sendAvailable) {
-			sendMessage();
-			__sendAvailable = false;
-		}
+		for (int i = 0; i < PT_NUM_TASKS; ++i)
+			if (Common::testAndSet(&__sendAvailable[i], false))
+				sendMessage(i);
 	}
 }
 
@@ -36,16 +40,19 @@ void CommunicatorTask::__onTimedOut() {
 	hasTimedOut = true;
 }
 
-bool CommunicatorTask::getReceivedMessage(Message& msg) {
-	bool isNewMessageAvailable = Common::testAndSet(&__recvAvailable, false);
-	if (isNewMessageAvailable)
+bool CommunicatorTask::getReceivedMessage(Message& msg, int taskId) {
+	bool isNewMessageAvailable = Common::testAndSet(&__recvAvailable[taskId], false);
+	if (isNewMessageAvailable) {
+		noInterrupts();
 		msg = recvMsg;
+		interrupts();
+	}
 	return isNewMessageAvailable;
 }
 
-void rc_car::CommunicatorTask::setMessageToSend(const Message & msg) {
-	sendMsg = msg;
-	__sendAvailable = true;
+void rc_car::CommunicatorTask::setMessageToSend(const Message& msg, int taskId) {
+	sendMsg[taskId] = msg;
+	__sendAvailable[taskId] = true;
 }
 
 bool CommunicatorTask::receiveChars() {
@@ -113,7 +120,7 @@ void CommunicatorTask::fetchMessage() {
 //	recvByteIdx = 0;
 }
 
-int CommunicatorTask::sendMessage() {
+int CommunicatorTask::sendMessage(int taskId) {
 	//TODO sending not working properly!
-	return Serial.write(static_cast<const byte*>(sendMsg.toBytes()), COMM_MSG_LENGTH);
+	return Serial.write(static_cast<const byte*>(sendMsg[taskId].toBytes()), COMM_MSG_LENGTH);
 }

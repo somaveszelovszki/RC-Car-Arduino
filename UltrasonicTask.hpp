@@ -3,7 +3,8 @@
 
 #include "PeriodicTask.hpp"
 #include <NewPing.h>
-#include "Point.hpp"
+#include "Environment.hpp"
+#include "Message.hpp"
 
 namespace rc_car {
 	void ultrasonicEchoCheckIT();
@@ -39,10 +40,15 @@ namespace rc_car {
 		bool busy;
 
 		bool enabled;
-
 		int currentSampleIndex;
 
+		Message msg;
+		Environment environment;
+		bool sendEnvironmentEnabled = false;
+
 		void updateSensorSelection();
+
+		const Message::CODE ultraPosToMsgCode(Common::UltrasonicPos pos);
 
 		//Common::UltrasonicPos calculateForwardDirection(float steeringAngle);
 
@@ -66,6 +72,8 @@ namespace rc_car {
 		void validateAndUpdateSensedPoints();
 
 		void getMeasuredPoints(Point<float> dest[ULTRA_NUM_SENSORS]);
+
+		void executeMessage();
 
 		void __initialize() override;
 		void __run(void *unused) override;

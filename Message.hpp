@@ -11,10 +11,20 @@ namespace rc_car {
 	public:
 
 		enum CODE {
-			ACK_ = 0,			// for acknowledgements
-			Speed = 1,          // [cm/sec] (>0 means FORWARD)
-			SteeringAngle = 2,  // [rad] (>0 means LEFT)
-			DriveMode = 3		// datas in Common::DriveMode
+			ACK_				= 0b00000000,		// for acknowledgements
+			Speed				= 0b00000001,       // [cm/sec] (>0 means FORWARD)
+			SteeringAngle		= 0b00000010,		// [rad] (>0 means LEFT)
+			DriveMode			= 0b00000011,		// datas in Common::DriveMode
+
+			Ultra0_1_EnvPoint	= 0b00001000,
+			Ultra2_3_EnvPoint	= 0b00001001,
+			Ultra4_5_EnvPoint	= 0b00001010,
+			Ultra6_7_EnvPoint	= 0b00001011,
+			Ultra8_9_EnvPoint	= 0b00001100,
+			Ultra10_11_EnvPoint	= 0b00001101,
+			Ultra12_13_EnvPoint	= 0b00001110,
+			Ultra14_15_EnvPoint	= 0b00001111,
+			EnableEnvironment	= 0b00010000
 		};
 
 		static const ByteArray<COMM_MSG_SEPARATOR_LENGTH> SEPARATOR;

@@ -2,8 +2,6 @@
 
 using namespace rc_car;
 
-unsigned long Common::MILLIS = 0;
-
 void Common::initializeTimer() {
 	//noInterrupts();
 

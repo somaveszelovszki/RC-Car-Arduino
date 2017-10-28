@@ -105,16 +105,13 @@ bool DriveTask::isDistanceCritical(Common::UltrasonicPos pos, int distance) cons
 }
 
 void DriveTask::updateValues() {
-	//ultrasonicTask.getMeasuredPoints(environment.measuredPoints);
-	environment.calculate();
-
 	float actualSpeed = rotaryTask.getSpeed();
 	motorHandler.updateSpeed(actualSpeed);
 
-	isNewMsgAvailable = communicatorTask.getReceivedMessage(msg);
+	isNewMsgAvailable = communicatorTask.getReceivedMessage(msg, getId());
 	if (isNewMsgAvailable) {
 #if __DEBUG
-		communicatorTask.setMessageToSend(Message(Message::ACK));
+		communicatorTask.setMessageToSend(Message(Message::ACK), getId());
 #endif // __DEBUG);
 	}
 }

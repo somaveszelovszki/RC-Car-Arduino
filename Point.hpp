@@ -1,7 +1,7 @@
 #ifndef POINT_HPP
 #define POINT_HPP
 
-#include "Common.hpp"
+#include "ByteArray.hpp"
 
 namespace rc_car {
 	template <typename T>
@@ -49,6 +49,10 @@ namespace rc_car {
 		}
 
 		static Point<T> average(const Point<T>& p1, const Point<T>& p2);
+
+		ByteArray<2> toByteArray() const;
+
+		static Point<T> fromByteArray(const ByteArray<2>& bytes);
 
 #if(__DEBUG)
 		String toString() const;
@@ -149,10 +153,31 @@ namespace rc_car {
 		return Point<T>((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2);
 	}
 
+	template<typename T>
+	ByteArray<2> Point<T>::toByteArray() const {
+		ByteArray<2> result;
+		// maps X and Y coordinates to fit into a byte
+		int _X = Common::incarcerate(static_cast<int>(X * 128 / ULTRA_MAX_DISTANCE), -128, 127),
+			_Y = Common::incarcerate(static_cast<int>(Y * 128 / ULTRA_MAX_DISTANCE), -128, 127);
+
+		result[0] = static_cast<byte>(_X);
+		result[1] = static_cast<byte>(_Y);
+
+		return result;
+	}
+
+	template<typename T>
+	Point<T> Point<T>::fromByteArray(const ByteArray<2>& bytes) {
+		return Point<T>(
+			static_cast<T>(static_cast<int>(bytes[0]) * ULTRA_MAX_DISTANCE / 128.0f),
+			static_cast<T>(static_cast<int>(bytes[1]) * ULTRA_MAX_DISTANCE / 128.0f),
+		);
+	}
+
 #if(__DEBUG)
 	template<typename T>
 	String Point<T>::toString() const {
-		return String("(") + String(X) + String(", ") + String(Y) + String(")");
+		return String("Point(") + String(X) + String(", ") + String(Y) + String(")");
 	}
 #endif // __DEBUG
 }

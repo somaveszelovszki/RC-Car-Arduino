@@ -78,6 +78,11 @@ namespace rc_car {
 			Common::arrayConcat<size, size2>(static_cast<const byte*>(*this), static_cast<const byte*>(other), static_cast<byte*>(dest));
 		}
 
+		template <int size2>
+		ByteArray<size2> subArray(int startIndex) {
+			return ByteArray<size2>(&value[startIndex]);
+		}
+
 		void append(byte b, ByteArray<size + 1>& dest) const {
 			Common::arrayCopy<size>(value, static_cast<byte*>(dest));
 			dest[size] = b;
