@@ -10,10 +10,13 @@ namespace rc_car {
 
 	public:
 
+		static const ByteArray<COMM_MSG_DATA_LENGTH> BOOL_VALUE_TRUE;
+		static const ByteArray<COMM_MSG_DATA_LENGTH> BOOL_VALUE_FALSE;
+
 		enum CODE {
 			ACK_				= 0b00000000,		// for acknowledgements
 			Speed				= 0b00000001,       // [cm/sec] (>0 means FORWARD)
-			SteeringAngle		= 0b00000010,		// [rad] (>0 means LEFT)
+			SteeringAngle		= 0b00000010,		// [degree] (>0 means LEFT)
 			DriveMode			= 0b00000011,		// datas in Common::DriveMode
 
 			Ultra0_1_EnvPoint	= 0b00001000,
@@ -93,6 +96,14 @@ namespace rc_car {
 
 		void setData(float _data) {
 			ByteArray<4>::fromFloat(_data, data);
+		}
+
+		bool getDataAsBool() const {
+			return data == BOOL_VALUE_TRUE;
+		}
+
+		void setData(bool _data) {
+			data = _data ? BOOL_VALUE_TRUE : BOOL_VALUE_FALSE;
 		}
 
 		static byte codeToByte(CODE _code) {

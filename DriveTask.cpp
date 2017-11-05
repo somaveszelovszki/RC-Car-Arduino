@@ -10,20 +10,15 @@ extern CommunicatorTask communicatorTask;
 extern UltrasonicTask ultrasonicTask;
 extern RotaryTask rotaryTask;
 
-void DriveTask::__initialize() {
+void DriveTask::initialize() {
 	motorHandler.initialize();
 }
 
-void DriveTask::__run(void *unused) {
+void DriveTask::run() {
 	updateValues();
 
-	if (Common::testAndSet(&isNewMsgAvailable, false)) {
-		// TODO handle new message from communicator
-#if __DEBUG
-		//Common::debug_println(msg.toString());
-		//Common::debug_println("new message arrived.");
-#endif // __DEBUG
-	}
+	if (Common::testAndSet(&isNewMsgAvailable, false))
+		executeMessage();
 
 	switch (mode) {
 	case Common::FREE_DRIVE:
@@ -47,13 +42,9 @@ void DriveTask::__run(void *unused) {
 	case Common::AUTOPILOT:
 		break;
 	}
-
-
-
-	executeMessage();
 }
 
-void DriveTask::__onTimedOut() {
+void DriveTask::onTimedOut() {
 	// TODO
 }
 
@@ -68,25 +59,25 @@ bool DriveTask::isDistanceCritical(Common::UltrasonicPos pos, int distance) cons
 //	if (speed > 0) {		// FORWARD
 //	//	if (pos == Common::UltrasonicPos::FRONT_LEFT || pos == Common::UltrasonicPos::FRONT_RIGHT) {
 //#if __DEBUG
-//Common::debug_print("distance: ");
-//		Common::debug_print(distance);
-//		Common::debug_print(" cm");
-//		Common::debug_print("\t\tspeed: ");
-//		Common::debug_println(speed);
-//		Common::debug_print(" cm/sec");
-//		Common::debug_print(preCrashTime);
-//		Common::debug_print(" <= ");
-//		Common::debug_println(CRITICAL_PRE_CRASH_TIME);
-//		Common::debug_println();
+//DEBUG_print("distance: ");
+//		DEBUG_print(distance);
+//		DEBUG_print(" cm");
+//		DEBUG_print("\t\tspeed: ");
+//		DEBUG_println(speed);
+//		DEBUG_print(" cm/sec");
+//		DEBUG_print(preCrashTime);
+//		DEBUG_print(" <= ");
+//		DEBUG_println(CRITICAL_PRE_CRASH_TIME);
+//		DEBUG_println();
 //#endif // __DEBUG*/
 //
 //	//		// checks if time until crash is below critical
 //	//		if (preCrashTime <= CRITICAL_PRE_CRASH_TIME) {
 //	//			/*#if __DEBUG
-//Common::debug_print("\t->\t");
+//DEBUG_print("\t->\t");
 //#endif // __DEBUG
 //	//#if __DEBUG
-//			Common::debug_println("CRITICAL!");
+//			DEBUG_println("CRITICAL!");
 //#endif // __DEBUG*/
 //	//			return true;
 //	//		}
@@ -106,14 +97,15 @@ bool DriveTask::isDistanceCritical(Common::UltrasonicPos pos, int distance) cons
 
 void DriveTask::updateValues() {
 	float actualSpeed = rotaryTask.getSpeed();
+
+	// TODO remove this line
+	motorHandler.setDesiredSpeed(0.0f);
+
+	//DEBUG_println("desired: -10.00\tactual: " + String(actualSpeed));
+
 	motorHandler.updateSpeed(actualSpeed);
 
 	isNewMsgAvailable = communicatorTask.getReceivedMessage(msg, getId());
-	if (isNewMsgAvailable) {
-#if __DEBUG
-		communicatorTask.setMessageToSend(Message(Message::ACK), getId());
-#endif // __DEBUG);
-	}
 }
 
 void DriveTask::executeMessage() {

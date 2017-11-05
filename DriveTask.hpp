@@ -16,10 +16,6 @@ namespace rc_car {
 		bool isNewMsgAvailable = false;
 		Message msg;
 
-		void __initialize() override;
-		void __run(void *unused) override;
-		void __onTimedOut() override;
-
 		bool forceStopActive = false;
 
 		/*
@@ -37,8 +33,11 @@ namespace rc_car {
 			forceStopWatchdog(DRIVE_FORCE_STOP_TIME),
 
 			// TODO remove this line, initialize mode from phone
-			mode(Common::DriveMode::FREE_DRIVE) {
-		}
+			mode(Common::DriveMode::FREE_DRIVE) {}
+
+		void initialize();
+		void run();
+		void onTimedOut();
 	};
 
 }

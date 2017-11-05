@@ -7,75 +7,87 @@ using namespace rc_car;
 extern UltrasonicTask ultrasonicTask;
 extern CommunicatorTask communicatorTask;
 
-const Common::ValidationData UltrasonicTask::maxDistanceValidationData = {
-	ULTRA_VALID_MAX_DIST_SAMPLE_NUM, ULTRA_VALID_MAX_DIST_RELATIVE_ERROR
+const Common::Validation UltrasonicTask::MAX_DIST_VALIDATION = {
+	ULTRA_VALID_MAX_DIST_SAMPLE_NUM, ULTRA_VALID_MAX_DIST_REL_ERR
 };
 
-const Common::ValidationData UltrasonicTask::defaultValidationData = {
-	ULTRA_VALID_DEFAULT_SAMPLE_NUM, ULTRA_VALID_DEFAULT_RELATIVE_ERROR
+const Common::Validation UltrasonicTask::DEF_VALIDATION = {
+	ULTRA_VALID_DEF_SAMPLE_NUM, ULTRA_VALID_DEF_REL_ERR
 };
 
 UltrasonicTask::UltrasonicTask() : PeriodicTask(PT_PERIOD_TIME_ULTRASONIC, PT_WATCHDOG_TIMEOUT_ULTRASONIC),
-		sensorConnection(ULTRA_TRIGGER_PIN, ULTRA_ECHO_PIN, ULTRA_MAX_DISTANCE) {
+sensorConnection(ULTRA_TRIGGER_PIN, ULTRA_ECHO_PIN, ULTRA_MAX_DISTANCE) {
 
 	setEnabled(false);
 
 	sensors[static_cast<int>(Common::UltrasonicPos::FRONT_RIGHT_CORNER)].pos.X = ULTRA_POS_X_FRC;
 	sensors[static_cast<int>(Common::UltrasonicPos::FRONT_RIGHT_CORNER)].pos.Y = ULTRA_POS_Y_FRC;
 	sensors[static_cast<int>(Common::UltrasonicPos::FRONT_RIGHT_CORNER)].viewAngle = ULTRA_VIEW_ANGLE_FRC;
+	sensors[static_cast<int>(Common::UltrasonicPos::FRONT_RIGHT_CORNER)].selIdx = ULTRA_IDX_FRC;
 
 	sensors[static_cast<int>(Common::UltrasonicPos::FRONT_RIGHT)].pos.X = ULTRA_POS_X_FR;
 	sensors[static_cast<int>(Common::UltrasonicPos::FRONT_RIGHT)].pos.Y = ULTRA_POS_Y_FR;
 	sensors[static_cast<int>(Common::UltrasonicPos::FRONT_RIGHT)].viewAngle = ULTRA_VIEW_ANGLE_FR;
+	sensors[static_cast<int>(Common::UltrasonicPos::FRONT_RIGHT)].selIdx = ULTRA_IDX_FR;
 
 	sensors[static_cast<int>(Common::UltrasonicPos::FRONT_LEFT)].pos.X = ULTRA_POS_X_FL;
 	sensors[static_cast<int>(Common::UltrasonicPos::FRONT_LEFT)].pos.Y = ULTRA_POS_Y_FL;
 	sensors[static_cast<int>(Common::UltrasonicPos::FRONT_LEFT)].viewAngle = ULTRA_VIEW_ANGLE_FL;
+	sensors[static_cast<int>(Common::UltrasonicPos::FRONT_LEFT)].selIdx = ULTRA_IDX_FL;
 
 	sensors[static_cast<int>(Common::UltrasonicPos::FRONT_LEFT_CORNER)].pos.X = ULTRA_POS_X_FLC;
 	sensors[static_cast<int>(Common::UltrasonicPos::FRONT_LEFT_CORNER)].pos.Y = ULTRA_POS_Y_FLC;
 	sensors[static_cast<int>(Common::UltrasonicPos::FRONT_LEFT_CORNER)].viewAngle = ULTRA_VIEW_ANGLE_FLC;
+	sensors[static_cast<int>(Common::UltrasonicPos::FRONT_LEFT_CORNER)].selIdx = ULTRA_IDX_FLC;
 
 
 
 	sensors[static_cast<int>(Common::UltrasonicPos::LEFT_FRONT)].pos.X = ULTRA_POS_X_LF;
 	sensors[static_cast<int>(Common::UltrasonicPos::LEFT_FRONT)].pos.Y = ULTRA_POS_Y_LF;
 	sensors[static_cast<int>(Common::UltrasonicPos::LEFT_FRONT)].viewAngle = ULTRA_VIEW_ANGLE_LF;
+	sensors[static_cast<int>(Common::UltrasonicPos::LEFT_FRONT)].selIdx = ULTRA_IDX_LF;
 
 	sensors[static_cast<int>(Common::UltrasonicPos::LEFT_REAR)].pos.X = ULTRA_POS_X_LR;
 	sensors[static_cast<int>(Common::UltrasonicPos::LEFT_REAR)].pos.Y = ULTRA_POS_Y_LR;
 	sensors[static_cast<int>(Common::UltrasonicPos::LEFT_REAR)].viewAngle = ULTRA_VIEW_ANGLE_LR;
+	sensors[static_cast<int>(Common::UltrasonicPos::LEFT_REAR)].selIdx = ULTRA_IDX_LR;
 
 
 
 	sensors[static_cast<int>(Common::UltrasonicPos::REAR_LEFT_CORNER)].pos.X = ULTRA_POS_X_RLC;
 	sensors[static_cast<int>(Common::UltrasonicPos::REAR_LEFT_CORNER)].pos.Y = ULTRA_POS_Y_RLC;
 	sensors[static_cast<int>(Common::UltrasonicPos::REAR_LEFT_CORNER)].viewAngle = ULTRA_VIEW_ANGLE_RLC;
+	sensors[static_cast<int>(Common::UltrasonicPos::REAR_LEFT_CORNER)].selIdx = ULTRA_IDX_FRC;
 
 	sensors[static_cast<int>(Common::UltrasonicPos::REAR_LEFT)].pos.X = ULTRA_POS_X_RL;
 	sensors[static_cast<int>(Common::UltrasonicPos::REAR_LEFT)].pos.Y = ULTRA_POS_Y_RL;
 	sensors[static_cast<int>(Common::UltrasonicPos::REAR_LEFT)].viewAngle = ULTRA_VIEW_ANGLE_RL;
+	sensors[static_cast<int>(Common::UltrasonicPos::REAR_LEFT)].selIdx = ULTRA_IDX_RL;
 
 	sensors[static_cast<int>(Common::UltrasonicPos::REAR_RIGHT)].pos.X = ULTRA_POS_X_RR;
 	sensors[static_cast<int>(Common::UltrasonicPos::REAR_RIGHT)].pos.Y = ULTRA_POS_Y_RR;
 	sensors[static_cast<int>(Common::UltrasonicPos::REAR_RIGHT)].viewAngle = ULTRA_VIEW_ANGLE_RR;
+	sensors[static_cast<int>(Common::UltrasonicPos::REAR_RIGHT)].selIdx = ULTRA_IDX_RR;
 
 	sensors[static_cast<int>(Common::UltrasonicPos::REAR_RIGHT_CORNER)].pos.X = ULTRA_POS_X_RRC;
 	sensors[static_cast<int>(Common::UltrasonicPos::REAR_RIGHT_CORNER)].pos.Y = ULTRA_POS_Y_RRC;
 	sensors[static_cast<int>(Common::UltrasonicPos::REAR_RIGHT_CORNER)].viewAngle = ULTRA_VIEW_ANGLE_RRC;
+	sensors[static_cast<int>(Common::UltrasonicPos::REAR_RIGHT_CORNER)].selIdx = ULTRA_IDX_RRC;
 
 
 
 	sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_REAR)].pos.X = ULTRA_POS_X_RiR;
 	sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_REAR)].pos.Y = ULTRA_POS_Y_RiR;
 	sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_REAR)].viewAngle = ULTRA_VIEW_ANGLE_RiR;
+	sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_REAR)].selIdx = ULTRA_IDX_RiR;
 
 	sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_FRONT)].pos.X = ULTRA_POS_X_RF;
 	sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_FRONT)].pos.Y = ULTRA_POS_Y_RF;
 	sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_FRONT)].viewAngle = ULTRA_VIEW_ANGLE_RF;
+	sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_FRONT)].selIdx = ULTRA_IDX_RF;
 }
 
-void UltrasonicTask::__initialize() {
+void UltrasonicTask::initialize() {
 	pinMode(ULTRA_SEL_0_PIN, OUTPUT);
 	pinMode(ULTRA_SEL_1_PIN, OUTPUT);
 	pinMode(ULTRA_SEL_2_PIN, OUTPUT);
@@ -87,7 +99,7 @@ void UltrasonicTask::__initialize() {
 
 		for (int sampleIndex = 0; sampleIndex < ULTRA_NUM_DIST_SAMPLES; ++sampleIndex) {
 			sensors[pos].dist_stored[sampleIndex] = ULTRA_MAX_DISTANCE;
-			sensors[pos].dist_validated[sampleIndex] = ULTRA_MAX_DISTANCE;
+			sensors[pos].dist_valid = ULTRA_MAX_DISTANCE;
 		}
 
 		sensors[pos].nonResponsiveCounter = 0;
@@ -97,23 +109,30 @@ void UltrasonicTask::__initialize() {
 	busy = false;
 	currentSensorPos = static_cast<Common::UltrasonicPos>(ULTRA_NUM_SENSORS - 1);
 	currentSampleIndex = ULTRA_NUM_DIST_SAMPLES - 1;
+
+
+
+	// TODO remove these lines
+	for (int i = 0; i < ULTRA_NUM_SENSORS; ++i)
+		sensors[i].dist_measured = 100;
 }
 
-void UltrasonicTask::__run(void *unused) {
+void UltrasonicTask::run() {
 	// gets next ultrasonic sensor distance (will run in background and call an IT routine)
 	if (isEnabled() && !isBusy()) {
 
 		// checks if all the ultrasonic sensors have been pinged in this cycle
 		// and if yes, stores and validates distances
-		if (cycleFinished()) {
+		if (measurementCycleFinished()) {
 			validateAndUpdateSensedPoints();
 
 			//ultrasonicTask.getMeasuredPoints(environment.measuredPoints);
-			environment.calculate();
+			environment.calculate();	// TODO calculate() does not do anything at the moment
 		}
 
 		if (communicatorTask.getReceivedMessage(msg, getId()))
 			executeMessage();
+
 
 		if (sendEnvironmentEnabled && currentSensorPos % 2) {
 			msg.setCode(ultraPosToMsgCode(currentSensorPos));
@@ -125,6 +144,12 @@ void UltrasonicTask::__run(void *unused) {
 
 		pingNextSensor();
 	}
+}
+
+void UltrasonicTask::onTimedOut() {
+	//responsive[static_cast<int>(currentSensorPos)] = false;
+	sensorConnection.timer_stop();
+	busy = false;
 }
 
 bool UltrasonicTask::isBusy() const {
@@ -141,21 +166,9 @@ void UltrasonicTask::setEnabled(bool enabled) {
 
 
 void UltrasonicTask::pingNextSensor() {
-	if (cycleFinished()) {
+
+	if (measurementCycleFinished())
 		currentSampleIndex = (currentSampleIndex + 1) % ULTRA_NUM_DIST_SAMPLES;
-
-		/*for (int i = 0; i < ULTRA_NUM_SENSORS; ++i) {
-
-		char s[4];
-		Common::debug_print(itoa(measuredDistances[i], s, 10));
-#if __DEBUG
-		Common::debug_print(", ");
-#endif // __DEBUG
-		}
-#if __DEBUG
-		Common::debug_println("");
-#endif // __DEBUG*/
-	}
 
 	// increases sensor position
 	currentSensorPos = Common::nextUltrasonicPos(currentSensorPos);
@@ -168,11 +181,12 @@ void UltrasonicTask::pingNextSensor() {
 		updateSensorSelection();
 		// Pings sensor (processing continues, interrupt will call echoCheck to look for echo).
 		sensorConnection.ping_timer(ultrasonicEchoCheckIT);
+
+		busy = false;
 	}
 }
 
 void UltrasonicTask::echoCheck() { // If ping received, set the sensor distance to array.
-
 	if (sensorConnection.check_timer()) {
 		sensors[static_cast<int>(currentSensorPos)].dist_measured = sensorConnection.ping_result / US_ROUNDTRIP_CM;
 
@@ -187,7 +201,7 @@ void UltrasonicTask::echoCheck() { // If ping received, set the sensor distance 
 void UltrasonicTask::validateAndUpdateSensedPoints() {
 	for (int pos = 0; pos < ULTRA_NUM_SENSORS; ++pos) {
 		sensors[static_cast<Common::UltrasonicPos>(pos)].validate(currentSampleIndex);
-		sensors[static_cast<Common::UltrasonicPos>(pos)].updatePoint(currentSampleIndex);
+		sensors[static_cast<Common::UltrasonicPos>(pos)].updatePoint();
 	}
 }
 
@@ -200,7 +214,7 @@ void UltrasonicTask::getMeasuredPoints(Point<float> dest[ULTRA_NUM_SENSORS]) {
 
 void UltrasonicTask::updateSensorSelection() {
 
-	uint8_t pos = static_cast<uint8_t>(currentSensorPos);
+	uint8_t pos = static_cast<uint8_t>(sensors[static_cast<Common::UltrasonicPos>(currentSensorPos)].selIdx);
 
 	// writes position to selection wires (as binary value)
 	digitalWrite(ULTRA_SEL_0_PIN, (pos & 0x01) ? HIGH : LOW);
@@ -228,39 +242,25 @@ const Message::CODE rc_car::UltrasonicTask::ultraPosToMsgCode(Common::Ultrasonic
 //	return static_cast<Common::UltrasonicPos>(minPos);
 //}
 
-bool UltrasonicTask::cycleFinished() const {
+bool UltrasonicTask::measurementCycleFinished() const {
 	return currentSensorPos == ULTRA_NUM_SENSORS - 1;
-}
-
-void UltrasonicTask::onWatchdoghasTimedOut() {
-	//responsive[static_cast<int>(currentSensorPos)] = false;
-	sensorConnection.timer_stop();
-
-	/*#if __DEBUG
-Common::debug_print("not responsive: ");
-#endif // __DEBUG
-	char s[1];
-#if __DEBUG
-	Common::debug_println(itoa((int);
-#endif // __DEBUGcurrentSensorPos, s, 10));*/
-	busy = false;
 }
 
 void UltrasonicTask::Sensor::validate(int sampleIndex) {
 	dist_stored[sampleIndex] = dist_measured;
 
-	Common::ValidationData validationData = dist_measured == ULTRA_MAX_DISTANCE ?
-		UltrasonicTask::maxDistanceValidationData : UltrasonicTask::defaultValidationData;
+	Common::Validation validation = dist_measured == ULTRA_MAX_DISTANCE ?
+		UltrasonicTask::MAX_DIST_VALIDATION : UltrasonicTask::DEF_VALIDATION;
 
-	int prevValidatedValue = dist_validated[(sampleIndex + ULTRA_NUM_DIST_SAMPLES - 1) % ULTRA_NUM_DIST_SAMPLES];
+	int prevValidatedValue = dist_valid;
 	int currentStoredValue = dist_stored[sampleIndex];
 
 	/*
 	Checks if current stored value is in the given range of the previous validated value for the sensor.
 	e.g. if the previous validated value was 150, we will believe 145 without hesitation, no need for further validation
 	*/
-	if (Common::isInRange(prevValidatedValue, currentStoredValue, validationData.relativeError)) {
-		dist_validated[sampleIndex] = currentStoredValue;
+	if (Common::isInRange(prevValidatedValue, currentStoredValue, validation.relErr)) {
+		dist_valid = currentStoredValue;
 	} else {
 		// if we got here, current stored value is out of range of the previous validated value so we need to validate
 
@@ -268,12 +268,17 @@ void UltrasonicTask::Sensor::validate(int sampleIndex) {
 		bool outOfRangeFound = false;
 
 		// iterates through stored values (from latest to earliest) and counts how many values are also out of range of previous validated value (sign of error is also important to match)
-		// latest (validationSampleNum - 1) results should be out of range for us to believe that current value is valid
+		// latest (minSampleNum - 1) results should be out of range for us to believe that current value is valid
+
+
+		// TODO compare previous values with current measured value, instead of checking if they are also out of range
+
+
 		for (int idx = (sampleIndex + ULTRA_NUM_DIST_SAMPLES - 1) % ULTRA_NUM_DIST_SAMPLES;
-			!outOfRangeFound && (idx != sampleIndex);
+			!outOfRangeFound && (idx != sampleIndex) && sampleCount < validation.minSampleNum;
 			idx = (idx + ULTRA_NUM_DIST_SAMPLES - 1) % ULTRA_NUM_DIST_SAMPLES) {
 
-			if (!Common::isInRange(prevValidatedValue, dist_stored[idx], validationData.relativeError,
+			if (!Common::isInRange(prevValidatedValue, dist_stored[idx], validation.relErr,
 				currentStoredValue < prevValidatedValue ? Common::ErrorSign::NEGATIVE : Common::ErrorSign::POSITIVE)) {
 				++sampleCount;
 			} else
@@ -282,14 +287,14 @@ void UltrasonicTask::Sensor::validate(int sampleIndex) {
 
 		// validation OK -> we believe that distance is really what we measured
 		// validation FAILED -> validated value will be previous validated value
-		dist_validated[sampleIndex] = sampleCount >= validationData.validationSampleNum - 1 ?
+		dist_valid = sampleCount >= validation.minSampleNum - 1 ?
 			currentStoredValue : prevValidatedValue;
 	}
 }
 
-void UltrasonicTask::Sensor::updatePoint(int sampleIndex) {
-	sensedPoint.X = pos.X + dist_validated[sampleIndex] * cos(dirAngleToXY(viewAngle));
-	sensedPoint.Y = pos.Y + dist_validated[sampleIndex] * sin(dirAngleToXY(viewAngle));
+void UltrasonicTask::Sensor::updatePoint() {
+	sensedPoint.X = pos.X + dist_valid * cos(dirAngleToXY(viewAngle));
+	sensedPoint.Y = pos.Y + dist_valid * sin(dirAngleToXY(viewAngle));
 }
 
 void UltrasonicTask::executeMessage() {
@@ -301,12 +306,8 @@ void UltrasonicTask::executeMessage() {
 	}
 }
 
-void UltrasonicTask::__onTimedOut() {
-	onWatchdoghasTimedOut();
-}
-
 /*
-	Timer2 interrupt calls this function every 24uS where we check the ping status.
+Timer2 interrupt calls this function every 24uS where we check the ping status.
 */
 void rc_car::ultrasonicEchoCheckIT() {
 	ultrasonicTask.echoCheck();

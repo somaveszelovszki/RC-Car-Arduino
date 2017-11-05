@@ -15,9 +15,10 @@ namespace rc_car {
 	private:
 		class Sensor {
 		public:
+			int selIdx;
 			int dist_measured;
 			int dist_stored[ULTRA_NUM_DIST_SAMPLES];
-			int dist_validated[ULTRA_NUM_DIST_SAMPLES];
+			int dist_valid;
 			int nonResponsiveCounter;
 
 			Point<float> pos;
@@ -26,15 +27,15 @@ namespace rc_car {
 
 			void validate(int sampleIndex);
 
-			void updatePoint(int sampleIndex);
+			void updatePoint();
 		};
 
 		Sensor sensors[ULTRA_NUM_SENSORS];
 
 		NewPing sensorConnection;
 
-		static const Common::ValidationData maxDistanceValidationData;
-		static const Common::ValidationData defaultValidationData;
+		static const Common::Validation MAX_DIST_VALIDATION;
+		static const Common::Validation DEF_VALIDATION;
 
 		Common::UltrasonicPos currentSensorPos;
 		bool busy;
@@ -55,6 +56,10 @@ namespace rc_car {
 	public:
 		UltrasonicTask();
 
+		void initialize();
+		void run();
+		void onTimedOut();
+
 		bool isBusy() const;
 
 		bool isEnabled() const;
@@ -65,19 +70,13 @@ namespace rc_car {
 
 		void echoCheck();
 
-		bool cycleFinished() const;
-
-		void onWatchdoghasTimedOut();
+		bool measurementCycleFinished() const;
 
 		void validateAndUpdateSensedPoints();
 
 		void getMeasuredPoints(Point<float> dest[ULTRA_NUM_SENSORS]);
 
 		void executeMessage();
-
-		void __initialize() override;
-		void __run(void *unused) override;
-		void __onTimedOut() override;
 	};
 }
 

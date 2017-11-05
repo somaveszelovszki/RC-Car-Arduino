@@ -170,7 +170,7 @@ namespace rc_car {
 	Point<T> Point<T>::fromByteArray(const ByteArray<2>& bytes) {
 		return Point<T>(
 			static_cast<T>(static_cast<int>(bytes[0]) * ULTRA_MAX_DISTANCE / 128.0f),
-			static_cast<T>(static_cast<int>(bytes[1]) * ULTRA_MAX_DISTANCE / 128.0f),
+			static_cast<T>(static_cast<int>(bytes[1]) * ULTRA_MAX_DISTANCE / 128.0f)
 		);
 	}
 

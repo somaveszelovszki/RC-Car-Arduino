@@ -4,6 +4,9 @@ using namespace rc_car;
 
 const ByteArray<COMM_MSG_SEPARATOR_LENGTH> Message::SEPARATOR(COMM_MSG_SEPARATOR);
 
+const ByteArray<COMM_MSG_DATA_LENGTH> Message::BOOL_VALUE_TRUE(static_cast<int32_t>(1));
+const ByteArray<COMM_MSG_DATA_LENGTH> Message::BOOL_VALUE_FALSE(static_cast<int32_t>(0));
+
 const Message Message::ACK(Message::CODE::ACK_, static_cast<int32_t>(0));
 
 Message::Message(CODE _code, const ByteArray<4>& _value) {

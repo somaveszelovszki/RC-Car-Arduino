@@ -32,16 +32,16 @@ namespace rc_car {
 
 	// frequencies [ms]
 
-#define PT_PERIOD_TIME_ULTRASONIC		1
+#define PT_PERIOD_TIME_ULTRASONIC		10
 #define PT_PERIOD_TIME_COMMUNICATOR		20
-#define PT_PERIOD_TIME_DRIVE			1
-#define PT_PERIOD_TIME_ROTARY			50
+#define PT_PERIOD_TIME_DRIVE			10
+#define PT_PERIOD_TIME_ROTARY			15
 
 	// watchdog timeouts [ms]
 
-#define PT_WATCHDOG_TIMEOUT_ULTRASONIC		10
+#define PT_WATCHDOG_TIMEOUT_ULTRASONIC		50
 #define PT_WATCHDOG_TIMEOUT_COMMUNICATOR	1000
-#define PT_WATCHDOG_TIMEOUT_DRIVE			20
+#define PT_WATCHDOG_TIMEOUT_DRIVE			50
 #define PT_WATCHDOG_TIMEOUT_ROTARY			200
 
 // Watchdog
@@ -52,7 +52,6 @@ namespace rc_car {
 
 #define COMM_RX_PIN					0
 #define COMM_TX_PIN					1
-#define COMM_EN_PIN					13
 #define COMM_EN_SIGNAL_LEVEL		LOW
 #define COMM_BLUETOOTH_BAUD_RATE	9600
 
@@ -95,8 +94,8 @@ namespace rc_car {
 
 // speed controller
 #define DC_CONTROL_UPDATE_PERIOD_TIME	10
-#define DC_CONTROL_Kp					2.0f
-#define DC_CONTROL_Kd					2.0f
+#define DC_CONTROL_Kp					0.5f
+#define DC_CONTROL_Kd					0.1f
 
 // motor transfer rates
 
@@ -116,17 +115,18 @@ namespace rc_car {
 #define ROTARY_D6_PIN		A3
 #define ROTARY_D7_PIN		A4
 
-#define ROTARY_RESOLUTION	100
+#define ROTARY_RESOLUTION		600
+#define ROTARY_EVAL_MULTIPLIER	4
 
 // Defines maximum previous position change for position-validation:
 //		if the difference between the new position and the previous is lower than this value,
 //		then it will be accepted without any overflow-check
-#define ROTARY_OVERFLOW_PREV_MAX_D_POS		20
+#define ROTARY_OVERFLOW_PREV_MAX_D_POS		128
 
 // Ultrasonic sensors
 
 #define ULTRA_TRIGGER_PIN	12
-#define ULTRA_ECHO_PIN		ULTRA_TRIGGER_PIN
+#define ULTRA_ECHO_PIN		13
 
 #define ULTRA_SEL_0_PIN		8
 #define ULTRA_SEL_1_PIN		7
@@ -134,16 +134,17 @@ namespace rc_car {
 #define ULTRA_SEL_3_PIN		10
 
 #define ULTRA_NUM_SENSORS		12
-#define ULTRA_NUM_DIST_SAMPLES	10
 #define ULTRA_MAX_DISTANCE		200u
 
 // defines how many stored measured values need to be ULTRA_MAX_DISTANCE, so that we can validate value
 // 	->	many times the sensors do not respond, which equals ULTRA_MAX_DISTANCE as a value,
 // 		so we must not believe it unless the result is the same for a few times in a row
 #define ULTRA_VALID_MAX_DIST_SAMPLE_NUM			5		// -> if the result has been ULTRA_MAX_DISTANCE for 2 times in a row, we believe it
-#define ULTRA_VALID_MAX_DIST_RELATIVE_ERROR		0
-#define ULTRA_VALID_DEFAULT_SAMPLE_NUM			2
-#define ULTRA_VALID_DEFAULT_RELATIVE_ERROR		0.5F
+#define ULTRA_VALID_MAX_DIST_REL_ERR		0
+#define ULTRA_VALID_DEF_SAMPLE_NUM			2
+#define ULTRA_VALID_DEF_REL_ERR		0.5F
+
+#define ULTRA_NUM_DIST_SAMPLES	max(ULTRA_VALID_MAX_DIST_SAMPLE_NUM, ULTRA_VALID_DEF_SAMPLE_NUM)
 
 // defines how many times in a row an ultrasonic sensor can skip response before being marked unresponsive
 // -> unresponsive sensors will not be pinged again
@@ -169,56 +170,68 @@ namespace rc_car {
 #define ULTRA_POS_X_FRC			__ULTRA_POS_X_CORNER
 #define ULTRA_POS_Y_FRC			__ULTRA_POS_Y_CORNER
 #define ULTRA_VIEW_ANGLE_FRC	(-__ULTRA_VIEW_ANGLE)
+#define ULTRA_IDX_FRC			12
 
 #define ULTRA_POS_X_FR			__ULTRA_POS_X_MID
 #define ULTRA_POS_Y_FR			__ULTRA_POS_Y_MID
 #define ULTRA_VIEW_ANGLE_FR		0.0f
+#define ULTRA_IDX_FR			1
 
 #define ULTRA_POS_X_FL			(-__ULTRA_POS_X_MID)
 #define ULTRA_POS_Y_FL			__ULTRA_POS_Y_MID
 #define ULTRA_VIEW_ANGLE_FL		0.0f
+#define ULTRA_IDX_FL			2
 
 #define ULTRA_POS_X_FLC			(-__ULTRA_POS_X_CORNER)
 #define ULTRA_POS_Y_FLC			__ULTRA_POS_Y_CORNER
 #define ULTRA_VIEW_ANGLE_FLC	__ULTRA_VIEW_ANGLE
+#define ULTRA_IDX_FLC			3
 
 
 
 #define ULTRA_POS_X_LF			(-__ULTRA_POS_X_SIDE)
 #define ULTRA_POS_Y_LF			__ULTRA_POS_Y_SIDE_FRONT
 #define ULTRA_VIEW_ANGLE_LF		static_cast<float>(M_PI_2 - __ULTRA_VIEW_ANGLE)
+#define ULTRA_IDX_LF			4
 
 #define ULTRA_POS_X_LR			(-__ULTRA_POS_X_SIDE)
 #define ULTRA_POS_Y_LR			__ULTRA_POS_Y_SIDE_REAR
 #define ULTRA_VIEW_ANGLE_LR		static_cast<float>(M_PI_2 + __ULTRA_VIEW_ANGLE)
+#define ULTRA_IDX_LR			5
 
 
 
 #define ULTRA_POS_X_RLC			(-__ULTRA_POS_X_CORNER)
 #define ULTRA_POS_Y_RLC			(-__ULTRA_POS_Y_CORNER)
 #define ULTRA_VIEW_ANGLE_RLC	static_cast<float>(M_PI - __ULTRA_VIEW_ANGLE)
+#define ULTRA_IDX_RLC			6
 
 #define ULTRA_POS_X_RL			(-__ULTRA_POS_X_MID)
 #define ULTRA_POS_Y_RL			(-__ULTRA_POS_Y_MID)
 #define ULTRA_VIEW_ANGLE_RL		static_cast<float>(M_PI)
+#define ULTRA_IDX_RL			7
 
 #define ULTRA_POS_X_RR			__ULTRA_POS_X_MID
 #define ULTRA_POS_Y_RR			(-__ULTRA_POS_Y_MID)
 #define ULTRA_VIEW_ANGLE_RR		static_cast<float>(M_PI)
+#define ULTRA_IDX_RR			8
 
 #define ULTRA_POS_X_RRC			__ULTRA_POS_X_CORNER
 #define ULTRA_POS_Y_RRC			(-__ULTRA_POS_Y_CORNER)
 #define ULTRA_VIEW_ANGLE_RRC	static_cast<float>(-M_PI + __ULTRA_VIEW_ANGLE)
+#define ULTRA_IDX_RRC			13
 
 
 
 #define ULTRA_POS_X_RiR			__ULTRA_POS_X_SIDE
 #define ULTRA_POS_Y_RiR			__ULTRA_POS_Y_SIDE_REAR
 #define ULTRA_VIEW_ANGLE_RiR	static_cast<float>(-M_PI_2 - __ULTRA_VIEW_ANGLE)
+#define ULTRA_IDX_RiR			10
 
 #define ULTRA_POS_X_RF			__ULTRA_POS_X_SIDE
 #define ULTRA_POS_Y_RF			__ULTRA_POS_Y_SIDE_FRONT
 #define ULTRA_VIEW_ANGLE_RF		static_cast<float>(-M_PI_2 + __ULTRA_VIEW_ANGLE)
+#define ULTRA_IDX_RF			11
 
 // Environment
 

@@ -5,7 +5,6 @@ using namespace rc_car;
 CommunicatorTask::CommunicatorTask() : PeriodicTask(PT_PERIOD_TIME_COMMUNICATOR, PT_WATCHDOG_TIMEOUT_COMMUNICATOR) {
 	//commSerial = new SoftwareSerial(COMM_BLUETOOTH_RX_PIN, COMM_BLUETOOTH_TX_PIN);
 	//commSerial = new AltSoftSerial(0, 0);
-	pinMode(COMM_EN_PIN, OUTPUT);
 	pinMode(COMM_RX_PIN, INPUT);
 	pinMode(COMM_TX_PIN, OUTPUT);
 
@@ -14,16 +13,16 @@ CommunicatorTask::CommunicatorTask() : PeriodicTask(PT_PERIOD_TIME_COMMUNICATOR,
 	}
 }
 
-void CommunicatorTask::__initialize() {
+void CommunicatorTask::initialize() {
 	Serial.begin(COMM_BLUETOOTH_BAUD_RATE);
 	while (!Serial) {}
-	digitalWrite(COMM_EN_PIN, COMM_EN_SIGNAL_LEVEL);	// enables communication
 
 	recvByteIdx = 0;
 }
 
-void CommunicatorTask::__run(void *unused) {
-	if (!hasTimedOut) {
+void CommunicatorTask::run() {
+	if (true || !__hasTimedOut) {	// TODO remove 'true ||'
+
 		if (receiveChars()) {
 			fetchMessage();
 			for (int i = 0; i < PT_NUM_TASKS; ++i)
@@ -36,22 +35,19 @@ void CommunicatorTask::__run(void *unused) {
 	}
 }
 
-void CommunicatorTask::__onTimedOut() {
-	hasTimedOut = true;
+void CommunicatorTask::onTimedOut() {
+	__hasTimedOut = true;
 }
 
 bool CommunicatorTask::getReceivedMessage(Message& msg, int taskId) {
 	bool isNewMessageAvailable = Common::testAndSet(&__recvAvailable[taskId], false);
-	if (isNewMessageAvailable) {
-		noInterrupts();
+	if (isNewMessageAvailable)
 		msg = recvMsg;
-		interrupts();
-	}
 	return isNewMessageAvailable;
 }
 
 void rc_car::CommunicatorTask::setMessageToSend(const Message& msg, int taskId) {
-	sendMsg[taskId] = msg;
+	sendMsgs[taskId] = msg;
 	__sendAvailable[taskId] = true;
 }
 
@@ -59,12 +55,12 @@ bool CommunicatorTask::receiveChars() {
 	int availableBytesNum = Serial.available();
 
 	bool msgReceived = false;
-
 	if (availableBytesNum) {
 		int bytesNum = min(availableBytesNum, COMM_MSG_LENGTH - recvByteIdx);
 
 		for (int i = 0; i < bytesNum; ++i) {
 			byte b = static_cast<byte>(Serial.read());
+
 			switch (recvState) {
 			case READ_SEPARATOR:
 				if (b == Message::SEPARATOR[recvByteIdx]) {
@@ -113,7 +109,7 @@ void CommunicatorTask::fetchMessage() {
 	//bool valid = Message::isValid(recvBuffer);
 	//// parses message from buffer string
 	//if (valid) Message::fromString(recvBuffer, dest);
-	//// clears buffer string
+	//// clears buffer string 
 	//recvBuffer = "";
 
 	Message::fromBytes(recvBuffer, recvMsg);
@@ -122,5 +118,5 @@ void CommunicatorTask::fetchMessage() {
 
 int CommunicatorTask::sendMessage(int taskId) {
 	//TODO sending not working properly!
-	return Serial.write(static_cast<const byte*>(sendMsg[taskId].toBytes()), COMM_MSG_LENGTH);
+	return Serial.write(static_cast<const byte*>(sendMsgs[taskId].toBytes()), COMM_MSG_LENGTH);
 }

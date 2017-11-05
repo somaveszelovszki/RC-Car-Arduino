@@ -12,11 +12,11 @@ namespace rc_car {
 		float prevError = 0.0f;
 		float output = 0.0f;
 
-		void __run(void *pError) override;
-
 	public:
 
 		PD_Controller(int _periodTime, float _Kp, float _Kd) : Periodic(_periodTime), Kp(_Kp), Kd(_Kd) {}
+
+		void run(float currentError);
 
 		float getOutput() const {
 			return output;

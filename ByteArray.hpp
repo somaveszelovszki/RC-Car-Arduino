@@ -57,6 +57,17 @@ namespace rc_car {
 			return value[pos];
 		}
 
+		bool operator==(const ByteArray<size>& other) const {
+			bool eq = true;
+			for (int i = 0; eq && i < size; ++i)
+				eq = (*this)[i] == other[i];
+			return eq;
+		}
+
+		bool operator!=(const ByteArray<size>& other) const {
+			return !(*this == other);
+		}
+
 		static void fromInteger(int32_t _value, ByteArray<size>& dest) {
 			Common::intToBytes(_value, dest.value);
 		}

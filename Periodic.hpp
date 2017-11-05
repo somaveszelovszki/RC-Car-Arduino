@@ -11,12 +11,8 @@ namespace rc_car {
 	private:
 		Watchdog periodWatchdog;
 
-		virtual void __run(void *data) = 0;
-
 	public:
 		Periodic(int _periodTime) : periodWatchdog(_periodTime) {}
-
-		virtual void run(void *data = NULL);
 
 		void restartPeriodCheck() {
 			periodWatchdog.restart();

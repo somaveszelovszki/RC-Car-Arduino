@@ -11,9 +11,6 @@ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\RC_Car.cpp.o: \
  C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\cores\arduino/USBAPI.h \
  C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\cores\arduino/Arduino.h \
  C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\variants\standard/pins_arduino.h \
- F:\Program\ Files\ (x86)\Arduino\libraries\pt/pt.h \
- F:\Program\ Files\ (x86)\Arduino\libraries\pt/lc.h \
- F:\Program\ Files\ (x86)\Arduino\libraries\pt/lc-switch.h \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\CommunicatorTask.hpp \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\PeriodicTask.hpp \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\Watchdog.hpp \
@@ -31,7 +28,6 @@ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\RC_Car.cpp.o: \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\RotaryTask.hpp \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\DriveTask.hpp \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\MotorHandler.hpp \
- F:\Program\ Files\ (x86)\Arduino\libraries\Servo\src/Servo.h \
- F:\Program\ Files\ (x86)\Arduino\libraries\Servo\src/avr/ServoTimers.h \
+ C:\Users\Soma\Documents\Arduino\libraries\ServoTimer1/ServoTimer1.h \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\PD_Controller.hpp \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\Trajectory.hpp

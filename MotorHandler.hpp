@@ -1,8 +1,8 @@
 #ifndef MOTOR_HANDLER_HPP
 #define MOTOR_HANDLER_HPP
 
-#include <Servo.h>
-
+//#include <Servo.h>
+#include <ServoTimer1.h>
 #include "Message.hpp"
 #include "PD_Controller.hpp"
 
@@ -16,7 +16,7 @@ namespace rc_car {
 		/*
 			Handles a servo motor.
 		*/
-		class ServoMotor : public Servo {
+		class ServoMotor : public ServoTimer1 {
 			friend class MotorHandler;
 		public:
 			void writeAngle(float angle);
@@ -31,7 +31,7 @@ namespace rc_car {
 		public:
 			DCMotor() {}
 			void initialize();
-			void writeValue(int value);
+			void writeValue(float value);
 		};
 
 		PD_Controller speedCtrl;

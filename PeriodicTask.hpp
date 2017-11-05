@@ -11,11 +11,6 @@ namespace rc_car {
 
 	private:
 		int id;
-		static PeriodicTask *instances[PT_NUM_TASKS];
-		static int numInstances;
-
-		virtual void __initialize() = 0;
-		virtual void __onTimedOut() = 0;
 
 	protected:
 		Watchdog timeoutCheckWatchdog;
@@ -25,14 +20,15 @@ namespace rc_car {
 		}
 
 	public:
+		PeriodicTask(int _periodTime, int _watchDogTimeout) : Periodic(_periodTime), timeoutCheckWatchdog(_watchDogTimeout) {}
 
-		PeriodicTask::PeriodicTask(int _periodTime, int _watchDogTimeout);
+		bool hasTimedOut() {
+			return timeoutCheckWatchdog.hasTimedOut();
+		}
 
-		void checkIfTimedOut();
-
-		void run(void *data = NULL);
-
-		static void initializeTasks();
+		void restartTimeoutCheck() {
+			timeoutCheckWatchdog.restart();
+		}
 	};
 }
 

@@ -19,41 +19,33 @@ void Common::initializeTimer() {
 }
 
 int32_t Common::bytesToInt(const byte bytes[], int startIndex = 0) {
-	//return *reinterpret_cast<const int32_t*>(&bytes[startIndex]);
 	return (static_cast<int32_t>(bytes[startIndex]) << 24)
 		| (static_cast<int32_t>(bytes[startIndex + 1]) << 16)
 		| (static_cast<int32_t>(bytes[startIndex + 2]) << 8)
 		| static_cast<int32_t>(bytes[startIndex + 3]);
+	//return *reinterpret_cast<const int*>(&bytes[startIndex]);
 }
 
 float Common::bytesToFloat(const byte bytes[], int startIndex = 0) {
-	// TODO
-	return 0.0f;
+	int32_t intVal = bytesToInt(bytes, startIndex);
+	return *reinterpret_cast<float*>(&intVal);
 	//return *reinterpret_cast<const float*>(&bytes[startIndex]);
 }
 
 void Common::intToBytes(int32_t value, byte dest[4]) {
-	//*reinterpret_cast<int32_t*>(dest) = value;
 	dest[0] = static_cast<byte>(value >> 24);
 	dest[1] = static_cast<byte>(value >> 16);
 	dest[2] = static_cast<byte>(value >> 8);
 	dest[3] = static_cast<byte>(value);
+
+	//arrayCopy<4>(reinterpret_cast<byte*>(&value), dest);
 }
 
 void Common::floatToBytes(float value, byte dest[4]) {
-	//*reinterpret_cast<float*>(dest) = value;
-	// TODO
-}
+	int32_t intVal = *reinterpret_cast<int32_t*>(&value);
+	intToBytes(intVal, dest);
 
-void Common::debug_print(const String& str, bool addNewLine = false) {
-	uint8_t en = digitalRead(COMM_EN_PIN);
-	digitalWrite(COMM_EN_PIN, !COMM_EN_SIGNAL_LEVEL);
-	addNewLine ? Serial.println(str) : Serial.print(str);
-	digitalWrite(COMM_EN_PIN, en);
-}
-
-void Common::debug_println(const String& str) {
-	debug_print(str, true);
+	//arrayCopy<4>(reinterpret_cast<byte*>(&value), dest);
 }
 
 bool rc_car::Common::testAndSet(bool *value, bool valueToSet = true) {

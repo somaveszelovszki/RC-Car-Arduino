@@ -3,7 +3,9 @@
 using namespace rc_car;
 
 void MotorHandler::ServoMotor::writeAngle(float angle) {
-	write(Common::incarcerate(static_cast<int>((angle + M_PI_2) * RAD_TO_DEG), SERVO_POS_MIN, SERVO_POS_MAX));
+	int _value = static_cast<int>(angle + M_PI_2 * RAD_TO_DEG);
+	if (_value >= SERVO_POS_MIN && _value <= SERVO_POS_MAX)
+		write(_value);
 }
 
 void MotorHandler::DCMotor::initialize() {
@@ -11,15 +13,16 @@ void MotorHandler::DCMotor::initialize() {
 	pinMode(DC_MOTOR_BACKWARD_PIN, OUTPUT);
 }
 
-void MotorHandler::DCMotor::writeValue(int value) {
+void MotorHandler::DCMotor::writeValue(float value) {
 
-	// TODO define DC motor value bit length
-	value = Common::incarcerate(value, DC_MIN_VALUE, DC_MAX_VALUE);
+	int _value = static_cast<int>(value);
 
-	bool isFwd = value >= 0;
+	if (_value >= DC_MIN_VALUE && _value <= DC_MAX_VALUE) {
+		bool isFwd = _value >= 0;
 
-	analogWrite(DC_MOTOR_FORWARD_PIN, isFwd ? value : 0);
-	analogWrite(DC_MOTOR_BACKWARD_PIN, isFwd ? 0 : -value);
+		analogWrite(DC_MOTOR_FORWARD_PIN, isFwd ? _value : 0);
+		analogWrite(DC_MOTOR_BACKWARD_PIN, isFwd ? 0 : -_value);
+	}
 }
 
 void MotorHandler::initialize() {
@@ -36,9 +39,10 @@ void MotorHandler::updateSpeed(float actualSpeed) {
 	// -> controller's 'run' method is called with the error (difference between desired and actual speed)
 	if (speedCtrl.periodTimeReached()) {
 		float error = desiredSpeed - actualSpeed;
-		speedCtrl.run(&error);
+		speedCtrl.run(error);
 		DC_Motor.writeValue(speedCtrl.getOutput());
 	}
+	//DC_Motor.writeValue(desiredSpeed * 4);	// TODO
 }
 
 void MotorHandler::updateSteeringAngle(float _steeringAngle) {

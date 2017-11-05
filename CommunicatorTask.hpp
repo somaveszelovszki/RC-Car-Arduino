@@ -23,10 +23,10 @@ namespace rc_car {
 		ByteArray<COMM_MSG_LENGTH> recvBuffer;
 		int recvByteIdx;
 
-		Message recvMsg, sendMsg[PT_NUM_TASKS];
+		Message recvMsg, sendMsgs[PT_NUM_TASKS];
 		RecvState recvState = READ_SEPARATOR;
 		bool __recvAvailable[PT_NUM_TASKS], __sendAvailable[PT_NUM_TASKS];
-		bool hasTimedOut = false;	// TODO find a more elegant and effective way
+		bool __hasTimedOut = false;	// TODO find a more elegant and effective way
 
 		/*
 		Reads characters from stream.
@@ -38,20 +38,19 @@ namespace rc_car {
 		*/
 		void fetchMessage();
 
-		void __initialize() override;
-		void __run(void *unused) override;
-		void __onTimedOut() override;
-
 		int sendMessage(int taskId);
 
 	public:
-
 		CommunicatorTask();
+
+		void initialize();
+		void run();
+		void onTimedOut();
 
 		bool getReceivedMessage(Message& msg, int taskId);
 
 		void setMessageToSend(const Message& msg, int taskId);
 	};
-
 }
+
 #endif	// COMMUNICATOR_TASK_HPP

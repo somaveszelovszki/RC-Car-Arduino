@@ -12,6 +12,12 @@ namespace rc_car {
 
 #define SEC_TO_MSEC 1000
 
+#if __DEBUG
+#define DEBUG_print(str) Serial.print(str)
+#define DEBUG_println(str) Serial.println(str)
+#endif // __DEBUG
+
+
 	/** @brief Common functions and enumerations that are used throughout the project.
 	*/
 	class Common {
@@ -68,9 +74,9 @@ namespace rc_car {
 			return static_cast<UltrasonicPos>((static_cast<int>(pos) + 1) % ULTRA_NUM_SENSORS);
 		}
 
-		struct ValidationData {
-			int validationSampleNum;
-			float relativeError;
+		struct Validation {
+			int minSampleNum;	// minimum validation sample num
+			float relErr;		// relative error
 		};
 
 		static void initializeTimer();
@@ -110,7 +116,7 @@ namespace rc_car {
 		Checks if value is in a given range of the reference value.
 		*/
 		template <typename T>
-		static bool isInRange(T ref, T value, float relativeError, ErrorSign errorDir = Common::ErrorSign::BOTH);
+		static bool isInRange(T ref, T value, float relErr, ErrorSign errorDir = Common::ErrorSign::BOTH);
 
 		template <int size1, int size2, typename T>
 		static void arrayConcat(const T ar1[], const T ar2[], T res[]);
@@ -124,7 +130,7 @@ namespace rc_car {
 		static void floatToBytes(float value, byte dest[4]);
 
 		static void debug_print(const String& str, bool addNewLine = false);
-		static void debug_println(const String& str);
+		static void debug_println(const String& str = "");
 
 		static bool testAndSet(bool *value, bool valueToSet = true);
 
@@ -133,9 +139,9 @@ namespace rc_car {
 	};
 
 	template<typename T>
-	inline bool Common::isInRange(T ref, T value, float relativeError, ErrorSign errorDir) {
-		T max = errorDir == ErrorSign::NEGATIVE ? ref : static_cast<T>(ref * (1.0F + relativeError));
-		T min = errorDir == ErrorSign::POSITIVE ? ref : static_cast<T>(ref * (1.0F - relativeError));
+	inline bool Common::isInRange(T ref, T value, float relErr, ErrorSign errorDir) {
+		T max = errorDir == ErrorSign::NEGATIVE ? ref : static_cast<T>(ref * (1.0F + relErr));
+		T min = errorDir == ErrorSign::POSITIVE ? ref : static_cast<T>(ref * (1.0F - relErr));
 		return isBetween(value, min, max);
 	}
 

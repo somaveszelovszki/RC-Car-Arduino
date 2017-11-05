@@ -22,10 +22,6 @@ namespace rc_car {
 		_Value prev;
 		_Value diff;
 
-		void __initialize() override;
-		void __run(void *unused) override;
-		void __onTimedOut() override;
-
 		int readPosition() const;
 
 		void setEnabled(bool enabled) {
@@ -35,8 +31,11 @@ namespace rc_car {
 		void updateOverflowPos(int *newPos) const;
 
 	public:
-
 		RotaryTask() : PeriodicTask(PT_PERIOD_TIME_ROTARY, PT_WATCHDOG_TIMEOUT_ROTARY) {}
+
+		void initialize();
+		void run();
+		void onTimedOut();
 
 		float getSpeed() const;
 
