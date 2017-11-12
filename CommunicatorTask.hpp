@@ -1,5 +1,5 @@
-#ifndef COMMUNICATOR_TASK_HPP
-#define COMMUNICATOR_TASK_HPP
+#ifndef RC_CAR__COMMUNICATOR_TASK__HPP
+#define RC_CAR__COMMUNICATOR_TASK__HPP
 
 #include "PeriodicTask.hpp"
 //#include <SoftwareSerial.h>
@@ -53,4 +53,4 @@ namespace rc_car {
 	};
 }
 
-#endif	// COMMUNICATOR_TASK_HPP
+#endif // RC_CAR__COMMUNICATOR_TASK__HPP

@@ -1,5 +1,5 @@
-#ifndef CONFIG_HPP
-#define CONFIG_HPP
+#ifndef RC_CAR__CONFIG__HPP
+#define RC_CAR__CONFIG__HPP
 
 #include <Arduino.h>
 #include <stdint.h>
@@ -24,7 +24,7 @@ namespace rc_car {
 #define CAR_PIVOT_FRONT_DISTANCE		7.2f		// distance between car front and front pivot
 #define CAR_PIVOT_REAR_DISTANCE			7.2f		// distance between car rear and rear pivot
 
-#define CAR_WHEEL_CIRCUMFERENCE			20.3f		// circumference of motor-powered wheels [cm]
+#define CAR_WHEEL_CIRC					20.3f		// circumference of motor-powered wheels [cm]
 
 // Periodic tasks
 
@@ -32,14 +32,14 @@ namespace rc_car {
 
 	// frequencies [ms]
 
-#define PT_PERIOD_TIME_ULTRASONIC		10
+#define PT_PERIOD_TIME_ULTRASONIC		15
 #define PT_PERIOD_TIME_COMMUNICATOR		20
-#define PT_PERIOD_TIME_DRIVE			10
-#define PT_PERIOD_TIME_ROTARY			15
+#define PT_PERIOD_TIME_DRIVE			5
+#define PT_PERIOD_TIME_ROT				15
 
 	// watchdog timeouts [ms]
 
-#define PT_WATCHDOG_TIMEOUT_ULTRASONIC		50
+#define PT_WATCHDOG_TIMEOUT_ULTRASONIC		100
 #define PT_WATCHDOG_TIMEOUT_COMMUNICATOR	1000
 #define PT_WATCHDOG_TIMEOUT_DRIVE			50
 #define PT_WATCHDOG_TIMEOUT_ROTARY			200
@@ -77,8 +77,8 @@ namespace rc_car {
 	// ServoMotor
 #define SERVO_PIN 9
 
-#define DC_MOTOR_FORWARD_PIN		3
-#define DC_MOTOR_BACKWARD_PIN		11
+#define DC_MOTOR_FORWARD_PIN		5
+#define DC_MOTOR_BACKWARD_PIN		6
 
 // steering construction restrictions
 #define __SERVO_ROT_MAX		60
@@ -90,7 +90,9 @@ namespace rc_car {
 #define DC_MAX_VALUE		255
 #define DC_MIN_VALUE		(-DC_MAX_VALUE)
 
-#define DC_MAX_SPEED		55 // [cm/sec]
+#define DC_MAX_SPEED		55.0f	// [cm/sec]
+
+#define DC_ZERO_SPEED_BOUNDARY			1.0f
 
 // speed controller
 #define DC_CONTROL_UPDATE_PERIOD_TIME	10
@@ -99,29 +101,33 @@ namespace rc_car {
 
 // motor transfer rates
 
-#define MOTOR_ROTARY_TRANSFER_RATE	1.0f	// transfer rate between motor and rotary encoder
-#define MOTOR_WHEEL_TRANSFER_RATE	1.0f	// transfer rate between motor and wheels
+#define MOT_ROT_TR	1.0f	// transfer rate between motor and rotary encoder
+#define MOT_WHEEL_TR	1.0f	// transfer rate between motor and wheels
 
 // Rotary encoder
 
-#define ROTARY_EN_PIN		A5
+#define ROT_EN_PIN		A5
 
-#define ROTARY_D0_PIN		2
-#define ROTARY_D1_PIN		4
-#define ROTARY_D2_PIN		5
-#define ROTARY_D3_PIN		A0
-#define ROTARY_D4_PIN		A1
-#define ROTARY_D5_PIN		A2
-#define ROTARY_D6_PIN		A3
-#define ROTARY_D7_PIN		A4
+#define ROT_D0_PIN		2
+#define ROT_D1_PIN		4
+#define ROT_D2_PIN		3
+#define ROT_D3_PIN		A0
+#define ROT_D4_PIN		A1
+#define ROT_D5_PIN		A2
+#define ROT_D6_PIN		A3
+#define ROT_D7_PIN		A4
 
-#define ROTARY_RESOLUTION		600
-#define ROTARY_EVAL_MULTIPLIER	4
+// Rotary resolution
+#define ROT_RES		600
 
+// ROtary evaluation multiplier
+#define ROT_EVAL_MUL	4
+
+#define ROT_COUNTER_RESOLUTION			256
 // Defines maximum previous position change for position-validation:
 //		if the difference between the new position and the previous is lower than this value,
 //		then it will be accepted without any overflow-check
-#define ROTARY_OVERFLOW_PREV_MAX_D_POS		128
+#define ROT_OVERFLOW_PREV_MAX_D_POS		128
 
 // Ultrasonic sensors
 
@@ -130,11 +136,12 @@ namespace rc_car {
 
 #define ULTRA_SEL_0_PIN		8
 #define ULTRA_SEL_1_PIN		7
-#define ULTRA_SEL_2_PIN		6
+#define ULTRA_SEL_2_PIN		11
 #define ULTRA_SEL_3_PIN		10
 
 #define ULTRA_NUM_SENSORS		12
 #define ULTRA_MAX_DISTANCE		200u
+#define ULTRA_ECHO_TIMEOUT		10
 
 // defines how many stored measured values need to be ULTRA_MAX_DISTANCE, so that we can validate value
 // 	->	many times the sensors do not respond, which equals ULTRA_MAX_DISTANCE as a value,
@@ -151,7 +158,6 @@ namespace rc_car {
 #define ULTRA_VALID_MAX_NON_RESPONSIVE_COUNT	10
 
 	// Sensor positions and view angles
-// TODO update this number, I just made it up
 // view angle defines the angle of the sensor relative to the RIGHT direction
 #define __ULTRA_VIEW_ANGLE		static_cast<float>(18.435f * RAD_TO_DEG)
 
@@ -166,6 +172,11 @@ namespace rc_car {
 #define __ULTRA_POS_Y_SIDE_REAR		3.6f
 
 
+
+#define ULTRA_POS_X_RF			__ULTRA_POS_X_SIDE
+#define ULTRA_POS_Y_RF			__ULTRA_POS_Y_SIDE_FRONT
+#define ULTRA_VIEW_ANGLE_RF		static_cast<float>(-M_PI_2 + __ULTRA_VIEW_ANGLE)
+#define ULTRA_IDX_RF			11
 
 #define ULTRA_POS_X_FRC			__ULTRA_POS_X_CORNER
 #define ULTRA_POS_Y_FRC			__ULTRA_POS_Y_CORNER
@@ -228,30 +239,17 @@ namespace rc_car {
 #define ULTRA_VIEW_ANGLE_RiR	static_cast<float>(-M_PI_2 - __ULTRA_VIEW_ANGLE)
 #define ULTRA_IDX_RiR			10
 
-#define ULTRA_POS_X_RF			__ULTRA_POS_X_SIDE
-#define ULTRA_POS_Y_RF			__ULTRA_POS_Y_SIDE_FRONT
-#define ULTRA_VIEW_ANGLE_RF		static_cast<float>(-M_PI_2 + __ULTRA_VIEW_ANGLE)
-#define ULTRA_IDX_RF			11
-
 // Environment
 
-// Number of sensors in a combined section
-//#define ENV_COMBINED_SECTION_SENSORS_NUM 3
-
-//#define ENV_COMBINED_SECTIONS_NUM (ULTRA_NUM_SENSORS / ENV_COMBINED_SECTION_SENSORS_NUM)
-
-// Number of environment points surrounding the car
-#define ENV_POINTS_NUM			100
-#define ENV_POINTS_DELTA_ANGLE	static_cast<float>(2 * M_PI / ENV_POINTS_NUM)
+#define ENV_SECTIONS_NUM			3
+#define ENV_SECTION_POINTS_MAX_NUM	5
+#define ENV_SECTION_POINTS_DIST		10.0f	// [cm]
 
 // Absolute position is measured from the start position
 // (the moment the car is powered on, its position is saved as absolute origo)
-#define ENV_ABS_POINTS_DIST			10	// distance between stored absoulte points [cm]
-#define ENV_ABS_POINTS_NUM_X		32	// number of absolute points stored in x direction
-#define ENV_ABS_POINTS_NUM_Y		32	// number of absolute points stored in y direction
-
-// Defines maximum number of points in a sensor direction section
-//#define ENV_SECTION_POINTS_MAX_NUM 8 
+#define ENV_ABS_POINTS_DIST		10	// distance between stored absoulte points [cm]
+#define ENV_ABS_POINTS_NUM_X	32	// number of absolute points stored in x direction
+#define ENV_ABS_POINTS_NUM_Y	32	// number of absolute points stored in y direction
 }
 
-#endif		// CONFIG_HPP
+#endif // RC_CAR__CONFIG__HPP

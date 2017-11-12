@@ -1,5 +1,5 @@
-#ifndef ROTARY_TASK_HPP
-#define ROTARY_TASK_HPP
+#ifndef RC_CAR__ROTARY_TASK__HPP
+#define RC_CAR__ROTARY_TASK__HPP
 
 #include "PeriodicTask.hpp"
 
@@ -25,13 +25,13 @@ namespace rc_car {
 		int readPosition() const;
 
 		void setEnabled(bool enabled) {
-			digitalWrite(ROTARY_EN_PIN, enabled);
+			digitalWrite(ROT_EN_PIN, static_cast<uint8_t>(enabled));
 		}
 
 		void updateOverflowPos(int *newPos) const;
 
 	public:
-		RotaryTask() : PeriodicTask(PT_PERIOD_TIME_ROTARY, PT_WATCHDOG_TIMEOUT_ROTARY) {}
+		RotaryTask() : PeriodicTask(PT_PERIOD_TIME_ROT, PT_WATCHDOG_TIMEOUT_ROTARY) {}
 
 		void initialize();
 		void run();
@@ -43,4 +43,4 @@ namespace rc_car {
 	};
 
 }
-#endif // ROTARY_TASK_HPP
+#endif // RC_CAR__ROTARY_TASK__HPP

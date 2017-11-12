@@ -16,9 +16,16 @@ const Common::Validation UltrasonicTask::DEF_VALIDATION = {
 };
 
 UltrasonicTask::UltrasonicTask() : PeriodicTask(PT_PERIOD_TIME_ULTRASONIC, PT_WATCHDOG_TIMEOUT_ULTRASONIC),
-sensorConnection(ULTRA_TRIGGER_PIN, ULTRA_ECHO_PIN, ULTRA_MAX_DISTANCE) {
+sensorConnection(ULTRA_TRIGGER_PIN, ULTRA_ECHO_PIN, ULTRA_MAX_DISTANCE), echoWatchdog(ULTRA_ECHO_TIMEOUT) {
 
 	setEnabled(false);
+
+	sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_FRONT)].pos.X = ULTRA_POS_X_RF;
+	sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_FRONT)].pos.Y = ULTRA_POS_Y_RF;
+	sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_FRONT)].viewAngle = ULTRA_VIEW_ANGLE_RF;
+	sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_FRONT)].selIdx = ULTRA_IDX_RF;
+
+
 
 	sensors[static_cast<int>(Common::UltrasonicPos::FRONT_RIGHT_CORNER)].pos.X = ULTRA_POS_X_FRC;
 	sensors[static_cast<int>(Common::UltrasonicPos::FRONT_RIGHT_CORNER)].pos.Y = ULTRA_POS_Y_FRC;
@@ -57,7 +64,7 @@ sensorConnection(ULTRA_TRIGGER_PIN, ULTRA_ECHO_PIN, ULTRA_MAX_DISTANCE) {
 	sensors[static_cast<int>(Common::UltrasonicPos::REAR_LEFT_CORNER)].pos.X = ULTRA_POS_X_RLC;
 	sensors[static_cast<int>(Common::UltrasonicPos::REAR_LEFT_CORNER)].pos.Y = ULTRA_POS_Y_RLC;
 	sensors[static_cast<int>(Common::UltrasonicPos::REAR_LEFT_CORNER)].viewAngle = ULTRA_VIEW_ANGLE_RLC;
-	sensors[static_cast<int>(Common::UltrasonicPos::REAR_LEFT_CORNER)].selIdx = ULTRA_IDX_FRC;
+	sensors[static_cast<int>(Common::UltrasonicPos::REAR_LEFT_CORNER)].selIdx = ULTRA_IDX_RLC;
 
 	sensors[static_cast<int>(Common::UltrasonicPos::REAR_LEFT)].pos.X = ULTRA_POS_X_RL;
 	sensors[static_cast<int>(Common::UltrasonicPos::REAR_LEFT)].pos.Y = ULTRA_POS_Y_RL;
@@ -80,11 +87,6 @@ sensorConnection(ULTRA_TRIGGER_PIN, ULTRA_ECHO_PIN, ULTRA_MAX_DISTANCE) {
 	sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_REAR)].pos.Y = ULTRA_POS_Y_RiR;
 	sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_REAR)].viewAngle = ULTRA_VIEW_ANGLE_RiR;
 	sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_REAR)].selIdx = ULTRA_IDX_RiR;
-
-	sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_FRONT)].pos.X = ULTRA_POS_X_RF;
-	sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_FRONT)].pos.Y = ULTRA_POS_Y_RF;
-	sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_FRONT)].viewAngle = ULTRA_VIEW_ANGLE_RF;
-	sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_FRONT)].selIdx = ULTRA_IDX_RF;
 }
 
 void UltrasonicTask::initialize() {
@@ -110,29 +112,21 @@ void UltrasonicTask::initialize() {
 	currentSensorPos = static_cast<Common::UltrasonicPos>(ULTRA_NUM_SENSORS - 1);
 	currentSampleIndex = ULTRA_NUM_DIST_SAMPLES - 1;
 
-
-
-	// TODO remove these lines
-	for (int i = 0; i < ULTRA_NUM_SENSORS; ++i)
-		sensors[i].dist_measured = 100;
+	sendEnvironmentEnabled = false;
 }
 
 void UltrasonicTask::run() {
+
+	if (communicatorTask.getReceivedMessage(msg, getId()))
+		executeMessage();
+
 	// gets next ultrasonic sensor distance (will run in background and call an IT routine)
 	if (isEnabled() && !isBusy()) {
 
 		// checks if all the ultrasonic sensors have been pinged in this cycle
 		// and if yes, stores and validates distances
-		if (measurementCycleFinished()) {
+		if (measurementCycleFinished())
 			validateAndUpdateSensedPoints();
-
-			//ultrasonicTask.getMeasuredPoints(environment.measuredPoints);
-			environment.calculate();	// TODO calculate() does not do anything at the moment
-		}
-
-		if (communicatorTask.getReceivedMessage(msg, getId()))
-			executeMessage();
-
 
 		if (sendEnvironmentEnabled && currentSensorPos % 2) {
 			msg.setCode(ultraPosToMsgCode(currentSensorPos));
@@ -147,9 +141,7 @@ void UltrasonicTask::run() {
 }
 
 void UltrasonicTask::onTimedOut() {
-	//responsive[static_cast<int>(currentSensorPos)] = false;
-	sensorConnection.timer_stop();
-	busy = false;
+	DEBUG_println("UltrasonicTask timed out.");
 }
 
 bool UltrasonicTask::isBusy() const {
@@ -164,37 +156,37 @@ void UltrasonicTask::setEnabled(bool enabled) {
 	this->enabled = enabled;
 }
 
-
 void UltrasonicTask::pingNextSensor() {
-
 	if (measurementCycleFinished())
 		currentSampleIndex = (currentSampleIndex + 1) % ULTRA_NUM_DIST_SAMPLES;
 
 	// increases sensor position
 	currentSensorPos = Common::nextUltrasonicPos(currentSensorPos);
+//	if (currentSensorPos == Common::UltrasonicPos::FRONT_RIGHT_CORNER) currentSensorPos = Common::UltrasonicPos::FRONT_RIGHT;
 
 	// if sensor is not responsive, does not ping it
 	if (sensors[static_cast<int>(currentSensorPos)].nonResponsiveCounter <= ULTRA_VALID_MAX_NON_RESPONSIVE_COUNT) {
+		updateSensorSelection();
 		busy = true;
 		sensorConnection.timer_stop();
-		sensors[static_cast<int>(currentSensorPos)].dist_measured = ULTRA_MAX_DISTANCE;	// in case there is no echo
-		updateSensorSelection();
-		// Pings sensor (processing continues, interrupt will call echoCheck to look for echo).
+		echoWatchdog.restart();
 		sensorConnection.ping_timer(ultrasonicEchoCheckIT);
-
-		busy = false;
 	}
 }
 
-void UltrasonicTask::echoCheck() { // If ping received, set the sensor distance to array.
+void UltrasonicTask::echoCheck() {
 	if (sensorConnection.check_timer()) {
 		sensors[static_cast<int>(currentSensorPos)].dist_measured = sensorConnection.ping_result / US_ROUNDTRIP_CM;
 
 		// sensor response is 0 if (measured distance > ULTRA_MAX_DISTANCE)
 		if (sensors[static_cast<int>(currentSensorPos)].dist_measured == 0)
 			sensors[static_cast<int>(currentSensorPos)].dist_measured = ULTRA_MAX_DISTANCE;
-
 		busy = false;
+
+	} else if (echoWatchdog.hasTimedOut()) {
+		sensors[static_cast<int>(currentSensorPos)].dist_measured = ULTRA_MAX_DISTANCE;
+		busy = false;
+		sensorConnection.timer_stop();
 	}
 }
 
@@ -205,11 +197,8 @@ void UltrasonicTask::validateAndUpdateSensedPoints() {
 	}
 }
 
-void UltrasonicTask::getMeasuredPoints(Point<float> dest[ULTRA_NUM_SENSORS]) {
-	noInterrupts();
-	for (int pos = 0; pos < ULTRA_NUM_SENSORS; ++pos)
-		dest[pos] = sensors[pos].pos;
-	interrupts();
+const Point<float>& UltrasonicTask::getPoint(Common::UltrasonicPos sensorPos) const {
+	return sensors[static_cast<int>(sensorPos)].pos;
 }
 
 void UltrasonicTask::updateSensorSelection() {
@@ -227,23 +216,8 @@ const Message::CODE rc_car::UltrasonicTask::ultraPosToMsgCode(Common::Ultrasonic
 	return static_cast<Message::CODE>(static_cast<int>(Message::CODE::Ultra0_1_EnvPoint) + static_cast<int>(pos) / 2);
 }
 
-//Common::UltrasonicPos UltrasonicTask::calculateForwardDirection(float steeringAngle) {
-//	float min = abs(steeringAngle - sensors[0].viewAngle);
-//	int minPos = 0;
-//
-//	for (int pos = 1; pos < ULTRA_NUM_SENSORS; ++pos) {
-//		float current = abs(steeringAngle - sensors[pos].viewAngle);
-//		if (current < min) {
-//			min = current;
-//			minPos = pos;
-//		}
-//	}
-//
-//	return static_cast<Common::UltrasonicPos>(minPos);
-//}
-
 bool UltrasonicTask::measurementCycleFinished() const {
-	return currentSensorPos == ULTRA_NUM_SENSORS - 1;
+	return static_cast<int>(currentSensorPos) == ULTRA_NUM_SENSORS - 1;
 }
 
 void UltrasonicTask::Sensor::validate(int sampleIndex) {
@@ -293,8 +267,25 @@ void UltrasonicTask::Sensor::validate(int sampleIndex) {
 }
 
 void UltrasonicTask::Sensor::updatePoint() {
+	// view angles are relative to the y-axis, but now we need the angle frm the x-axis
+	// the conversion is defined by dirAngleToXY(viewAngle)
 	sensedPoint.X = pos.X + dist_valid * cos(dirAngleToXY(viewAngle));
 	sensedPoint.Y = pos.Y + dist_valid * sin(dirAngleToXY(viewAngle));
+}
+
+Common::UltrasonicPos UltrasonicTask::getForwardPos(float steeringAngle) {
+	float _min = abs(steeringAngle - sensors[0].viewAngle * RAD_TO_DEG);
+	int minPos = 0;
+
+	for (int pos = 1; pos < ULTRA_NUM_SENSORS; ++pos) {
+		float current = abs(steeringAngle - sensors[pos].viewAngle * RAD_TO_DEG);
+		if (current < _min) {
+			_min = current;
+			minPos = pos;
+		}
+	}
+
+	return static_cast<Common::UltrasonicPos>(minPos);
 }
 
 void UltrasonicTask::executeMessage() {
@@ -302,6 +293,7 @@ void UltrasonicTask::executeMessage() {
 
 	case Message::CODE::EnableEnvironment:
 		sendEnvironmentEnabled = static_cast<bool>(msg.getDataAsInt());
+		communicatorTask.setMessageToSend(Message::ACK, getId());
 		break;
 	}
 }

@@ -1,5 +1,5 @@
-#ifndef WATCHDOG_HPP
-#define WATCHDOG_HPP
+#ifndef RC_CAR__WATCHDOG__HPP
+#define RC_CAR__WATCHDOG__HPP
 
 #include "Common.hpp"
 
@@ -11,18 +11,18 @@ namespace rc_car {
 	public:
 
 	private: 
-		const int TIMEOUT;
+		const unsigned long TIMEOUT;
 		unsigned long startTime;
 
 	public:
-		Watchdog(int _timeout) : TIMEOUT(_timeout) {}
+		Watchdog(int _timeout) : TIMEOUT(static_cast<unsigned long>(_timeout)) {}
 
 		void restart() {
 			startTime = millis();
 		}
 
 		bool hasTimedOut() const {
-			return millis() >= startTime + static_cast<unsigned long>(TIMEOUT);
+			return millis() >= startTime + TIMEOUT;
 		}
 
 		unsigned long getStartTime() const {
@@ -31,5 +31,5 @@ namespace rc_car {
 	};
 
 }
-#endif	// WATCHDOG_HPP
+#endif // RC_CAR__WATCHDOG__HPP
 

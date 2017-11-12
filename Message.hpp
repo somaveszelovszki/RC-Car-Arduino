@@ -1,5 +1,5 @@
-#ifndef MESSAGE_HPP
-#define MESSAGE_HPP
+#ifndef RC_CAR__MESSAGE__HPP
+#define RC_CAR__MESSAGE__HPP
 
 #include "ByteArray.hpp"
 
@@ -124,4 +124,4 @@ namespace rc_car {
 	};
 }
 
-#endif	// MESSAGE_HPP
+#endif // RC_CAR__MESSAGE__HPP

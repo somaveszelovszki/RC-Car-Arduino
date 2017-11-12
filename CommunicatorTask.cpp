@@ -117,6 +117,5 @@ void CommunicatorTask::fetchMessage() {
 }
 
 int CommunicatorTask::sendMessage(int taskId) {
-	//TODO sending not working properly!
 	return Serial.write(static_cast<const byte*>(sendMsgs[taskId].toBytes()), COMM_MSG_LENGTH);
 }

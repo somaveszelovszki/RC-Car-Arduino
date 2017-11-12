@@ -1,5 +1,5 @@
-#ifndef ENVIRONMENT_HPP
-#define ENVIRONMENT_HPP
+#ifndef RC_CAR__ENVIRONMENT__HPP
+#define RC_CAR__ENVIRONMENT__HPP
 
 #include "Point.hpp"
 #include "Vec.hpp"
@@ -9,18 +9,25 @@ namespace rc_car {
 	*/
 	class Environment {
 	private:
-		Point<float> currentPos;
-		//Point<float> absPoints[ENV_ABS_POINTS_NUM_X][ENV_ABS_POINTS_NUM_Y];
+		Point<float> startPoint, diff;
 
-		void calculateSectionPoints(Common::UltrasonicPos pos, int *pDestStartIndex);
+		// Section points include the start point but not the endpoint!
+		int sectionPointsCount, currentSectionPointIdx;
+
+		//Vec<Point<float>, ENV_SECTION_POINTS_MAX_NUM> envPoints[ENV_SECTIONS_NUM];
+		//void calculateSectionPoints(Point<float> measuredPoints[ULTRA_NUM_SENSORS], Common::UltrasonicPos startPos, int sectionIdx);
 
 	public:
-		Point<float> measuredPoints[ULTRA_NUM_SENSORS];
-		
-		//float estimatedPoints[70];
+		void setSection(const Point<float>& _startPoint, const Point<float>& _endPoint);
 
-		void calculate();
+		bool nextSectionPointExists() const {
+			return currentSectionPointIdx < sectionPointsCount;
+		}
+
+		Point<float> calculateNextSectionPoint();
+
+		//void calculate(Point<float> measuredPoints[ULTRA_NUM_SENSORS], Common::UltrasonicPos startPos);
 	};
 }
 
-#endif // ENVIRONMENT_HPP
+#endif // RC_CAR__ENVIRONMENT__HPP

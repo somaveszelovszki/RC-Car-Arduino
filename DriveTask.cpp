@@ -15,10 +15,64 @@ void DriveTask::initialize() {
 }
 
 void DriveTask::run() {
-	updateValues();
+	motorHandler.updateSpeed(rotaryTask.getSpeed());
+	isNewMsgAvailable = communicatorTask.getReceivedMessage(msg, getId());
 
 	if (Common::testAndSet(&isNewMsgAvailable, false))
 		executeMessage();
+
+	// gets track distances for important points (important = measured by sensor in the moving direction)
+
+	Common::UltrasonicPos sectionStartPos, fwdPos = ultrasonicTask.getForwardPos(motorHandler.getSteeringAngle());
+
+	switch (fwdPos) {
+	case Common::UltrasonicPos::RIGHT_FRONT:
+	case Common::UltrasonicPos::FRONT_RIGHT_CORNER:
+		sectionStartPos = Common::UltrasonicPos::RIGHT_FRONT;
+		break;
+	case Common::UltrasonicPos::FRONT_RIGHT:
+	case Common::UltrasonicPos::FRONT_LEFT:
+		sectionStartPos = Common::UltrasonicPos::FRONT_RIGHT_CORNER;
+		break;
+	case Common::UltrasonicPos::FRONT_LEFT_CORNER:
+	case Common::UltrasonicPos::LEFT_FRONT:
+		sectionStartPos = Common::UltrasonicPos::FRONT_RIGHT;
+		break;
+	case Common::UltrasonicPos::LEFT_REAR:
+	case Common::UltrasonicPos::REAR_LEFT_CORNER:
+		sectionStartPos = Common::UltrasonicPos::LEFT_REAR;
+		break;
+	case Common::UltrasonicPos::REAR_LEFT:
+	case Common::UltrasonicPos::REAR_RIGHT:
+		sectionStartPos = Common::UltrasonicPos::REAR_LEFT_CORNER;
+		break;
+	case Common::UltrasonicPos::REAR_RIGHT_CORNER:
+	case Common::UltrasonicPos::RIGHT_REAR:
+		sectionStartPos = Common::UltrasonicPos::REAR_LEFT;
+		break;
+	}
+
+	Point<float> sectionStart, sectionEnd;
+
+	for (int i = 0; i < ENV_SECTIONS_NUM; ++i) {
+		sectionStart = ultrasonicTask.getPoint(sectionStartPos);
+		sectionEnd = ultrasonicTask.getPoint(sectionStartPos = Common::nextUltrasonicPos(sectionStartPos));
+		environment.setSection(sectionStart, sectionEnd);
+
+		while (environment.nextSectionPointExists()) {
+			Point<float> sectionPoint = environment.calculateNextSectionPoint();
+			//
+			//
+			// TODO do something with section points
+			//
+			//
+		}
+
+		sectionStart = sectionEnd;
+	}
+
+
+
 
 	switch (mode) {
 	case Common::FREE_DRIVE:
@@ -93,19 +147,6 @@ bool DriveTask::isDistanceCritical(Common::UltrasonicPos pos, int distance) cons
 //	////}
 //
 	return false;
-}
-
-void DriveTask::updateValues() {
-	float actualSpeed = rotaryTask.getSpeed();
-
-	// TODO remove this line
-	motorHandler.setDesiredSpeed(0.0f);
-
-	//DEBUG_println("desired: -10.00\tactual: " + String(actualSpeed));
-
-	motorHandler.updateSpeed(actualSpeed);
-
-	isNewMsgAvailable = communicatorTask.getReceivedMessage(msg, getId());
 }
 
 void DriveTask::executeMessage() {

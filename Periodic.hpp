@@ -1,5 +1,5 @@
-#ifndef PERIODIC_HPP
-#define PERIODIC_HPP
+#ifndef RC_CAR__PERIODIC__HPP
+#define RC_CAR__PERIODIC__HPP
 
 #include "Watchdog.hpp"
 
@@ -28,5 +28,5 @@ namespace rc_car {
 	};
 }
 
-#endif // PERIODIC_HPP
+#endif // RC_CAR__PERIODIC__HPP
 

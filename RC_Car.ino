@@ -1,7 +1,6 @@
-/*
-	Contains main program.
-	Receives messages through a Communicator object, reads ultrasonic sensor distances.
-	Handles motors according to drive mode.
+/** @brief Contains main program.
+Receives and sends messages through the Communicator task, reads ultrasonic sensor distances and motor speed.
+Handles motors according to Drive mode.
 */
 
 #include "CommunicatorTask.hpp"
@@ -16,9 +15,7 @@ UltrasonicTask ultrasonicTask;
 RotaryTask rotaryTask;
 DriveTask driveTask;
 
-//ISR(TIMER1_COMPB_vect);
-
-#define INIT_TASK(task)			\
+#define INIT_TASK(task)					\
 task.initialize();
 
 #define RUN_TASK(task)					\
@@ -35,11 +32,6 @@ if(task.periodTimeReached()) {			\
 /** @brief Initializes tasks.
 */
 void setup() {
-
-	//Common::initializeTimer();
-
-	// TODO maybe use millis() instead - skip custom timer manipulations
-
 	INIT_TASK(communicatorTask);
 	INIT_TASK(ultrasonicTask);
 	INIT_TASK(rotaryTask);
@@ -52,11 +44,3 @@ void loop() {
 	RUN_TASK(rotaryTask);
 	RUN_TASK(driveTask);
 }
-
-/*
-	Timer0 interrupt - called in every 1 ms. Decrements watchdogs.
-*/
-//ISR(TIMER1_COMPB_vect) {
-//	Common::incrementMilliSecs();
-//	Watchdog::decrementAll();
-//}

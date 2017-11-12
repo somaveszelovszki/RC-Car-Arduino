@@ -1,5 +1,5 @@
-#ifndef DRIVE_FACTOR_HPP
-#define DRIVE_FACTOR_HPP
+#ifndef RC_CAR__DRIVE_FACTOR__HPP
+#define RC_CAR__DRIVE_FACTOR__HPP
 
 namespace rc_car {
 
@@ -18,4 +18,4 @@ namespace rc_car {
 	};
 }
 
-#endif // DRIVE_FACTOR_HPP
+#endif // RC_CAR__DRIVE_FACTOR__HPP

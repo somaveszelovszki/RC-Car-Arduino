@@ -1,5 +1,5 @@
-#ifndef PERIODIC_TASK_HPP
-#define PERIODIC_TASK_HPP
+#ifndef RC_CAR__PERIODIC_TASK__HPP
+#define RC_CAR__PERIODIC_TASK__HPP
 
 #include "Watchdog.hpp"
 #include "Periodic.hpp"
@@ -32,7 +32,4 @@ namespace rc_car {
 	};
 }
 
-#endif	// PERIODIC_TASK_HPP
-
-
-
+#endif // RC_CAR__PERIODIC_TASK__HPP

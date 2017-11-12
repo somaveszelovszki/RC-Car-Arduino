@@ -1,5 +1,5 @@
-#ifndef COMMON_HPP
-#define COMMON_HPP
+#ifndef RC_CAR__COMMON__HPP
+#define RC_CAR__COMMON__HPP
 
 #include <math.h>
 
@@ -53,7 +53,9 @@ namespace rc_car {
 		NOTE: If you add a position, don't forget to update ULTRA_NUM_SENSORS!
 		*/
 		enum UltrasonicPos {
-			FRONT_RIGHT_CORNER = 0,
+			RIGHT_FRONT = 0,
+
+			FRONT_RIGHT_CORNER,
 			FRONT_RIGHT,
 			FRONT_LEFT,
 			FRONT_LEFT_CORNER,
@@ -66,8 +68,7 @@ namespace rc_car {
 			REAR_RIGHT,
 			REAR_RIGHT_CORNER,
 
-			RIGHT_REAR,
-			RIGHT_FRONT
+			RIGHT_REAR
 		};
 
 		static UltrasonicPos nextUltrasonicPos(UltrasonicPos pos) {
@@ -129,9 +130,6 @@ namespace rc_car {
 
 		static void floatToBytes(float value, byte dest[4]);
 
-		static void debug_print(const String& str, bool addNewLine = false);
-		static void debug_println(const String& str = "");
-
 		static bool testAndSet(bool *value, bool valueToSet = true);
 
 		template <typename T>
@@ -163,4 +161,4 @@ namespace rc_car {
 	}
 
 }
-#endif	// COMMON_HPP
+#endif // RC_CAR__COMMON__HPP

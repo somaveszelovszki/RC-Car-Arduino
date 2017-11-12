@@ -1,5 +1,5 @@
-#ifndef ULTRASONIC_TASK_HPP
-#define ULTRASONIC_TASK_HPP
+#ifndef RC_CAR__ULTRASONIC_TASK__HPP
+#define RC_CAR__ULTRASONIC_TASK__HPP
 
 #include "PeriodicTask.hpp"
 #include <NewPing.h>
@@ -44,14 +44,13 @@ namespace rc_car {
 		int currentSampleIndex;
 
 		Message msg;
-		Environment environment;
-		bool sendEnvironmentEnabled = false;
+		bool sendEnvironmentEnabled;
+
+		Watchdog echoWatchdog;
 
 		void updateSensorSelection();
 
 		const Message::CODE ultraPosToMsgCode(Common::UltrasonicPos pos);
-
-		//Common::UltrasonicPos calculateForwardDirection(float steeringAngle);
 
 	public:
 		UltrasonicTask();
@@ -74,10 +73,15 @@ namespace rc_car {
 
 		void validateAndUpdateSensedPoints();
 
-		void getMeasuredPoints(Point<float> dest[ULTRA_NUM_SENSORS]);
+		const Point<float>& getPoint(Common::UltrasonicPos sensorPos) const;
+
+		/** @brief Gets the UltrasonicPos that is nearest to the current steering angle.
+		Therefore gives the direction of the car in UltrasonicPos.
+		*/
+		Common::UltrasonicPos getForwardPos(float steeringAngle);
 
 		void executeMessage();
 	};
 }
 
-#endif	// ULTRASONIC_TASK_HPP
+#endif // RC_CAR__ULTRASONIC_TASK__HPP

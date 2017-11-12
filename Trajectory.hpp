@@ -1,5 +1,5 @@
-#ifndef TRAJECTORY_HPP
-#define TRAJECTORY_HPP
+#ifndef RC_CAR__TRAJECTORY__HPP
+#define RC_CAR__TRAJECTORY__HPP
 
 #include "Point.hpp"
 
@@ -38,13 +38,12 @@ namespace rc_car {
 
 		void updateValues(int steeringAngle, float speed);
 
-		/*
-		Calculates distance between given point and car during its trajectory.
+		/** @brief Calculates distance between given point and car during its trajectory.
 		@param relativePos coordinates of the point - relative to car middle.
 		@param forceCalcRemainingTime Indicates if remaining time should be calculated even if car will not hit obstacle
 		*/
-		TrackDistance trackDistanceFromPoint(Point<float> relativePos, bool forceCalcRemainingTime = false) const;
+		TrackDistance trackDistanceFromPoint(const Point<float>& relativePos, bool forceCalcRemainingTime = false) const;
 	};
 }
 
-#endif		// TRAJECTORY_HPP
+#endif // RC_CAR__TRAJECTORY__HPP

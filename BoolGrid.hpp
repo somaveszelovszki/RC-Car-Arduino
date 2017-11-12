@@ -1,5 +1,5 @@
-#ifndef BOOL_GRID_HPP
-#define BOOL_GRID_HPP
+#ifndef RC_CAR__BOOL_GRID__HPP
+#define RC_CAR__BOOL_GRID__HPP
 
 #include "Common.hpp"
 
@@ -26,4 +26,4 @@ namespace rc_car {
 	};
 }
 
-#endif // BOOL_GRID_HPP
+#endif // RC_CAR__BOOL_GRID__HPP

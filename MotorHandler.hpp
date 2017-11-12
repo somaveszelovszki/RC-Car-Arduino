@@ -1,5 +1,5 @@
-#ifndef MOTOR_HANDLER_HPP
-#define MOTOR_HANDLER_HPP
+#ifndef RC_CAR__MOTOR_HANDLER__HPP
+#define RC_CAR__MOTOR_HANDLER__HPP
 
 //#include <Servo.h>
 #include <ServoTimer1.h>
@@ -19,7 +19,7 @@ namespace rc_car {
 		class ServoMotor : public ServoTimer1 {
 			friend class MotorHandler;
 		public:
-			void writeAngle(float angle);
+			void writeAngle(float _angle);
 		};
 
 		class DCMotor {
@@ -31,7 +31,7 @@ namespace rc_car {
 		public:
 			DCMotor() {}
 			void initialize();
-			void writeValue(float value);
+			void writeValue(int _value);
 		};
 
 		PD_Controller speedCtrl;
@@ -55,7 +55,7 @@ namespace rc_car {
 
 		void updateSteeringAngle(float _steeringAngle);
 
-		float getAngle() {
+		float getSteeringAngle() {
 			return steeringAngle;
 		}
 		/*
@@ -68,4 +68,4 @@ namespace rc_car {
 	};
 }
 
-#endif	// MOTOR_HANDLER_HPP
+#endif // RC_CAR__MOTOR_HANDLER__HPP

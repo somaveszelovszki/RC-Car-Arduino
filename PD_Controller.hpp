@@ -1,5 +1,5 @@
-#ifndef PD_CONTROLLER_HPP
-#define PD_CONTROLLER_HPP
+#ifndef RC_CAR__PD_CONTROLLER__HPP
+#define RC_CAR__PD_CONTROLLER__HPP
 
 #include "PeriodicTask.hpp"
 
@@ -18,10 +18,10 @@ namespace rc_car {
 
 		void run(float currentError);
 
-		float getOutput() const {
-			return output;
+		int getOutput() const {
+			return static_cast<int>(output);
 		}
 	};
 }
 
-#endif // PD_CONTROLLER_HPP
+#endif // RC_CAR__PD_CONTROLLER__HPP

@@ -1,5 +1,5 @@
-#ifndef POINT_HPP
-#define POINT_HPP
+#ifndef RC_CAR__POINT__HPP
+#define RC_CAR__POINT__HPP
 
 #include "ByteArray.hpp"
 
@@ -56,7 +56,7 @@ namespace rc_car {
 
 #if(__DEBUG)
 		String toString() const;
-#endif	// __DEBUG
+#endif // RC_CAR____DEBUG
 	};
 
 
@@ -181,4 +181,4 @@ namespace rc_car {
 	}
 #endif // __DEBUG
 }
-#endif	// POINT_HPP
+#endif // RC_CAR__POINT__HPP

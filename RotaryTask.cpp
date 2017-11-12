@@ -3,17 +3,16 @@
 using namespace rc_car;
 
 void RotaryTask::initialize() {
-	// TODO initialize pins
-	pinMode(ROTARY_D0_PIN, INPUT);
-	pinMode(ROTARY_D1_PIN, INPUT);
-	pinMode(ROTARY_D2_PIN, INPUT);
-	pinMode(ROTARY_D3_PIN, INPUT);
-	pinMode(ROTARY_D4_PIN, INPUT);
-	pinMode(ROTARY_D5_PIN, INPUT);
-	pinMode(ROTARY_D6_PIN, INPUT);
-	pinMode(ROTARY_D7_PIN, INPUT);
+	pinMode(ROT_D0_PIN, INPUT);
+	pinMode(ROT_D1_PIN, INPUT);
+	pinMode(ROT_D2_PIN, INPUT);
+	pinMode(ROT_D3_PIN, INPUT);
+	pinMode(ROT_D4_PIN, INPUT);
+	pinMode(ROT_D5_PIN, INPUT);
+	pinMode(ROT_D6_PIN, INPUT);
+	pinMode(ROT_D7_PIN, INPUT);
 
-	pinMode(ROTARY_EN_PIN, OUTPUT);
+	pinMode(ROT_EN_PIN, OUTPUT);
 
 	prev.time = millis();
 	prev.pos = 0;
@@ -46,21 +45,21 @@ void RotaryTask::onTimedOut() {
 
 int RotaryTask::readPosition() const {
 	return static_cast<int>(static_cast<int8_t>(
-		(digitalRead(ROTARY_D7_PIN) << 7)
-		+ (digitalRead(ROTARY_D6_PIN) << 6)
-		+ (digitalRead(ROTARY_D5_PIN) << 5)
-		+ (digitalRead(ROTARY_D4_PIN) << 4)
-		+ (digitalRead(ROTARY_D3_PIN) << 3)
-		+ (digitalRead(ROTARY_D2_PIN) << 2)
-		+ (digitalRead(ROTARY_D1_PIN) << 1)
-		+ digitalRead(ROTARY_D0_PIN)));
+		(digitalRead(ROT_D7_PIN) << 7)
+		+ (digitalRead(ROT_D6_PIN) << 6)
+		+ (digitalRead(ROT_D5_PIN) << 5)
+		+ (digitalRead(ROT_D4_PIN) << 4)
+		+ (digitalRead(ROT_D3_PIN) << 3)
+		+ (digitalRead(ROT_D2_PIN) << 2)
+		+ (digitalRead(ROT_D1_PIN) << 1)
+		+ digitalRead(ROT_D0_PIN)));
 }
 
 void RotaryTask::updateOverflowPos(int *newPos) const {
 	int d = *newPos - prev.pos;
 
-	if (abs(d) > ROTARY_OVERFLOW_PREV_MAX_D_POS) {
-		int dp = d + 256, dm = d - 256;
+	if (abs(d) > ROT_OVERFLOW_PREV_MAX_D_POS) {
+		int dp = d + ROT_COUNTER_RESOLUTION, dm = d - ROT_COUNTER_RESOLUTION;
 		d = abs(dp) <= abs(dm) ? dp : dm;
 		*newPos = prev.pos + d;
 	}
@@ -68,8 +67,8 @@ void RotaryTask::updateOverflowPos(int *newPos) const {
 
 float RotaryTask::getSpeed() const {
 	return diff.time > 0 ?
-		(1 / MOTOR_ROTARY_TRANSFER_RATE) * MOTOR_WHEEL_TRANSFER_RATE
-			* (diff.pos / static_cast<float>(ROTARY_RESOLUTION * ROTARY_EVAL_MULTIPLIER) * CAR_WHEEL_CIRCUMFERENCE) / diff.time * SEC_TO_MSEC
+		(1 / MOT_ROT_TR) * MOT_WHEEL_TR
+			* (diff.pos / static_cast<float>(ROT_RES * ROT_EVAL_MUL) * CAR_WHEEL_CIRC) / diff.time * SEC_TO_MSEC
 		: 0.0f;
 }
 

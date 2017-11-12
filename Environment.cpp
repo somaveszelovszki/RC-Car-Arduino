@@ -2,23 +2,35 @@
 
 using namespace rc_car;
 
-void Environment::calculateSectionPoints(Common::UltrasonicPos pos, int *pDestStartIndex) {
-	//Point<float> start = measuredPoints[pos],
-	//	end = measuredPoints[Common::nextUltrasonicPos(pos)];
+//void Environment::calculateSectionPoints(Point<float> measuredPoints[ULTRA_NUM_SENSORS], Common::UltrasonicPos startPos, int sectionIdx) {
+//	Point<float> start = measuredPoints[startPos],
+//		end = measuredPoints[Common::nextUltrasonicPos(startPos)],
+//		wholeDiff = end - start;
+//
+//	float wholeDiffLength = wholeDiff.length();
+//	int sectionPointsCount = min(wholeDiffLength / ENV_SECTION_POINTS_DIST, ENV_SECTION_POINTS_MAX_NUM);
+//
+//	Point<float> diff = wholeDiff / (sectionPointsCount + 1);
+//
+//	for (int i = 0; i < sectionPointsCount; ++i)
+//		envPoints[sectionIdx][i] = start + i * diff;
+//}
 
-	//float diffAngle = abs(Point<float>::ORIGO.getAngle(start, Common::SteeringDir::LEFT)
-	//	- Point<float>::ORIGO.getAngle(end, Common::SteeringDir::LEFT));
+void Environment::setSection(const Point<float>& _startPoint, const Point<float>& _endPoint) {
+	startPoint = _startPoint;
+	Point<float> wholeDiff = _endPoint - startPoint;
+	float wholeDiffLength = wholeDiff.length();
 
-	//// rounds down angle ratio -> gets number of middle points
-	//int middlePointsNum = static_cast<int>(diffAngle / ENV_POINTS_DELTA_ANGLE);
-
-	//Point<float> diff = (end - start) / (middlePointsNum + 1);
-	//for (int i = 0; i < middlePointsNum; ++i)
-	//	estimatedPoints[(*pDestStartIndex)++] = start + i * diff;
+	sectionPointsCount = min(wholeDiffLength / ENV_SECTION_POINTS_DIST, ENV_SECTION_POINTS_MAX_NUM);
+	diff = wholeDiff / (sectionPointsCount + 1);
+	currentSectionPointIdx = 0;
 }
 
-void Environment::calculate() {
-	int currentIndex = 0;
-	for (int i = 0; i < ULTRA_NUM_SENSORS; ++i)
-		calculateSectionPoints(static_cast<Common::UltrasonicPos>(i), &currentIndex);
+Point<float> Environment::calculateNextSectionPoint() {
+	return startPoint + diff * currentSectionPointIdx++;
 }
+
+//void Environment::calculate(Point<float> measuredPoints[ULTRA_NUM_SENSORS], Common::UltrasonicPos startPos) {
+//	for (int i = 0; i < ENV_SECTIONS_NUM; ++i)
+//		calculateSectionPoints(measuredPoints, static_cast<Common::UltrasonicPos>(static_cast<int>(startPos) + i), i);
+//}

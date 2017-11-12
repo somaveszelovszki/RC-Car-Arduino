@@ -1,5 +1,5 @@
-#ifndef DRIVE_TASK_HPP
-#define DRIVE_TASK_HPP
+#ifndef RC_CAR__DRIVE_TASK__HPP
+#define RC_CAR__DRIVE_TASK__HPP
 
 #include "MotorHandler.hpp"
 #include "Trajectory.hpp"
@@ -13,6 +13,7 @@ namespace rc_car {
 		Common::DriveMode mode;
 		MotorHandler motorHandler;
 		Watchdog forceStopWatchdog;
+		Environment environment;
 		bool isNewMsgAvailable = false;
 		Message msg;
 
@@ -23,8 +24,6 @@ namespace rc_car {
 			TODO replace with DANGER_LEVELs
 		*/
 		bool isDistanceCritical(Common::UltrasonicPos pos, int distance) const;
-
-		void updateValues();
 
 		void executeMessage();
 
@@ -41,5 +40,5 @@ namespace rc_car {
 	};
 
 }
-#endif	// DRIVE_TASK_HPP
+#endif // RC_CAR__DRIVE_TASK__HPP
 

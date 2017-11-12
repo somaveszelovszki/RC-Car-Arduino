@@ -1,5 +1,5 @@
-#ifndef VEC_HPP
-#define VEC_HPP
+#ifndef RC_CAR__VEC__HPP
+#define RC_CAR__VEC__HPP
 
 namespace rc_car {
 	/** @brief Template vector implementation with static maximum length.
@@ -23,4 +23,4 @@ namespace rc_car {
 	};
 }
 
-#endif // VEC_HPP
+#endif // RC_CAR__VEC__HPP

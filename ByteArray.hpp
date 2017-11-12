@@ -1,5 +1,5 @@
-#ifndef BYTE_ARRAY_HPP
-#define BYTE_ARRAY_HPP
+#ifndef RC_CAR__BYTE_ARRAY__HPP
+#define RC_CAR__BYTE_ARRAY__HPP
 
 #include "Common.hpp"
 
@@ -180,4 +180,4 @@ namespace rc_car {
 #endif // __DEBUG
 }
 
-#endif // BYTE_ARRAY_HPP
+#endif // RC_CAR__BYTE_ARRAY__HPP
