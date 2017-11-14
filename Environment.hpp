@@ -3,12 +3,16 @@
 
 #include "Point.hpp"
 #include "Vec.hpp"
+#include "BoolGrid.hpp"
 
 namespace rc_car {
 	/** @brief Calculates environment around car from the measured data of the ultrasonic sensors.
 	*/
 	class Environment {
 	private:
+
+		BoolGrid<ENV_ABS_POINTS_NUM_X, ENV_ABS_POINTS_NUM_Y> envGrid;
+
 		Point<float> startPoint, diff;
 
 		// Section points include the start point but not the endpoint!
@@ -18,6 +22,9 @@ namespace rc_car {
 		//void calculateSectionPoints(Point<float> measuredPoints[ULTRA_NUM_SENSORS], Common::UltrasonicPos startPos, int sectionIdx);
 
 	public:
+
+		Environment();
+
 		void setSection(const Point<float>& _startPoint, const Point<float>& _endPoint);
 
 		bool nextSectionPointExists() const {

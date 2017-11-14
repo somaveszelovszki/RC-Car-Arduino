@@ -3,6 +3,7 @@
 
 #include "MotorHandler.hpp"
 #include "Trajectory.hpp"
+#include "Environment.hpp"
 
 namespace rc_car {
 	/** @brief Makes driving decisions from sensor data and car state. Controls motors via the MotorHandler.
@@ -26,7 +27,6 @@ namespace rc_car {
 		bool isDistanceCritical(Common::UltrasonicPos pos, int distance) const;
 
 		void executeMessage();
-
 	public:
 		DriveTask() : PeriodicTask(PT_PERIOD_TIME_DRIVE, PT_WATCHDOG_TIMEOUT_DRIVE),
 			forceStopWatchdog(DRIVE_FORCE_STOP_TIME),

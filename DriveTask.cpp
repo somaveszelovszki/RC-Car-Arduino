@@ -23,34 +23,8 @@ void DriveTask::run() {
 
 	// gets track distances for important points (important = measured by sensor in the moving direction)
 
-	Common::UltrasonicPos sectionStartPos, fwdPos = ultrasonicTask.getForwardPos(motorHandler.getSteeringAngle());
-
-	switch (fwdPos) {
-	case Common::UltrasonicPos::RIGHT_FRONT:
-	case Common::UltrasonicPos::FRONT_RIGHT_CORNER:
-		sectionStartPos = Common::UltrasonicPos::RIGHT_FRONT;
-		break;
-	case Common::UltrasonicPos::FRONT_RIGHT:
-	case Common::UltrasonicPos::FRONT_LEFT:
-		sectionStartPos = Common::UltrasonicPos::FRONT_RIGHT_CORNER;
-		break;
-	case Common::UltrasonicPos::FRONT_LEFT_CORNER:
-	case Common::UltrasonicPos::LEFT_FRONT:
-		sectionStartPos = Common::UltrasonicPos::FRONT_RIGHT;
-		break;
-	case Common::UltrasonicPos::LEFT_REAR:
-	case Common::UltrasonicPos::REAR_LEFT_CORNER:
-		sectionStartPos = Common::UltrasonicPos::LEFT_REAR;
-		break;
-	case Common::UltrasonicPos::REAR_LEFT:
-	case Common::UltrasonicPos::REAR_RIGHT:
-		sectionStartPos = Common::UltrasonicPos::REAR_LEFT_CORNER;
-		break;
-	case Common::UltrasonicPos::REAR_RIGHT_CORNER:
-	case Common::UltrasonicPos::RIGHT_REAR:
-		sectionStartPos = Common::UltrasonicPos::REAR_LEFT;
-		break;
-	}
+	// calculates section start position according to forward direction
+	Common::UltrasonicPos sectionStartPos = Common::calculateSectionStartPos(ultrasonicTask.getForwardPos(motorHandler.getSteeringAngle()));
 
 	Point<float> sectionStart, sectionEnd;
 

@@ -25,6 +25,7 @@ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\RC_Car.cpp.o: \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\Environment.hpp \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\Point.hpp \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\Vec.hpp \
+ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\BoolGrid.hpp \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\RotaryTask.hpp \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\DriveTask.hpp \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\MotorHandler.hpp \

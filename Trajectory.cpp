@@ -50,9 +50,6 @@ Trajectory::TrackDistance Trajectory::trackDistanceFromPoint(const Point<float>&
 	inner.X = R_inner / cos_ObsAngle, inner.Y = R_inner / sin_ObsAngle,
 	outer.X = R_outer / cos_ObsAngle, outer.Y = R_outer / sin_ObsAngle;
 
-	float innerDist = inner.distanceFrom(obs),
-	outerDist = outer.distanceFrom(obs);
-
 	float obsDist = obs.distanceFrom(origo),
 		innerDist = abs(obsDist - abs(R_inner)),
 		outerDist = abs(obsDist - abs(R_outer));

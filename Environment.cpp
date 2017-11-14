@@ -16,6 +16,12 @@ using namespace rc_car;
 //		envPoints[sectionIdx][i] = start + i * diff;
 //}
 
+Environment::Environment() {
+	for (int x = 0; x < ENV_ABS_POINTS_NUM_X; ++x)
+		for (int y = 0; y < ENV_ABS_POINTS_NUM_Y; ++y)
+			envGrid[x][y] = false;
+}
+
 void Environment::setSection(const Point<float>& _startPoint, const Point<float>& _endPoint) {
 	startPoint = _startPoint;
 	Point<float> wholeDiff = _endPoint - startPoint;

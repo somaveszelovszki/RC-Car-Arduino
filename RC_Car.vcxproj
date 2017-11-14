@@ -80,6 +80,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BoolArray.hpp" />
     <ClInclude Include="BoolGrid.hpp" />
     <ClInclude Include="ByteArray.hpp" />
     <ClInclude Include="config.hpp" />

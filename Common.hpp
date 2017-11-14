@@ -75,6 +75,40 @@ namespace rc_car {
 			return static_cast<UltrasonicPos>((static_cast<int>(pos) + 1) % ULTRA_NUM_SENSORS);
 		}
 
+		/** @brief Calculates section start position according to forward direction.
+
+		For given forward directions the section start positions are the following:
+
+		RIGHT_FRONT:
+		FRONT_RIGHT_CORNER:
+			sectionStartPos = RIGHT_FRONT;
+
+		FRONT_RIGHT:
+		FRONT_LEFT:
+			sectionStartPos = FRONT_RIGHT_CORNER;
+
+		FRONT_LEFT_CORNER:
+		LEFT_FRONT:
+			sectionStartPos = FRONT_RIGHT;
+
+		LEFT_REAR:
+		REAR_LEFT_CORNER:
+			sectionStartPos = LEFT_REAR;
+
+		REAR_LEFT:
+		REAR_RIGHT:
+			sectionStartPos = REAR_LEFT_CORNER;
+
+		REAR_RIGHT_CORNER:
+		RIGHT_REAR:
+			sectionStartPos = REAR_LEFT
+
+		@param fwdPos The forward direction.
+		*/
+		static UltrasonicPos calculateSectionStartPos(UltrasonicPos fwdPos) {
+			return static_cast<UltrasonicPos>(static_cast<int>(fwdPos) >= 6 ? 3 + static_cast<int>(fwdPos) / 2 : static_cast<int>(fwdPos) / 2);
+		}
+
 		struct Validation {
 			int minSampleNum;	// minimum validation sample num
 			float relErr;		// relative error
