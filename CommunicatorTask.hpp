@@ -7,26 +7,31 @@
 #include "Message.hpp"
 #include "Watchdog.hpp"
 #include "ByteArray.hpp"
+#include "BoolArray.hpp"
 
 namespace rc_car {
 	/** @brief Handles communication with phone - sends and receives messages.
 	*/
 	class CommunicatorTask : public PeriodicTask {
+	public:
+		enum MsgAvailability {
+			NOT_AVAILABLE = 0,
+			AVAILABLE_LOW_PRIO,
+			AVAILABLE_HIGH_PRIO
+		};
+
 	private:
-		//SoftwareSerial *commSerial;
-		//AltSoftSerial *commSerial;
 
 		enum RecvState {
-			READ_SEPARATOR, READ_CODE, READ_DATA
+			READ_SEP, READ_CODE, READ_DATA
 		};
 
 		ByteArray<COMM_MSG_LENGTH> recvBuffer;
 		int recvByteIdx;
 
-		Message recvMsg, sendMsgs[PT_NUM_TASKS];
-		RecvState recvState = READ_SEPARATOR;
-		bool __recvAvailable[PT_NUM_TASKS], __sendAvailable[PT_NUM_TASKS];
-		bool __hasTimedOut = false;	// TODO find a more elegant and effective way
+		Message recvMsg, sendMsgs[TASK_COUNT];
+		RecvState recvState = READ_SEP;
+		MsgAvailability __recvAvailable[TASK_COUNT], __sendAvailable[TASK_COUNT];
 
 		/*
 		Reads characters from stream.
@@ -47,9 +52,16 @@ namespace rc_car {
 		void run();
 		void onTimedOut();
 
-		bool getReceivedMessage(Message& msg, int taskId);
+		MsgAvailability getRecvAvailability(int taskId) const {
+			return __recvAvailable[taskId];
+		}
 
-		void setMessageToSend(const Message& msg, int taskId);
+		MsgAvailability getSendAvailability(int taskId) const {
+			return __sendAvailable[taskId];
+		}
+
+		void getReceivedMessage(Message& msg, int taskId);
+		void setMessageToSend(const Message& msg, int taskId, MsgAvailability availability = AVAILABLE_LOW_PRIO);
 	};
 }
 

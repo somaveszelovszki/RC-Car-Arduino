@@ -31,7 +31,7 @@ namespace rc_car {
 		void updateOverflowPos(int *newPos) const;
 
 	public:
-		RotaryTask() : PeriodicTask(PT_PERIOD_TIME_ROT, PT_WATCHDOG_TIMEOUT_ROTARY) {}
+		RotaryTask() : PeriodicTask(TASK_PERIOD_TIME_ROT, TASK_WATCHDOG_TIMEOUT_ROTARY) {}
 
 		void initialize();
 		void run();

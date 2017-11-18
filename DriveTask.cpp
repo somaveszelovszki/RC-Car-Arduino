@@ -15,128 +15,141 @@ void DriveTask::initialize() {
 }
 
 void DriveTask::run() {
-	motorHandler.updateSpeed(rotaryTask.getSpeed());
-	isNewMsgAvailable = communicatorTask.getReceivedMessage(msg, getId());
+	float speed = rotaryTask.getSpeed(), steeringAngle = motorHandler.getSteeringAngle();
+	motorHandler.updateSpeed(speed);
 
-	if (Common::testAndSet(&isNewMsgAvailable, false))
-		executeMessage();
+	CommunicatorTask::MsgAvailability msgAvailability = communicatorTask.getRecvAvailability(getTaskId());
 
-	// gets track distances for important points (important = measured by sensor in the moving direction)
-
-	// calculates section start position according to forward direction
-	Common::UltrasonicPos sectionStartPos = Common::calculateSectionStartPos(ultrasonicTask.getForwardPos(motorHandler.getSteeringAngle()));
-
-	Point<float> sectionStart, sectionEnd;
-
-	for (int i = 0; i < ENV_SECTIONS_NUM; ++i) {
-		sectionStart = ultrasonicTask.getPoint(sectionStartPos);
-		sectionEnd = ultrasonicTask.getPoint(sectionStartPos = Common::nextUltrasonicPos(sectionStartPos));
-		environment.setSection(sectionStart, sectionEnd);
-
-		while (environment.nextSectionPointExists()) {
-			Point<float> sectionPoint = environment.calculateNextSectionPoint();
-			//
-			//
-			// TODO do something with section points
-			//
-			//
-		}
-
-		sectionStart = sectionEnd;
-	}
-
-
-
+	if (msgAvailability)
+		communicatorTask.getReceivedMessage(msg, getTaskId());
 
 	switch (mode) {
-	case Common::FREE_DRIVE:
-		break;
 	case Common::SAFE_DRIVE:
-		// if measured distance is critical, forces car to stop
-		/*for (int pos = 0; !forceStopWatchdog->isRunning() && pos < ULTRA_NUM_SENSORS; ++pos)
-		if (isDistanceCritical(static_cast<Common::UltrasonicPos>(pos), distances[pos])) {
-		forceStopWatchdog.restart();
-		forceStopActive = true;
-		}*/
+	{
+		updateEnvironmentGridPoints();
 
-		if (forceStopActive && msg.getCode() == Message::CODE::Speed) {
-			if (forceStopWatchdog.hasTimedOut())
+		trajectory.updateValues(speed, steeringAngle);
+
+		float remainingTimes[ENV_SECTIONS_NUM];
+
+		Point2f sectionStart, sectionEnd;
+
+		// calculates section start position according to forward direction
+		Common::UltrasonicPos fwdPos = ultrasonicTask.getForwardPos(steeringAngle),
+			globalStartPos = Common::calculateSectionStartPos(fwdPos),
+			sectionStartPos = globalStartPos;
+
+		for (int i = 0; i < ENV_SECTIONS_NUM; ++i) {
+			sectionStart = ultrasonicTask.getSensedPoint(sectionStartPos);
+			sectionEnd = ultrasonicTask.getSensedPoint(sectionStartPos = Common::nextUltrasonicPos(sectionStartPos));
+			environment.setSection(sectionStart, sectionEnd);
+
+			float minRemainingTime;
+			bool obstacle = false;
+
+			while (environment.nextSectionPointExists()) {
+				Trajectory::TrackDistance td = trajectory.trackDistanceFromPoint(environment.nextSectionPoint());
+
+				if (td.isCritical() && !obstacle || td.remainingTime < minRemainingTime) {
+					obstacle = true;
+					minRemainingTime = td.remainingTime;
+				}
+			}
+
+			remainingTimes[i] = obstacle ? minRemainingTime : 0.0f;
+			//DEBUG_println(String(i) + ": " + String(remainingTimes[i]));
+
+			sectionStart = sectionEnd;
+		}
+
+		/*int fwdRelPos = static_cast<int>(fwdPos) - static_cast<int>(globalStartPos);
+
+		driveCmdEnabled = !remainingTimes[fwdRelPos] || remainingTimes[fwdRelPos] > DRIVE_PRE_CRASH_TIME_DRIVE_CMD_DISABLE;
+
+		if (!driveCmdEnabled) {
+			bool newFwdPosFound = false;
+
+			for (int i = 0; !newFwdPosFound && i < ENV_SECTIONS_NUM; ++i) {
+				if (!remainingTimes[i] || remainingTimes[i] > DRIVE_PRE_CRASH_TIME_DRIVE_CMD_DISABLE) {
+					newFwdPosFound = true;
+					Common::UltrasonicPos newFwdPos = static_cast<Common::UltrasonicPos>(static_cast<int>(globalStartPos) + i);
+					motorHandler.updateSteeringAngle(ultrasonicTask.getSensorViewAngle(newFwdPos));
+				}
+			}
+
+			if (!newFwdPosFound && remainingTimes[fwdRelPos] <= DRIVE_PRE_CRASH_TIME_FORCE_STOP) {
+				forceStopWatchdog.restart();
+				forceStopActive = true;
+			}
+		}*/
+	}
+
+	case Common::FREE_DRIVE:
+		if (msgAvailability) {
+			executeMessage();
+			msgWatchdog.restart();
+		} else if (msgWatchdog.hasTimedOut()) {
+			forceStopWatchdog.restart();
+			forceStopActive = true;
+		}
+
+		if (forceStopActive) {
+			if (forceStopWatchdog.hasTimedOut()) {
+				forceStopWatchdog.stop();
 				forceStopActive = false;
-			else
-				msg.setData(static_cast<int32_t>(0));
+				driveCmdEnabled = true;
+			} else
+				motorHandler.setDesiredSpeed(0.0f);
 		}
 
 		break;
 	case Common::AUTOPILOT:
+		// TODO
 		break;
 	}
 }
 
 void DriveTask::onTimedOut() {
-	// TODO
-}
-
-bool DriveTask::isDistanceCritical(Common::UltrasonicPos pos, int distance) const {
-//
-//	float speed;
-//	//motorHandler.getActualSpeed(&speed);
-//
-//	// time until crash with given speed
-//	float preCrashTime = distance / abs(speed);
-//
-//	if (speed > 0) {		// FORWARD
-//	//	if (pos == Common::UltrasonicPos::FRONT_LEFT || pos == Common::UltrasonicPos::FRONT_RIGHT) {
-//#if __DEBUG
-//DEBUG_print("distance: ");
-//		DEBUG_print(distance);
-//		DEBUG_print(" cm");
-//		DEBUG_print("\t\tspeed: ");
-//		DEBUG_println(speed);
-//		DEBUG_print(" cm/sec");
-//		DEBUG_print(preCrashTime);
-//		DEBUG_print(" <= ");
-//		DEBUG_println(CRITICAL_PRE_CRASH_TIME);
-//		DEBUG_println();
-//#endif // __DEBUG*/
-//
-//	//		// checks if time until crash is below critical
-//	//		if (preCrashTime <= CRITICAL_PRE_CRASH_TIME) {
-//	//			/*#if __DEBUG
-//DEBUG_print("\t->\t");
-//#endif // __DEBUG
-//	//#if __DEBUG
-//			DEBUG_println("CRITICAL!");
-//#endif // __DEBUG*/
-//	//			return true;
-//	//		}
-//	//	}
-//	//} else {		// BACKWARD
-//	//	if (pos == Common::UltrasonicPos::REAR_LEFT || pos == Common::UltrasonicPos::REAR_RIGHT) {
-//
-//	//		// checks if time until crash is below critical
-//	//		if (preCrashTime <= CRITICAL_PRE_CRASH_TIME) {
-//	//			return true;
-//	//		}
-//	//	}
-//	////}
-//
-	return false;
+	restartTimeoutCheck();
 }
 
 void DriveTask::executeMessage() {
 	switch (msg.getCode()) {
 
 	case Message::CODE::Speed:
-		motorHandler.setDesiredSpeed(msg.getDataAsFloat());
+		if (driveCmdEnabled)
+			motorHandler.setDesiredSpeed(msg.getDataAsFloat());
 		break;
 
 	case Message::CODE::SteeringAngle:
-		motorHandler.updateSteeringAngle(msg.getDataAsFloat());
+		if (driveCmdEnabled)
+			motorHandler.updateSteeringAngle(msg.getDataAsFloat());
 		break;
 
 	case Message::CODE::DriveMode:
 		mode = static_cast<Common::DriveMode>(msg.getDataAsInt());
-		// TODO notification
+		communicatorTask.setMessageToSend(Message::ACK, getTaskId());
 		break;
 	}
+}
+
+void rc_car::DriveTask::updateEnvironmentGridPoints() {
+	Point2f sectionStart, sectionEnd;
+
+	Common::UltrasonicPos sectionStartPos = Common::UltrasonicPos::RIGHT_FRONT;
+
+	for (int i = 0; i < ULTRA_NUM_SENSORS; ++i) {
+		sectionEnd = ultrasonicTask.getSensedPoint(sectionStartPos = Common::nextUltrasonicPos(sectionStartPos));
+		environment.setSection(sectionStart, sectionEnd);
+
+		while (environment.nextSectionPointExists()) {
+			Point2f sectionPoint = environment.nextSectionPoint();
+			environment.setRelativePointObstacle(sectionPoint);
+		}
+
+		sectionStart = sectionEnd;
+	}
+
+	if (!(gridPrintCntr++ % 500) && false)
+		environment.print();
 }

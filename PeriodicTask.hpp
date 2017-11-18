@@ -13,14 +13,17 @@ namespace rc_car {
 		int id;
 
 	protected:
+		static int tasksCount;
 		Watchdog timeoutCheckWatchdog;
 
-		int getId() const {
-			return id;
+	public:
+		PeriodicTask(int _periodTime, int _watchDogTimeout) : Periodic(_periodTime), timeoutCheckWatchdog(_watchDogTimeout) {
+			id = tasksCount++;
 		}
 
-	public:
-		PeriodicTask(int _periodTime, int _watchDogTimeout) : Periodic(_periodTime), timeoutCheckWatchdog(_watchDogTimeout) {}
+		int getTaskId() const {
+			return id;
+		}
 
 		bool hasTimedOut() {
 			return timeoutCheckWatchdog.hasTimedOut();

@@ -21,9 +21,9 @@ namespace rc_car {
 			int dist_valid;
 			int nonResponsiveCounter;
 
-			Point<float> pos;
+			Point2f pos;
 			float viewAngle;
-			Point<float> sensedPoint;
+			Point2f sensedPoint;
 
 			void validate(int sampleIndex);
 
@@ -73,12 +73,14 @@ namespace rc_car {
 
 		void validateAndUpdateSensedPoints();
 
-		const Point<float>& getPoint(Common::UltrasonicPos sensorPos) const;
+		const Point2f& getSensedPoint(Common::UltrasonicPos sensorPos) const;
 
 		/** @brief Gets the UltrasonicPos that is nearest to the current steering angle.
 		Therefore gives the direction of the car in UltrasonicPos.
 		*/
-		Common::UltrasonicPos getForwardPos(float steeringAngle);
+		Common::UltrasonicPos getForwardPos(float steeringAngle) const;
+
+		float getSensorViewAngle(Common::UltrasonicPos sensorPos) const;
 
 		void executeMessage();
 	};

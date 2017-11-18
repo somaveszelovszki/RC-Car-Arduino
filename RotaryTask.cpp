@@ -40,7 +40,7 @@ void RotaryTask::run() {
 }
 
 void RotaryTask::onTimedOut() {
-	// TODO
+	restartTimeoutCheck();
 }
 
 int RotaryTask::readPosition() const {
@@ -59,7 +59,7 @@ void RotaryTask::updateOverflowPos(int *newPos) const {
 	int d = *newPos - prev.pos;
 
 	if (abs(d) > ROT_OVERFLOW_PREV_MAX_D_POS) {
-		int dp = d + ROT_COUNTER_RESOLUTION, dm = d - ROT_COUNTER_RESOLUTION;
+		int dp = d + ROT_COUNTER_RES, dm = d - ROT_COUNTER_RES;
 		d = abs(dp) <= abs(dm) ? dp : dm;
 		*newPos = prev.pos + d;
 	}

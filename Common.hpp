@@ -81,27 +81,27 @@ namespace rc_car {
 
 		RIGHT_FRONT:
 		FRONT_RIGHT_CORNER:
-			sectionStartPos = RIGHT_FRONT;
+		sectionStartPos = RIGHT_FRONT;
 
 		FRONT_RIGHT:
 		FRONT_LEFT:
-			sectionStartPos = FRONT_RIGHT_CORNER;
+		sectionStartPos = FRONT_RIGHT_CORNER;
 
 		FRONT_LEFT_CORNER:
 		LEFT_FRONT:
-			sectionStartPos = FRONT_RIGHT;
+		sectionStartPos = FRONT_RIGHT;
 
 		LEFT_REAR:
 		REAR_LEFT_CORNER:
-			sectionStartPos = LEFT_REAR;
+		sectionStartPos = LEFT_REAR;
 
 		REAR_LEFT:
 		REAR_RIGHT:
-			sectionStartPos = REAR_LEFT_CORNER;
+		sectionStartPos = REAR_LEFT_CORNER;
 
 		REAR_RIGHT_CORNER:
 		RIGHT_REAR:
-			sectionStartPos = REAR_LEFT
+		sectionStartPos = REAR_LEFT
 
 		@param fwdPos The forward direction.
 		*/
@@ -168,6 +168,11 @@ namespace rc_car {
 
 		template <typename T>
 		static T map(T value, T fromLow, T fromHigh, T toLow, T toHigh);
+
+		template <typename T>
+		static bool areEqual(T value, T ref, T eps = static_cast<T>(0.0001f)) {
+			return (value >= ref - eps) && (value <= ref + eps);
+		}
 	};
 
 	template<typename T>

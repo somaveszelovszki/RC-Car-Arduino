@@ -15,8 +15,8 @@ const Common::Validation UltrasonicTask::DEF_VALIDATION = {
 	ULTRA_VALID_DEF_SAMPLE_NUM, ULTRA_VALID_DEF_REL_ERR
 };
 
-UltrasonicTask::UltrasonicTask() : PeriodicTask(PT_PERIOD_TIME_ULTRASONIC, PT_WATCHDOG_TIMEOUT_ULTRASONIC),
-sensorConnection(ULTRA_TRIGGER_PIN, ULTRA_ECHO_PIN, ULTRA_MAX_DISTANCE), echoWatchdog(ULTRA_ECHO_TIMEOUT) {
+UltrasonicTask::UltrasonicTask() : PeriodicTask(TASK_PERIOD_TIME_ULTRASONIC, TASK_WATCHDOG_TIMEOUT_ULTRASONIC),
+sensorConnection(ULTRA_TRIGGER_PIN, ULTRA_ECHO_PIN, ULTRA_MAX_DIST), echoWatchdog(ULTRA_ECHO_TIMEOUT) {
 
 	setEnabled(false);
 
@@ -97,11 +97,11 @@ void UltrasonicTask::initialize() {
 
 	// initializes sensor data - measured, stored and validatied distances, nonResponsiveCounter
 	for (int pos = 0; pos < ULTRA_NUM_SENSORS; ++pos) {
-		sensors[pos].dist_measured = ULTRA_MAX_DISTANCE;
+		sensors[pos].dist_measured = ULTRA_MAX_DIST;
 
 		for (int sampleIndex = 0; sampleIndex < ULTRA_NUM_DIST_SAMPLES; ++sampleIndex) {
-			sensors[pos].dist_stored[sampleIndex] = ULTRA_MAX_DISTANCE;
-			sensors[pos].dist_valid = ULTRA_MAX_DISTANCE;
+			sensors[pos].dist_stored[sampleIndex] = ULTRA_MAX_DIST;
+			sensors[pos].dist_valid = ULTRA_MAX_DIST;
 		}
 
 		sensors[pos].nonResponsiveCounter = 0;
@@ -117,31 +117,35 @@ void UltrasonicTask::initialize() {
 
 void UltrasonicTask::run() {
 
-	if (communicatorTask.getReceivedMessage(msg, getId()))
-		executeMessage();
-
-	// gets next ultrasonic sensor distance (will run in background and call an IT routine)
-	if (isEnabled() && !isBusy()) {
-
-		// checks if all the ultrasonic sensors have been pinged in this cycle
-		// and if yes, stores and validates distances
-		if (measurementCycleFinished())
-			validateAndUpdateSensedPoints();
-
-		if (sendEnvironmentEnabled && currentSensorPos % 2) {
-			msg.setCode(ultraPosToMsgCode(currentSensorPos));
-			msg.setData(sensors[static_cast<int>(currentSensorPos) - 1].sensedPoint.toByteArray()
-				+ sensors[static_cast<int>(currentSensorPos)].sensedPoint.toByteArray());
-
-			communicatorTask.setMessageToSend(msg, getId());
+	if (isEnabled()) {
+		if (communicatorTask.getRecvAvailability(getTaskId())) {
+			communicatorTask.getReceivedMessage(msg, getTaskId());
+			executeMessage();
 		}
 
-		pingNextSensor();
+		if (!isBusy()) {
+
+			// checks if all the ultrasonic sensors have been pinged in this cycle
+			// and if yes, stores and validates distances
+			if (measurementCycleFinished())
+				validateAndUpdateSensedPoints();
+
+			if (sendEnvironmentEnabled && currentSensorPos % 2
+				&& (communicatorTask.getSendAvailability(getTaskId()) < CommunicatorTask::MsgAvailability::AVAILABLE_HIGH_PRIO)) {
+				msg.setCode(ultraPosToMsgCode(currentSensorPos));
+				msg.setData(sensors[static_cast<int>(currentSensorPos) - 1].sensedPoint.toByteArray()
+					+ sensors[static_cast<int>(currentSensorPos)].sensedPoint.toByteArray());
+
+				communicatorTask.setMessageToSend(msg, getTaskId());
+			}
+
+			pingNextSensor();
+		}
 	}
 }
 
 void UltrasonicTask::onTimedOut() {
-	DEBUG_println("UltrasonicTask timed out.");
+	restartTimeoutCheck();
 }
 
 bool UltrasonicTask::isBusy() const {
@@ -157,10 +161,11 @@ void UltrasonicTask::setEnabled(bool enabled) {
 }
 
 void UltrasonicTask::pingNextSensor() {
+	// if cycle finished, increments sample index
 	if (measurementCycleFinished())
 		currentSampleIndex = (currentSampleIndex + 1) % ULTRA_NUM_DIST_SAMPLES;
 
-	// increases sensor position
+	// increments sensor position
 	currentSensorPos = Common::nextUltrasonicPos(currentSensorPos);
 //	if (currentSensorPos == Common::UltrasonicPos::FRONT_RIGHT_CORNER) currentSensorPos = Common::UltrasonicPos::FRONT_RIGHT;
 
@@ -177,14 +182,10 @@ void UltrasonicTask::pingNextSensor() {
 void UltrasonicTask::echoCheck() {
 	if (sensorConnection.check_timer()) {
 		sensors[static_cast<int>(currentSensorPos)].dist_measured = sensorConnection.ping_result / US_ROUNDTRIP_CM;
-
-		// sensor response is 0 if (measured distance > ULTRA_MAX_DISTANCE)
-		if (sensors[static_cast<int>(currentSensorPos)].dist_measured == 0)
-			sensors[static_cast<int>(currentSensorPos)].dist_measured = ULTRA_MAX_DISTANCE;
 		busy = false;
 
 	} else if (echoWatchdog.hasTimedOut()) {
-		sensors[static_cast<int>(currentSensorPos)].dist_measured = ULTRA_MAX_DISTANCE;
+		sensors[static_cast<int>(currentSensorPos)].dist_measured = ULTRA_MAX_DIST;
 		busy = false;
 		sensorConnection.timer_stop();
 	}
@@ -197,8 +198,8 @@ void UltrasonicTask::validateAndUpdateSensedPoints() {
 	}
 }
 
-const Point<float>& UltrasonicTask::getPoint(Common::UltrasonicPos sensorPos) const {
-	return sensors[static_cast<int>(sensorPos)].pos;
+const Point2f& UltrasonicTask::getSensedPoint(Common::UltrasonicPos sensorPos) const {
+	return sensors[static_cast<int>(sensorPos)].sensedPoint;
 }
 
 void UltrasonicTask::updateSensorSelection() {
@@ -212,7 +213,7 @@ void UltrasonicTask::updateSensorSelection() {
 	digitalWrite(ULTRA_SEL_3_PIN, (pos & 0x08) ? HIGH : LOW);
 }
 
-const Message::CODE rc_car::UltrasonicTask::ultraPosToMsgCode(Common::UltrasonicPos pos) {
+const Message::CODE UltrasonicTask::ultraPosToMsgCode(Common::UltrasonicPos pos) {
 	return static_cast<Message::CODE>(static_cast<int>(Message::CODE::Ultra0_1_EnvPoint) + static_cast<int>(pos) / 2);
 }
 
@@ -221,9 +222,10 @@ bool UltrasonicTask::measurementCycleFinished() const {
 }
 
 void UltrasonicTask::Sensor::validate(int sampleIndex) {
-	dist_stored[sampleIndex] = dist_measured;
+	// sensor response is 0 if (measured distance > ULTRA_MAX_DIST)
+	dist_stored[sampleIndex] = dist_measured ? dist_measured : ULTRA_MAX_DIST;
 
-	Common::Validation validation = dist_measured == ULTRA_MAX_DISTANCE ?
+	Common::Validation validation = dist_measured == ULTRA_MAX_DIST ?
 		UltrasonicTask::MAX_DIST_VALIDATION : UltrasonicTask::DEF_VALIDATION;
 
 	int prevValidatedValue = dist_valid;
@@ -273,7 +275,7 @@ void UltrasonicTask::Sensor::updatePoint() {
 	sensedPoint.Y = pos.Y + dist_valid * sin(dirAngleToXY(viewAngle));
 }
 
-Common::UltrasonicPos UltrasonicTask::getForwardPos(float steeringAngle) {
+Common::UltrasonicPos UltrasonicTask::getForwardPos(float steeringAngle) const {
 	float _min = abs(steeringAngle - sensors[0].viewAngle * RAD_TO_DEG);
 	int minPos = 0;
 
@@ -288,12 +290,16 @@ Common::UltrasonicPos UltrasonicTask::getForwardPos(float steeringAngle) {
 	return static_cast<Common::UltrasonicPos>(minPos);
 }
 
+float UltrasonicTask::getSensorViewAngle(Common::UltrasonicPos sensorPos) const {
+	return sensors[static_cast<int>(sensorPos)].viewAngle * RAD_TO_DEG;
+}
+
 void UltrasonicTask::executeMessage() {
 	switch (msg.getCode()) {
 
 	case Message::CODE::EnableEnvironment:
 		sendEnvironmentEnabled = static_cast<bool>(msg.getDataAsInt());
-		communicatorTask.setMessageToSend(Message::ACK, getId());
+		communicatorTask.setMessageToSend(Message::ACK, getTaskId());
 		break;
 	}
 }

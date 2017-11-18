@@ -2,14 +2,15 @@
 
 using namespace rc_car;
 
-CommunicatorTask::CommunicatorTask() : PeriodicTask(PT_PERIOD_TIME_COMMUNICATOR, PT_WATCHDOG_TIMEOUT_COMMUNICATOR) {
+CommunicatorTask::CommunicatorTask() : PeriodicTask(TASK_PERIOD_TIME_COMMUNICATOR, TASK_WATCHDOG_TIMEOUT_COMMUNICATOR) {
 	//commSerial = new SoftwareSerial(COMM_BLUETOOTH_RX_PIN, COMM_BLUETOOTH_TX_PIN);
 	//commSerial = new AltSoftSerial(0, 0);
 	pinMode(COMM_RX_PIN, INPUT);
 	pinMode(COMM_TX_PIN, OUTPUT);
 
-	for (int i = 0; i < PT_NUM_TASKS; ++i) {
-		__recvAvailable[i] = __sendAvailable[i] = false;
+	for (int i = 0; i < TASK_COUNT; ++i) {
+		__recvAvailable[i] = NOT_AVAILABLE;
+		__sendAvailable[i] = NOT_AVAILABLE;
 	}
 }
 
@@ -21,34 +22,33 @@ void CommunicatorTask::initialize() {
 }
 
 void CommunicatorTask::run() {
-	if (true || !__hasTimedOut) {	// TODO remove 'true ||'
-
-		if (receiveChars()) {
-			fetchMessage();
-			for (int i = 0; i < PT_NUM_TASKS; ++i)
-				__recvAvailable[i] = true;
-		}
-
-		for (int i = 0; i < PT_NUM_TASKS; ++i)
-			if (Common::testAndSet(&__sendAvailable[i], false))
-				sendMessage(i);
+	if (receiveChars()) {
+		fetchMessage();
+		for (int i = 0; i < TASK_COUNT; ++i)
+			__recvAvailable[i] = AVAILABLE_LOW_PRIO;
 	}
+
+	for (int i = 0; i < TASK_COUNT; ++i)
+		if (__sendAvailable[i]) {
+			__sendAvailable[i] = NOT_AVAILABLE;
+			sendMessage(i);
+		}
 }
 
 void CommunicatorTask::onTimedOut() {
-	__hasTimedOut = true;
+	restartTimeoutCheck();
 }
 
-bool CommunicatorTask::getReceivedMessage(Message& msg, int taskId) {
-	bool isNewMessageAvailable = Common::testAndSet(&__recvAvailable[taskId], false);
-	if (isNewMessageAvailable)
+void CommunicatorTask::getReceivedMessage(Message& msg, int taskId) {
+	if (__recvAvailable[taskId]) {
+		__recvAvailable[taskId] = NOT_AVAILABLE;
 		msg = recvMsg;
-	return isNewMessageAvailable;
+	}
 }
 
-void rc_car::CommunicatorTask::setMessageToSend(const Message& msg, int taskId) {
+void CommunicatorTask::setMessageToSend(const Message& msg, int taskId, MsgAvailability availability = AVAILABLE_LOW_PRIO) {
 	sendMsgs[taskId] = msg;
-	__sendAvailable[taskId] = true;
+	__sendAvailable[taskId] = availability;
 }
 
 bool CommunicatorTask::receiveChars() {
@@ -62,7 +62,7 @@ bool CommunicatorTask::receiveChars() {
 			byte b = static_cast<byte>(Serial.read());
 
 			switch (recvState) {
-			case READ_SEPARATOR:
+			case READ_SEP:
 				if (b == Message::SEPARATOR[recvByteIdx]) {
 					recvBuffer[recvByteIdx++] = b;
 					if (recvByteIdx == COMM_MSG_SEPARATOR_LENGTH)
@@ -79,41 +79,19 @@ bool CommunicatorTask::receiveChars() {
 				recvBuffer[recvByteIdx++] = b;
 				if (recvByteIdx == COMM_MSG_LENGTH) {
 					recvByteIdx = 0;
-					recvState = READ_SEPARATOR;
+					recvState = READ_SEP;
 					msgReceived = true;
 				}
 				break;
 			}
 		}
-
-		//Serial.readBytes(static_cast<byte*>(recvBuffer) + recvByteIdx, bytesNum);
-		//recvByteIdx += bytesNum;
-
-		//// if SEPARATOR is not at the beginning of the byte array, shifts it
-		//int sepIndex = recvBuffer.indexOf(COMM_MSG_SEPARATOR);
-
-		//if (sepIndex > 0) {
-		//	recvBuffer.shiftBytesLeft(sepIndex);
-		//	recvByteIdx -= sepIndex;
-		//} else if (sepIndex == -1)
-		//	recvByteIdx = 0;
 	}
-
-	//return recvByteIdx == COMM_MSG_LENGTH;
 
 	return msgReceived;
 }
 
 void CommunicatorTask::fetchMessage() {
-
-	//bool valid = Message::isValid(recvBuffer);
-	//// parses message from buffer string
-	//if (valid) Message::fromString(recvBuffer, dest);
-	//// clears buffer string 
-	//recvBuffer = "";
-
 	Message::fromBytes(recvBuffer, recvMsg);
-//	recvByteIdx = 0;
 }
 
 int CommunicatorTask::sendMessage(int taskId) {

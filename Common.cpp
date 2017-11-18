@@ -48,7 +48,7 @@ void Common::floatToBytes(float value, byte dest[4]) {
 	//arrayCopy<4>(reinterpret_cast<byte*>(&value), dest);
 }
 
-bool rc_car::Common::testAndSet(bool *value, bool valueToSet = true) {
+bool Common::testAndSet(bool *value, bool valueToSet = true) {
 	noInterrupts();
 	bool res = *value;
 	*value = valueToSet;

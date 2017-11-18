@@ -4,8 +4,8 @@ using namespace rc_car;
 
 void Trajectory::updateRadiuses() {
 
-	if (steeringAngle == 0)
-		R_frontMiddle = R_rearMiddle = R_middle = R_outer = R_inner = 0;
+	if (Common::areEqual(steeringAngle, 0.0f))
+		R_frontMiddle = R_rearMiddle = R_middle = R_outer = R_inner = 0.0f;
 	else {
 		float sin_Angle = sin(steeringAngle), cos_Angle = cos(steeringAngle), tan_Angle = sin_Angle / cos_Angle;
 
@@ -14,31 +14,31 @@ void Trajectory::updateRadiuses() {
 		R_middle = Common::pythagoreanHypotenuse(R_rearMiddle, CAR_PIVOT_DIST_MID)
 			* static_cast<int>(steeringDir);
 
-		R_outer = Common::pythagoreanHypotenuse(R_rearMiddle + CAR_PIVOT_LENGTH_FRONT * static_cast<int>(steeringDir),
-			CAR_PIVOT_DIST_FRONT_REAR + CAR_PIVOT_FRONT_DISTANCE)
+		R_outer = Common::pythagoreanHypotenuse(R_rearMiddle + CAR_PIVOT_LENGTH * static_cast<int>(steeringDir),
+			CAR_PIVOT_DIST_FRONT_REAR + CAR_PIVOT_FRONT_DIST)
 			* static_cast<int>(steeringDir);
 
-		R_inner = R_rearMiddle - CAR_PIVOT_LENGTH_REAR * static_cast<int>(steeringDir);
+		R_inner = R_rearMiddle - CAR_PIVOT_LENGTH * static_cast<int>(steeringDir);
 
 		R_frontNear = Common::pythagoreanHypotenuse(R_inner, CAR_PIVOT_DIST_FRONT_REAR) * static_cast<int>(steeringDir);
-		R_rearFar = R_rearMiddle + CAR_PIVOT_LENGTH_REAR * static_cast<int>(steeringDir);
+		R_rearFar = R_rearMiddle + CAR_PIVOT_LENGTH * static_cast<int>(steeringDir);
 	}
 }
 
-void Trajectory::updateValues(int _steeringAngle, float _speed) {
+void Trajectory::updateValues(float _speed, float _steeringAngle) {
 	steeringAngle = _steeringAngle;
-	steeringDir = steeringAngle > 0 ? Common::SteeringDir::LEFT : Common::SteeringDir::RIGHT;
+	steeringDir = steeringAngle >= 0.0f ? Common::SteeringDir::LEFT : Common::SteeringDir::RIGHT;
 	speed = _speed;
 
 	updateRadiuses();
 }
 
-Trajectory::TrackDistance Trajectory::trackDistanceFromPoint(const Point<float>& relativePos, bool forceCalcRemainingTime) const {
+Trajectory::TrackDistance Trajectory::trackDistanceFromPoint(const Point2f& relativePos, bool forceCalcRemainingTime) const {
 	// origo	center of the trajectory circle of the rear pivot's center
 	// obs		position of the obstacle relative to the rear pivot's center
 	// inner	inner position of car when it is nearest to the object
 	// outer	outer position of car when it is nearest to the object
-	Point<float> origo(0.0, 0.0), obs, inner, outer;
+	Point2f origo(0.0, 0.0), obs, inner, outer;
 
 	obs.X = relativePos.X + R_rearMiddle;
 	obs.Y = relativePos.Y + CAR_PIVOT_DIST_MID;
@@ -59,7 +59,7 @@ Trajectory::TrackDistance Trajectory::trackDistanceFromPoint(const Point<float>&
 	td.dist = (Common::isBetween(obsDist, abs(R_inner), abs(R_outer)) ? -1 : 1) * min(innerDist, outerDist);
 	td.dir = static_cast<Common::SteeringDir>((innerDist < outerDist ? 1 : -1) * static_cast<int>(steeringDir));
 
-	// Calculates remaining time
+	// calculates remaining time
 	if (td.isCritical() || forceCalcRemainingTime) {
 
 		// delta angle on the trajectory
@@ -85,8 +85,4 @@ Trajectory::TrackDistance Trajectory::trackDistanceFromPoint(const Point<float>&
 	}
 
 	return td;
-}
-
-inline bool Trajectory::TrackDistance::isCritical() {
-	return dist <= MIN_OBSTACLE_DISTANCE;
 }

@@ -19,9 +19,10 @@ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\UltrasonicTask.cpp.o:
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\Periodic.hpp \
  F:\Program\ Files\ (x86)\Arduino\libraries\NewPing/NewPing.h \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\Environment.hpp \
- C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\Point.hpp \
+ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\Point2.hpp \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\ByteArray.hpp \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\Vec.hpp \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\BoolGrid.hpp \
+ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\BoolArray.hpp \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\Message.hpp \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\CommunicatorTask.hpp

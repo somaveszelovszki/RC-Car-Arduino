@@ -13,12 +13,12 @@ namespace rc_car {
 	private:
 		Common::DriveMode mode;
 		MotorHandler motorHandler;
-		Watchdog forceStopWatchdog;
+		Watchdog msgWatchdog, forceStopWatchdog;
 		Environment environment;
-		bool isNewMsgAvailable = false;
+		Trajectory trajectory;
 		Message msg;
 
-		bool forceStopActive = false;
+		bool driveCmdEnabled = true, forceStopActive = false;
 
 		/*
 			Decides if given distance at given position and at given speed is critical - need to stop the car.
@@ -27,11 +27,15 @@ namespace rc_car {
 		bool isDistanceCritical(Common::UltrasonicPos pos, int distance) const;
 
 		void executeMessage();
-	public:
-		DriveTask() : PeriodicTask(PT_PERIOD_TIME_DRIVE, PT_WATCHDOG_TIMEOUT_DRIVE),
-			forceStopWatchdog(DRIVE_FORCE_STOP_TIME),
 
-			// TODO remove this line, initialize mode from phone
+		void updateEnvironmentGridPoints();
+
+		int gridPrintCntr = 0;	// TODO remove this variable
+
+	public:
+		DriveTask() : PeriodicTask(TASK_PERIOD_TIME_DRIVE, TASK_WATCHDOG_TIMEOUT_DRIVE),
+			msgWatchdog(DRIVE_MSG_WATCHDOG_TIMEOUT),
+			forceStopWatchdog(DRIVE_FORCE_STOP_TIME, Watchdog::State::STOPPED),
 			mode(Common::DriveMode::FREE_DRIVE) {}
 
 		void initialize();

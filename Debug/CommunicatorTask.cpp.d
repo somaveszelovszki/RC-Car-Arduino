@@ -18,4 +18,5 @@ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\CommunicatorTask.cpp.
  C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\variants\standard/pins_arduino.h \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\Periodic.hpp \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\Message.hpp \
- C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\ByteArray.hpp
+ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\ByteArray.hpp \
+ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\BoolArray.hpp

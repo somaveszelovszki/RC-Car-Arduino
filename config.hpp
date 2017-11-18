@@ -16,37 +16,37 @@ namespace rc_car {
 #define CAR_PIVOT_DIST_FRONT_REAR		20.0f		// distance between front and rear pivots
 #define CAR_PIVOT_DIST_MID				(CAR_PIVOT_DIST_FRONT_REAR / 2)		// distance between pivot and car middle
 
-#define CAR_PIVOT_LENGTH_FRONT			8.0f			// length of front pivot (middle to wheel)
-#define CAR_PIVOT_LENGTH_REAR			8.0f			// length of rear pivot (middle to wheel)
+#define CAR_PIVOT_LENGTH				8.0f			// length of front and rear pivots (middle to wheel)
 
-#define CAR_PIVOT_LENGTH_MID			((CAR_PIVOT_LENGTH_FRONT + CAR_PIVOT_LENGTH_REAR) / 2)
-
-#define CAR_PIVOT_FRONT_DISTANCE		7.2f		// distance between car front and front pivot
-#define CAR_PIVOT_REAR_DISTANCE			7.2f		// distance between car rear and rear pivot
+#define CAR_PIVOT_FRONT_DIST			7.2f		// distance between car front and front pivot
+#define CAR_PIVOT_REAR_DIST				7.2f		// distance between car rear and rear pivot
 
 #define CAR_WHEEL_CIRC					20.3f		// circumference of motor-powered wheels [cm]
 
+#define CAR_WIDTH						(2 * CAR_PIVOT_LENGTH)
+#define CAR_HEIGHT						(CAR_PIVOT_FRONT_DIST + CAR_PIVOT_DIST_FRONT_REAR + CAR_PIVOT_REAR_DIST)
+
 // Periodic tasks
 
-#define PT_NUM_TASKS					4
+#define TASK_COUNT		4
 
 	// frequencies [ms]
 
-#define PT_PERIOD_TIME_ULTRASONIC		15
-#define PT_PERIOD_TIME_COMMUNICATOR		20
-#define PT_PERIOD_TIME_DRIVE			5
-#define PT_PERIOD_TIME_ROT				15
+#define TASK_PERIOD_TIME_ULTRASONIC			15
+#define TASK_PERIOD_TIME_COMMUNICATOR		20
+#define TASK_PERIOD_TIME_DRIVE				5
+#define TASK_PERIOD_TIME_ROT				15
 
 	// watchdog timeouts [ms]
 
-#define PT_WATCHDOG_TIMEOUT_ULTRASONIC		100
-#define PT_WATCHDOG_TIMEOUT_COMMUNICATOR	1000
-#define PT_WATCHDOG_TIMEOUT_DRIVE			50
-#define PT_WATCHDOG_TIMEOUT_ROTARY			200
+#define TASK_WATCHDOG_TIMEOUT_ULTRASONIC	100
+#define TASK_WATCHDOG_TIMEOUT_COMMUNICATOR	1000
+#define TASK_WATCHDOG_TIMEOUT_DRIVE			50
+#define TASK_WATCHDOG_TIMEOUT_ROTARY		200
 
 // Watchdog
 
-#define WD_MAX_NUM_WATCHDOGS PT_NUM_TASKS
+#define WD_MAX_NUM_WATCHDOGS TASK_COUNT
 
 // Communication
 
@@ -64,13 +64,15 @@ namespace rc_car {
 
 // DriveTask
 
-#define DRIVE_FORCE_STOP_TIME		3000	// [ms]
-#define CRITICAL_PRE_CRASH_TIME		0.5		// critical time until crash - in [sec]
+#define DRIVE_MSG_WATCHDOG_TIMEOUT				1000	// [ms]
+#define DRIVE_FORCE_STOP_TIME					3000	// [ms]
+#define DRIVE_PRE_CRASH_TIME_FORCE_STOP			0.5f		// critical time until crash - in [sec]
+#define DRIVE_PRE_CRASH_TIME_DRIVE_CMD_DISABLE	1.5f
 
 
 // minimum distance to keep from obstacles - in [cm]
 // if trajectory is within this distance from an obstacle, will be handled as if a crash was going to happen
-#define MIN_OBSTACLE_DISTANCE		2.0f
+#define MIN_OBSTACLE_DIST		2.0f
 
 // MotorHandler
 
@@ -123,7 +125,9 @@ namespace rc_car {
 // ROtary evaluation multiplier
 #define ROT_EVAL_MUL	4
 
-#define ROT_COUNTER_RESOLUTION			256
+// rotary counter resolution
+#define ROT_COUNTER_RES			256
+
 // Defines maximum previous position change for position-validation:
 //		if the difference between the new position and the previous is lower than this value,
 //		then it will be accepted without any overflow-check
@@ -140,13 +144,13 @@ namespace rc_car {
 #define ULTRA_SEL_3_PIN		10
 
 #define ULTRA_NUM_SENSORS		12
-#define ULTRA_MAX_DISTANCE		200u
+#define ULTRA_MAX_DIST		200u
 #define ULTRA_ECHO_TIMEOUT		10
 
-// defines how many stored measured values need to be ULTRA_MAX_DISTANCE, so that we can validate value
-// 	->	many times the sensors do not respond, which equals ULTRA_MAX_DISTANCE as a value,
+// defines how many stored measured values need to be ULTRA_MAX_DIST, so that we can validate value
+// 	->	many times the sensors do not respond, which equals ULTRA_MAX_DIST as a value,
 // 		so we must not believe it unless the result is the same for a few times in a row
-#define ULTRA_VALID_MAX_DIST_SAMPLE_NUM			5		// -> if the result has been ULTRA_MAX_DISTANCE for 2 times in a row, we believe it
+#define ULTRA_VALID_MAX_DIST_SAMPLE_NUM			5		// -> if the result has been ULTRA_MAX_DIST for 2 times in a row, we believe it
 #define ULTRA_VALID_MAX_DIST_REL_ERR		0
 #define ULTRA_VALID_DEF_SAMPLE_NUM			2
 #define ULTRA_VALID_DEF_REL_ERR		0.5F
@@ -167,7 +171,7 @@ namespace rc_car {
 #define __ULTRA_POS_X_CORNER		7.2f
 #define __ULTRA_POS_Y_CORNER		CAR_PIVOT_DIST_MID
 
-#define __ULTRA_POS_X_SIDE			(CAR_PIVOT_LENGTH_MID / 2)
+#define __ULTRA_POS_X_SIDE			(CAR_PIVOT_LENGTH / 2)
 #define __ULTRA_POS_Y_SIDE_FRONT	2.0f
 #define __ULTRA_POS_Y_SIDE_REAR		3.6f
 
@@ -247,9 +251,11 @@ namespace rc_car {
 
 // Absolute position is measured from the start position
 // (the moment the car is powered on, its position is saved as absolute origo)
-#define ENV_ABS_POINTS_DIST		10	// distance between stored absoulte points [cm]
-#define ENV_ABS_POINTS_NUM_X	32	// number of absolute points stored in x direction
-#define ENV_ABS_POINTS_NUM_Y	32	// number of absolute points stored in y direction
+#define ENV_ABS_POINTS_TOTAL_DIST	400.0f
+#define ENV_ABS_POINTS_DIST			(CAR_WIDTH / 2)	// distance between stored absoulte points [cm]
+#define ENV_ABS_AXIS_POINTS_NUM		static_cast<int>(ENV_ABS_POINTS_TOTAL_DIST / ENV_ABS_POINTS_DIST)	// number of absolute points stored in a direction (x or y)
+
+#define ENV_ABS_MIN_FIT_DIFF		(CAR_WIDTH / ENV_ABS_POINTS_DIST)	// minimum grid distance that car fits in (ratio of car width and environment points distance)
 }
 
 #endif // RC_CAR__CONFIG__HPP

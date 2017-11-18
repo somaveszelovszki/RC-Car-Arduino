@@ -9,20 +9,29 @@ namespace rc_car {
 	class Watchdog {
 
 	public:
+		enum State {
+			STOPPED = 0, RUNNING
+		};
 
-	private: 
+	private:
 		const unsigned long TIMEOUT;
 		unsigned long startTime;
+		State state;
 
 	public:
-		Watchdog(int _timeout) : TIMEOUT(static_cast<unsigned long>(_timeout)) {}
+		Watchdog(int _timeout, State _state = RUNNING) : TIMEOUT(static_cast<unsigned long>(_timeout)), state(_state) {}
 
 		void restart() {
 			startTime = millis();
+			state = RUNNING;
+		}
+
+		void stop() {
+			state = STOPPED;
 		}
 
 		bool hasTimedOut() const {
-			return millis() >= startTime + TIMEOUT;
+			return state && millis() >= startTime + TIMEOUT;
 		}
 
 		unsigned long getStartTime() const {

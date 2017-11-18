@@ -27,9 +27,6 @@
     <ClInclude Include="MotorHandler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Point.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Trajectory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -43,9 +40,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Environment.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vec.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ByteArray.hpp">
@@ -81,6 +75,9 @@
     <ClInclude Include="BoolArray.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Point2.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common.cpp">
@@ -111,6 +108,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Message.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PeriodicTask.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

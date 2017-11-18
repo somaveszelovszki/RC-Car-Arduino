@@ -1,7 +1,7 @@
 #ifndef RC_CAR__TRAJECTORY__HPP
 #define RC_CAR__TRAJECTORY__HPP
 
-#include "Point.hpp"
+#include "Point2.hpp"
 
 namespace rc_car {
 	/** @brief Calculates car trajectory from steering angle, and calculates object distance from this trajectory.
@@ -14,7 +14,9 @@ namespace rc_car {
 			float dist;	// distance from side of car to obstacle - if dist < 0 then car hits obstacle
 			Common::SteeringDir dir;
 			float remainingTime;	// time before reaching the point of the trajectory when car is nearest to (or when it hits) the obstacle
-			bool isCritical();
+			bool isCritical() const {
+				return dist <= MIN_OBSTACLE_DIST;
+			}
 		};
 
 	private:
@@ -36,13 +38,13 @@ namespace rc_car {
 
 	public:
 
-		void updateValues(int steeringAngle, float speed);
+		void updateValues(float _speed, float _steeringAngle);
 
 		/** @brief Calculates distance between given point and car during its trajectory.
 		@param relativePos coordinates of the point - relative to car middle.
 		@param forceCalcRemainingTime Indicates if remaining time should be calculated even if car will not hit obstacle
 		*/
-		TrackDistance trackDistanceFromPoint(const Point<float>& relativePos, bool forceCalcRemainingTime = false) const;
+		TrackDistance trackDistanceFromPoint(const Point2f& relativePos, bool forceCalcRemainingTime = false) const;
 	};
 }
 
