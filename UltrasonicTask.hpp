@@ -55,9 +55,20 @@ namespace rc_car {
 	public:
 		UltrasonicTask();
 
-		void initialize();
-		void run();
-		void onTimedOut();
+        /** @brief
+        NOTE: Compulsory TASK function - initializes task!
+        */
+        void initialize();
+
+        /** @brief
+        NOTE: Compulsory TASK function - called in every cycle!
+        */
+        void run();
+
+        /** @brief Restarts timeout check.
+        NOTE: Compulsory TASK function - called when task watchdog timed out!
+        */
+        void onTimedOut();
 
 		bool isBusy() const;
 

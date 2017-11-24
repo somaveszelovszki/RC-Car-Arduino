@@ -45,9 +45,6 @@
     <ClInclude Include="ByteArray.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DriveFactor.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="RotaryTask.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

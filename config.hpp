@@ -65,9 +65,10 @@ namespace rc_car {
 // DriveTask
 
 #define DRIVE_MSG_WATCHDOG_TIMEOUT				1000	// [ms]
+#define DRIVE_FORCE_STEERING_TIME				1000	// [ms]
 #define DRIVE_FORCE_STOP_TIME					3000	// [ms]
 #define DRIVE_PRE_CRASH_TIME_FORCE_STOP			0.5f		// critical time until crash - in [sec]
-#define DRIVE_PRE_CRASH_TIME_DRIVE_CMD_DISABLE	1.5f
+#define DRIVE_PRE_CRASH_TIME_DRIVE_CMD_DISABLE	1.0f
 
 
 // minimum distance to keep from obstacles - in [cm]
@@ -83,10 +84,10 @@ namespace rc_car {
 #define DC_MOTOR_BACKWARD_PIN		6
 
 // steering construction restrictions
-#define __SERVO_ROT_MAX		60
-#define __SERVO_POS_MID		90
-#define SERVO_POS_MIN		__SERVO_POS_MID - __SERVO_ROT_MAX
-#define SERVO_POS_MAX		__SERVO_POS_MID + __SERVO_ROT_MAX
+#define SERVO_ROT_MAX		60
+#define SERVO_POS_MID		90
+#define SERVO_POS_MIN		SERVO_POS_MID - SERVO_ROT_MAX
+#define SERVO_POS_MAX		SERVO_POS_MID + SERVO_ROT_MAX
 
 	// DCMotor
 #define DC_MAX_VALUE		255

@@ -118,8 +118,8 @@ void UltrasonicTask::initialize() {
 void UltrasonicTask::run() {
 
 	if (isEnabled()) {
-		if (communicatorTask.getRecvAvailability(getTaskId())) {
-			communicatorTask.getReceivedMessage(msg, getTaskId());
+		if (communicatorTask.isRecvMsgAvailable(getTaskId())) {
+			msg = communicatorTask.getReceivedMessage(getTaskId());
 			executeMessage();
 		}
 
@@ -130,8 +130,8 @@ void UltrasonicTask::run() {
 			if (measurementCycleFinished())
 				validateAndUpdateSensedPoints();
 
-			if (sendEnvironmentEnabled && currentSensorPos % 2
-				&& (communicatorTask.getSendAvailability(getTaskId()) < CommunicatorTask::MsgAvailability::AVAILABLE_HIGH_PRIO)) {
+			if (sendEnvironmentEnabled && currentSensorPos % 2) {
+
 				msg.setCode(ultraPosToMsgCode(currentSensorPos));
 				msg.setData(sensors[static_cast<int>(currentSensorPos) - 1].sensedPoint.toByteArray()
 					+ sensors[static_cast<int>(currentSensorPos)].sensedPoint.toByteArray());
@@ -235,7 +235,7 @@ void UltrasonicTask::Sensor::validate(int sampleIndex) {
 	Checks if current stored value is in the given range of the previous validated value for the sensor.
 	e.g. if the previous validated value was 150, we will believe 145 without hesitation, no need for further validation
 	*/
-	if (Common::isInRange(prevValidatedValue, currentStoredValue, validation.relErr)) {
+	if (Common::isInRange(currentStoredValue, prevValidatedValue, validation.relErr)) {
 		dist_valid = currentStoredValue;
 	} else {
 		// if we got here, current stored value is out of range of the previous validated value so we need to validate
@@ -254,7 +254,7 @@ void UltrasonicTask::Sensor::validate(int sampleIndex) {
 			!outOfRangeFound && (idx != sampleIndex) && sampleCount < validation.minSampleNum;
 			idx = (idx + ULTRA_NUM_DIST_SAMPLES - 1) % ULTRA_NUM_DIST_SAMPLES) {
 
-			if (!Common::isInRange(prevValidatedValue, dist_stored[idx], validation.relErr,
+			if (!Common::isInRange(dist_stored[idx], prevValidatedValue, validation.relErr,
 				currentStoredValue < prevValidatedValue ? Common::ErrorSign::NEGATIVE : Common::ErrorSign::POSITIVE)) {
 				++sampleCount;
 			} else

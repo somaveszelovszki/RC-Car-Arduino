@@ -31,7 +31,7 @@ namespace rc_car {
 		}
 
 		bool hasTimedOut() const {
-			return state && millis() >= startTime + TIMEOUT;
+			return state && (millis() >= startTime + TIMEOUT);
 		}
 
 		unsigned long getStartTime() const {

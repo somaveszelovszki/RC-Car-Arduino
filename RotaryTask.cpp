@@ -72,10 +72,3 @@ float RotaryTask::getSpeed() const {
 		: 0.0f;
 }
 
-Common::AccelerationDir RotaryTask::getDirection() const {
-	float speed = getSpeed();
-	return speed > 0 ? Common::AccelerationDir::FORWARD
-		: speed < 0 ? Common::AccelerationDir::BACKWARD
-		: Common::AccelerationDir::RELEASE;
-}
-

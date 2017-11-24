@@ -2,22 +2,6 @@
 
 using namespace rc_car;
 
-void Common::initializeTimer() {
-	//noInterrupts();
-
-	// TODO check if this clashes with Servo!!!
-
-	// Timer0 is already used for millis() - we'll just interrupt somewhere in the middle
-	// and call the ISR(TIMER0_COMPA_vect) function defined in RC_Car.ino
-	/*OCR0A = 0xAF;
-	TIMSK0 |= _BV(OCIE0A);*/
-
-	OCR1B = 0x3F;
-	TIMSK1 |= _BV(OCIE1B);
-
-	//interrupts();
-}
-
 int32_t Common::bytesToInt(const byte bytes[], int startIndex = 0) {
 	return (static_cast<int32_t>(bytes[startIndex]) << 24)
 		| (static_cast<int32_t>(bytes[startIndex + 1]) << 16)
@@ -46,12 +30,4 @@ void Common::floatToBytes(float value, byte dest[4]) {
 	intToBytes(intVal, dest);
 
 	//arrayCopy<4>(reinterpret_cast<byte*>(&value), dest);
-}
-
-bool Common::testAndSet(bool *value, bool valueToSet = true) {
-	noInterrupts();
-	bool res = *value;
-	*value = valueToSet;
-	interrupts();
-	return res;
 }
