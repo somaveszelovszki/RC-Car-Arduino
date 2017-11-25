@@ -1,5 +1,5 @@
 /** @brief Contains main program.
-Receives and sends messages through the Communicator task, reads ultrasonic sensor distances and motor speed.
+Receives and sends messages, reads ultrasonic sensor distances and motor speed.
 Handles motors according to Drive mode.
 */
 
@@ -10,14 +10,30 @@ Handles motors according to Drive mode.
 
 using namespace rc_car;
 
+/** @brief Handles communications.
+*/
 CommunicatorTask communicatorTask;
+
+/** @brief Handles ultrasonic sensors.
+*/
 UltrasonicTask ultrasonicTask;
+
+/** @brief Handles rotary encoder - responsible for speed measuring.
+*/
 RotaryTask rotaryTask;
+
+/** @brief Responsible for motor handling motors, calculating car trajectory and making driving decisions accroding to the current Drive mode.
+*/
 DriveTask driveTask;
 
+/** @brief Initializes task.
+*/
 #define INIT_TASK(task)					\
 task.initialize();
 
+/** @brief Checks if task has timed out.
+If yes, calls onTimedOut(), if not, calls run() and restarts watchdogs.
+*/
 #define RUN_TASK(task)					\
 if(task.periodTimeReached()) {			\
 	if (task.hasTimedOut())				\

@@ -20,11 +20,11 @@ namespace rc_car {
 
         /** @brief Data value for indicating boolean TRUE.
         */
-		static const ByteArray<COMM_MSG_DATA_LENGTH> BOOL_VALUE_TRUE;
+		static const ByteArray<COMM_MSG_DATA_LENGTH> BOOL_value_TRUE;
 
         /** @brief Data value for indicating boolean FALSE.
         */
-		static const ByteArray<COMM_MSG_DATA_LENGTH> BOOL_VALUE_FALSE;
+		static const ByteArray<COMM_MSG_DATA_LENGTH> BOOL_value_FALSE;
 
         /** @brief Message separator byte array.
         */
@@ -112,7 +112,7 @@ namespace rc_car {
 			return *this;
 		}
 
-        /** @brief Copy constructor - copies code, data and priority.
+        /** @brief Copy constructor - copies code, data and priority of the other message.
 
         @param other The other message.
         */
@@ -213,7 +213,7 @@ namespace rc_car {
         @returns The message data as boolean.
         */
 		bool getDataAsBool() const {
-			return data == BOOL_VALUE_TRUE;
+			return data == BOOL_value_TRUE;
 		}
 
         /** @brief Sets message data.
@@ -221,7 +221,7 @@ namespace rc_car {
         @param _data The boolean data to set.
         */
 		void setData(bool _data) {
-			data = _data ? BOOL_VALUE_TRUE : BOOL_VALUE_FALSE;
+			data = _data ? BOOL_value_TRUE : BOOL_value_FALSE;
 		}
 
         /** @brief Gets message priority.

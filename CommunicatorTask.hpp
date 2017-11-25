@@ -84,9 +84,11 @@ namespace rc_car {
         /** @brief Restarts timeout check.
         NOTE: Compulsory TASK function - called when task watchdog timed out!
         */
-		void onTimedOut();
+		void onTimedOut() {
+            restartTimeoutCheck();
+        };
 
-        /** @brief Returns received message availability for the given task.
+        /** @brief Gets received message availability for the given task.
 
         @param taskId The task id.
         @returns Boolean value indicating if a message is available for the task to read.
@@ -95,7 +97,7 @@ namespace rc_car {
 			return __recvAvailable[taskId];
 		}
 
-        /** @brief Returns send message availability for the given task.
+        /** @brief Gets send message availability for the given task.
 
         @param taskId The task id.
         @returns Boolean value indicating if a message for the task is set for sending but has not been sent yet.
@@ -104,14 +106,14 @@ namespace rc_car {
 			return __sendAvailable[taskId];
 		}
 
-        /** @brief Returns received message and updates message availability for the given task.
+        /** @brief Gets received message and updates message availability for the given task.
 
         @param taskId The task id.
         @returns The received message.
         */
 		const Message& getReceivedMessage(int taskId);
 
-        /** @brief Returns message to send for the given task.
+        /** @brief Gets message to send for the given task.
 
         @param taskId The task id.
         @returns The message to send.

@@ -17,15 +17,15 @@ void RotaryTask::initialize() {
 	prev.time = millis();
 	prev.pos = 0;
 
-	diff.time = static_cast<unsigned long>(0);
-	diff.pos = 0;
+    speed = 0.0f;
 }
 
 void RotaryTask::run() {
-	_Value current;
+	__Sample current, diff;
 
 	current.time = millis();
 
+    // counter needs to be disabled while reading position
 	setEnabled(false);
 	current.pos = readPosition();
 	setEnabled(true);
@@ -37,10 +37,11 @@ void RotaryTask::run() {
 	diff.pos = currPos - prev.pos;
 
 	prev = current;
-}
 
-void RotaryTask::onTimedOut() {
-	restartTimeoutCheck();
+    // updates speed
+    speed = diff.time > 0 ?
+        (1 / MOT_ROT_TR) * MOT_WHEEL_TR * (diff.pos / static_cast<float>(ROT_RES * ROT_EVAL_MUL) * CAR_WHEEL_CIRC) / diff.time * SEC_TO_MSEC
+        : 0.0f;
 }
 
 int RotaryTask::readPosition() const {
@@ -55,20 +56,13 @@ int RotaryTask::readPosition() const {
 		+ digitalRead(ROT_D0_PIN)));
 }
 
-void RotaryTask::updateOverflowPos(int *newPos) const {
-	int d = *newPos - prev.pos;
+void RotaryTask::updateOverflowPos(int *pNewPos) const {
+	int d = *pNewPos - prev.pos;
 
 	if (abs(d) > ROT_OVERFLOW_PREV_MAX_D_POS) {
 		int dp = d + ROT_COUNTER_RES, dm = d - ROT_COUNTER_RES;
 		d = abs(dp) <= abs(dm) ? dp : dm;
-		*newPos = prev.pos + d;
+		*pNewPos = prev.pos + d;
 	}
-}
-
-float RotaryTask::getSpeed() const {
-	return diff.time > 0 ?
-		(1 / MOT_ROT_TR) * MOT_WHEEL_TR
-			* (diff.pos / static_cast<float>(ROT_RES * ROT_EVAL_MUL) * CAR_WHEEL_CIRC) / diff.time * SEC_TO_MSEC
-		: 0.0f;
 }
 

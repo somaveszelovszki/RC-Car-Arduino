@@ -3,9 +3,8 @@
 using namespace rc_car;
 
 void MotorHandler::ServoMotor::writeAngle(float _angle) {
-	int _value = static_cast<int>(_angle + M_PI_2 * RAD_TO_DEG);
-	if (_value >= SERVO_POS_MIN && _value <= SERVO_POS_MAX)
-		write(_value);
+	int _value = static_cast<int>(_angle * SERVO_STEERING_TR + SERVO_POS_MID);
+	write(Common::incarcerate(_value, SERVO_POS_MIN, SERVO_POS_MAX));
 }
 
 void MotorHandler::DCMotor::initialize() {
@@ -15,12 +14,11 @@ void MotorHandler::DCMotor::initialize() {
 
 void MotorHandler::DCMotor::writeValue(int _value) {
 
-	if (_value >= DC_MIN_VALUE && _value <= DC_MAX_VALUE) {
-		bool isFwd = _value >= 0;
+    _value = Common::incarcerate(_value, DC_MIN_value, DC_MAX_value);
+    bool isFwd = _value >= 0;
 
-		analogWrite(DC_MOTOR_FORWARD_PIN, isFwd ? _value : 0);
-		analogWrite(DC_MOTOR_BACKWARD_PIN, isFwd ? 0 : -_value);
-	}
+    analogWrite(DC_MOTOR_FORWARD_PIN, isFwd ? _value : 0);
+    analogWrite(DC_MOTOR_BACKWARD_PIN, isFwd ? 0 : -_value);
 }
 
 void MotorHandler::initialize() {
@@ -39,26 +37,9 @@ void MotorHandler::updateSpeed(float actualSpeed) {
 		else {
 			float error = desiredSpeed - actualSpeed;
 			speedCtrl.run(error);
-			DC_Motor.writeValue(speedCtrl.getOutput());
+			DC_Motor.writeValue(static_cast<float>(speedCtrl.getOutput()));
 		}
 
 		speedCtrl.restartPeriodCheck();
 	}
-}
-
-void MotorHandler::updateSteeringAngle(float _steeringAngle) {
-	steeringAngle = _steeringAngle;
-	servoMotor.writeAngle(steeringAngle);
-}
-
-void MotorHandler::positionServoMiddle() {
-	updateSteeringAngle(0.0f);
-}
-
-void MotorHandler::attachServo() {
-	servoMotor.attach(SERVO_PIN);
-}
-
-void MotorHandler::detachServo() {
-	servoMotor.detach();
 }

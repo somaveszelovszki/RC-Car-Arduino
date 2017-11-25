@@ -4,54 +4,192 @@
 #include "ByteArray.hpp"
 
 namespace rc_car {
+    /** @brief Template implementation for 2-dimensional points.
+
+    @tparam T Numeric type of the coordinates.
+    */
 	template <typename T>
 	class Point2 {
 	public:
+        /** @brief The X coordinate.
+        */
 		T X;
+
+        /** @brief The Y coordinate.
+        */
 		T Y;
 
+        /** @brief Contains the ORIGO.
+        */
 		static const Point2<T> ORIGO;
+
+        /** @brief Constructor - does not initializes coordinates.
+        */
 		Point2<T>() {}
-		Point2<T>(T x, T y) : X(x), Y(y) {}
 
-		Point2<T>& operator=(const Point2<T>& other);
+        /** @brief Constructor - initializes X and Y coordinates.
 
-		Point(const Point2<T>& other) {
+        @param _X The X coordinate.
+        @param _Y The Y coordinate.
+        */
+		Point2<T>(T _X, T _Y) : X(_X), Y(_Y) {}
+
+        /** @brief Copies coordinates of the other point.
+
+        @param other The other point.
+        @returns This point.
+        */
+        const Point2<T>& operator=(const Point2<T>& other) {
+            X = other.X;
+            Y = other.Y;
+
+            return *this;
+        }
+
+        /** @brief Copy constructor - copies coordinates of the other point.
+
+        @param other The other point.
+        */
+		Point2(const Point2<T>& other) {
 			*this = other;
 		}
 
-		Point2<T> operator+(const Point2<T>& other) const;
-		Point2<T> operator-(const Point2<T>& other) const;
-		Point2<T>& operator+=(const Point2<T>& other);
-		Point2<T>& operator-=(const Point2<T>& other);
+        /** @brief Adds coordinates of this and the other point.
 
-		Point2<T> operator*(const T& c) const;
-		Point2<T> operator/(const T& c) const;
-		Point2<T>& operator*=(const T& c);
-		Point2<T>& operator/=(const T& c);
+        @param other The other point.
+        @returns The result of the addition.
+        */
+        Point2<T> operator+(const Point2<T>& other) const {
+            return Point2<T>(X + other.X, Y + other.Y);
+        }
 
-		friend Point2<T> operator*(const T& c, const Point2<T>& p) {
-			return p * c;
-		}
+        /** @brief Subtracts coordinates of the other point from the coordinates of this point.
 
-		T distanceFrom(Point2<T> other) const;
+        @param other The other point.
+        @returns The result of the subtraction.
+        */
+        Point2<T> operator-(const Point2<T>& other) const {
+            return Point2<T>(X - other.X, Y - other.Y);
+        }
 
-		T length() const;
+        /** @brief Adds coordinates of this and the other point and stores the result in this point.
 
-		static float getAngle(const Point2<T>& origo, const Point2<T>& other, Common::SteeringDir dir);
+        @param other The other point.
+        @returns This point.
+        */
+        Point2<T>& operator+=(const Point2<T>& other) {
+            X += other.X;
+            Y += other.Y;
+            return *this;
+        }
 
-		/*
-		Calculates steering angle of given point using this point as the origo.
-		NOTE: Steering angle is always positive for LEFT, and always negative for RIGHT steering direction!
+        /** @brief Subtracts coordinates of the other point from the coordinates of this point and stores the result in this point.
+
+        @param other The other point.
+        @returns This point.
+        */
+        Point2<T>& operator-=(const Point2<T>& other) {
+            X -= other.X;
+            Y -= other.Y;
+            return *this;
+        }
+
+        /** @brief Multiplies coordinates of the point with the given constant.
+
+        @param c The constant.
+        @returns The result of the multiplication.
+        */
+        Point2<T> operator*(const T& c) const {
+            return Point2<T>(X * c, Y * c);
+        }
+
+        /** @brief Divides coordinates of the point by the given constant.
+
+        @param c The constant.
+        @returns The result of the division.
+        */
+        Point2<T> operator/(const T& c) const {
+            return Point2<T>(X / c, Y / c);
+        }
+
+        /** @brief Multiplies coordinates of the point with the given constant and stores the result in the point.
+
+        @param c The constant.
+        @returns This point.
+        */
+        Point2<T>& operator*=(const T& c) {
+            X *= c;
+            Y *= c;
+            return *this;
+        }
+
+        /** @brief Divides coordinates of the point by the given constant and stores the result in the point.
+
+        @param c The constant.
+        @returns This point.
+        */
+        Point2<T>& operator/=(const T& c) {
+            X /= c;
+            Y /= c;
+            return *this;
+        }
+
+        /** @brief Multiplies coordinates of the point with the given constant.
+
+        @param c The constant.
+        @param p The point.
+        @returns The result of the multiplication.
+        */
+        friend Point2<T> operator*(const T& c, const Point2<T>& p) {
+            return p * c;
+        }
+
+        /** @brief Calculates distance between the two points.
+
+        @param other The other point.
+        @returns The distance between the two points.
+        */
+        T distanceFrom(Point2<T> other) const {
+            return Common::pythagoreanHypotenuse(X - other.X, Y - other.Y);
+        }
+
+        /** @brief Calculates length of the point vector.
+
+        @returns The length of the point vector.
+        */
+        T length() const {
+            return Common::pythagoreanHypotenuse(X, Y);
+        }
+
+		/** @brief Calculates steering angle of given point using this point as the origo.
+
+        @param other The other point.
+        @param dir Indicates which is the positive steering direction.
 		*/
-		float getAngle(const Point2<T>& other, Common::SteeringDir dir) const {
-			return Point2<T>::getAngle(*this, other, dir);
-		}
+        float getAngle(const Point2<T>& other, Common::SteeringDir dir) const;
 
-		static Point2<T> average(const Point2<T>& p1, const Point2<T>& p2);
+        /** @brief Calculates weighted average of the two points.
 
+        @param other The other point.
+        @param otherWeight The weight of the other point relative to this point - 1 by default.
+        @returns The average of the two points.
+        */
+        Point2<T> averageWith(const Point2<T>& other, float otherWeight = 1.0f) const {
+            float weightSum = 1.0f + otherWeight;
+            return Point2<T>((X + other.X * otherWeight) / weightSum, (Y + other.Y + otherWeight) / weightSum);
+        }
+
+        /** @brief Converts point to byte array.
+
+        @returns The point as a ByteArray object.
+        */
 		ByteArray<2> toByteArray() const;
 
+        /** @brief Creates point from byte array.
+
+        @param bytes The source ByteArray object.
+        @returns The point created from the byte array.
+        */
 		static Point2<T> fromByteArray(const ByteArray<2>& bytes);
 	};
 
@@ -60,96 +198,27 @@ namespace rc_car {
 	template <typename T>
 	const Point2<T> Point2<T>::ORIGO(static_cast<T>(0), static_cast<T>(0));
 
-	template<typename T>
-	Point2<T>& Point2<T>::operator=(const Point2<T>& other) {
-		X = other.X;
-		Y = other.Y;
-	}
-
-	template<typename T>
-	Point2<T> Point2<T>::operator+(const Point2<T>& other) const {
-		return Point2<T>(X + other.X, Y + other.Y);
-	}
-
-	template<typename T>
-	Point2<T> Point2<T>::operator-(const Point2<T>& other) const {
-		return Point2<T>(X - other.X, Y - other.Y);
-	}
-
-	template<typename T>
-	Point2<T>& Point2<T>::operator+=(const Point2<T>& other) {
-		X += other.X;
-		Y += other.Y;
-		return *this;
-	}
-
-	template<typename T>
-	Point2<T>& Point2<T>::operator-=(const Point2<T>& other) {
-		X -= other.X;
-		Y -= other.Y;
-		return *this;
-	}
-
-	template<typename T>
-	Point2<T> Point2<T>::operator*(const T & c) const {
-		return Point2<T>(X * c, Y * c);
-	}
-
-	template<typename T>
-	Point2<T> Point2<T>::operator/(const T & c) const {
-		return Point2<T>(X / c, Y / c);
-	}
-
-	template<typename T>
-	Point2<T>& Point2<T>::operator*=(const T & c) {
-		X *= c;
-		Y *= c;
-		return *this;
-	}
-
-	template<typename T>
-	Point2<T>& Point2<T>::operator/=(const T & c) {
-		X /= c;
-		Y /= c;
-		return *this;
-	}
-
-	template<typename T>
-	T Point2<T>::distanceFrom(Point2<T> other) const {
-		return Common::pythagoreanHypotenuse(X - other.X, Y - other.Y);
-	}
-
-	template<typename T>
-	T Point2<T>::length() const {
-		return Common::pythagoreanHypotenuse(X, Y);
-	}
-
 	template <typename T>
-	float Point2<T>::getAngle(const Point2<T>& origo, const Point2<T>& other, Common::SteeringDir dir) {
+	float Point2<T>::getAngle(const Point2<T>& other, Common::SteeringDir dir) const {
 		float angle;
 
 		switch (dir) {
 		case Common::SteeringDir::LEFT:
-			if (Common::areEqual(origo.X, other.X))
-				angle = other.Y > origo.Y ? static_cast<float>(M_PI_2) : 3 * static_cast<float>(M_PI_2);
-			else if (other.X > origo.X)
-				angle = other.Y >= origo.Y ?
-				static_cast<float>(atan(static_cast<double>((other.Y - origo.Y) / (other.X - origo.X))))
-				: static_cast<float>(2 * M_PI + atan(static_cast<double>((other.Y - origo.Y) / (other.X - origo.X))));
+			if (Common::areEqual(X, other.X))
+				angle = other.Y > Y ? static_cast<float>(M_PI_2) : 3 * static_cast<float>(M_PI_2);
+			else if (other.X > X)
+				angle = other.Y >= Y ?
+				static_cast<float>(atan(static_cast<double>((other.Y - Y) / (other.X - X))))
+				: static_cast<float>(2 * M_PI + atan(static_cast<double>((other.Y - Y) / (other.X - X))));
 			else
-				angle = static_cast<float>(M_PI + atan(static_cast<double>((other.Y - origo.Y) / (other.X - origo.X))));
+				angle = static_cast<float>(M_PI + atan(static_cast<double>((other.Y - Y) / (other.X - X))));
 			break;
 
 		case Common::SteeringDir::RIGHT:
-			angle = -1 * getAngle(origo, Point2<T>(2 * origo.X - other.X, other.Y), Common::SteeringDir::LEFT);
+			angle = -1 * getAngle(Point2<T>(2 * X - other.X, other.Y), Common::SteeringDir::LEFT);
 		}
 
 		return angle;
-	}
-
-	template<typename T>
-	Point2<T> Point2<T>::average(const Point2<T>& p1, const Point2<T>& p2) {
-		return Point2<T>((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2);
 	}
 
 	template<typename T>

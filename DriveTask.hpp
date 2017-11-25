@@ -95,8 +95,10 @@ namespace rc_car {
         /** @brief Restarts timeout check.
         NOTE: Compulsory TASK function - called when task watchdog timed out!
         */
-        void onTimedOut();
-	};
+        void onTimedOut() {
+            restartTimeoutCheck();
+        }
+    };
 
 }
 #endif // RC_CAR__DRIVE_TASK__HPP

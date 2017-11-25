@@ -215,7 +215,7 @@ namespace rc_car {
         @param errorSign The sign of the permitted error (determines if value must be smaller/larger than the reference) - ErrorSign::BOTH by default.
         */
         template <typename T>
-        static bool Common::isInRange(T value, T ref, float relErr, ErrorSign errorSign = ErrorSign::BOTH);
+        static bool isInRange(T value, T ref, float relErr, ErrorSign errorSign = ErrorSign::BOTH);
 
         /** @brief Concatenates two arrays.
 
@@ -237,7 +237,7 @@ namespace rc_car {
         */
         static int32_t bytesToInt(const byte bytes[], int startIndex = 0);
 
-         /** @brief Converts byte array to float.
+        /** @brief Converts byte array to float.
 
         @param bytes The byte array.
         @param startIndex The start index of the conversion - float value is stored in bytes [startIndex, startIndex + 3].
@@ -299,26 +299,26 @@ namespace rc_car {
         }
     };
 
-    template<int size, typename T>
-    inline void Common::arrayCopy(const T src[], T dest[]) {
+    template <int size, typename T>
+    void Common::arrayCopy(const T src[], T dest[]) {
         for (int i = 0; i < size; ++i)
             dest[i] = src[i];
     }
 
     template<typename T>
-    bool Common::isInRange(T value, T ref, float relErr, ErrorSign errorSign) {
-        T max = errorSign == ErrorSign::NEGATIVE ? ref : static_cast<T>(ref * (1.0F + relErr));
-        T min = errorSign == ErrorSign::POSITIVE ? ref : static_cast<T>(ref * (1.0F - relErr));
-        return isBetween(value, min, max);
+    bool Common::isInRange(T value, T ref, float relErr, Common::ErrorSign errorSign = Common::ErrorSign::BOTH) {
+        T _max = errorSign == ErrorSign::NEGATIVE ? ref : static_cast<T>(ref * (1.0F + relErr));
+        T _min = errorSign == ErrorSign::POSITIVE ? ref : static_cast<T>(ref * (1.0F - relErr));
+        return Common::isBetween(value, _min, _max);
     }
 
-    template<int size1, int size2, typename T>
+    template <int size1, int size2, typename T>
     void Common::arrayConcat(const T ar1[], const T ar2[], T res[]) {
         Common::arrayCopy<size1>(ar1, res);
         Common::arrayCopy<size2>(ar2, &res[size1]);
     }
 
-    template<typename T>
+    template <typename T>
     T Common::map(T value, T fromLow, T fromHigh, T toLow, T toHigh) {
         if (value <= fromLow)
             return toLow;

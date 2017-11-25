@@ -97,14 +97,10 @@ void UltrasonicTask::initialize() {
 
 	// initializes sensor data - measured, stored and validatied distances, nonResponsiveCounter
 	for (int pos = 0; pos < ULTRA_NUM_SENSORS; ++pos) {
-		sensors[pos].dist_measured = ULTRA_MAX_DIST;
+		sensors[pos].dist_measured = sensors[pos].dist_valid = ULTRA_MAX_DIST;
 
-		for (int sampleIndex = 0; sampleIndex < ULTRA_NUM_DIST_SAMPLES; ++sampleIndex) {
+		for (int sampleIndex = 0; sampleIndex < ULTRA_NUM_DIST_SAMPLES; ++sampleIndex)
 			sensors[pos].dist_stored[sampleIndex] = ULTRA_MAX_DIST;
-			sensors[pos].dist_valid = ULTRA_MAX_DIST;
-		}
-
-		sensors[pos].nonResponsiveCounter = 0;
 	}
 
 	setEnabled(true);
@@ -127,6 +123,8 @@ void UltrasonicTask::run() {
 
 			// checks if all the ultrasonic sensors have been pinged in this cycle
 			// and if yes, stores and validates distances
+
+            // TODO validate each sensor in their turn, don't wait until cycle finished
 			if (measurementCycleFinished())
 				validateAndUpdateSensedPoints();
 
@@ -144,22 +142,6 @@ void UltrasonicTask::run() {
 	}
 }
 
-void UltrasonicTask::onTimedOut() {
-	restartTimeoutCheck();
-}
-
-bool UltrasonicTask::isBusy() const {
-	return busy;
-}
-
-bool UltrasonicTask::isEnabled() const {
-	return enabled;
-}
-
-void UltrasonicTask::setEnabled(bool enabled) {
-	this->enabled = enabled;
-}
-
 void UltrasonicTask::pingNextSensor() {
 	// if cycle finished, increments sample index
 	if (measurementCycleFinished())
@@ -167,16 +149,12 @@ void UltrasonicTask::pingNextSensor() {
 
 	// increments sensor position
 	currentSensorPos = Common::nextUltrasonicPos(currentSensorPos);
-//	if (currentSensorPos == Common::UltrasonicPos::FRONT_RIGHT_CORNER) currentSensorPos = Common::UltrasonicPos::FRONT_RIGHT;
 
-	// if sensor is not responsive, does not ping it
-	if (sensors[static_cast<int>(currentSensorPos)].nonResponsiveCounter <= ULTRA_VALID_MAX_NON_RESPONSIVE_COUNT) {
-		updateSensorSelection();
-		busy = true;
-		sensorConnection.timer_stop();
-		echoWatchdog.restart();
-		sensorConnection.ping_timer(ultrasonicEchoCheckIT);
-	}
+    updateSensorSelection();
+    busy = true;
+    sensorConnection.timer_stop();
+    echoWatchdog.restart();
+    sensorConnection.ping_timer(ultrasonicEchoCheckIT);
 }
 
 void UltrasonicTask::echoCheck() {
@@ -198,10 +176,6 @@ void UltrasonicTask::validateAndUpdateSensedPoints() {
 	}
 }
 
-const Point2f& UltrasonicTask::getSensedPoint(Common::UltrasonicPos sensorPos) const {
-	return sensors[static_cast<int>(sensorPos)].sensedPoint;
-}
-
 void UltrasonicTask::updateSensorSelection() {
 
 	uint8_t pos = static_cast<uint8_t>(sensors[static_cast<Common::UltrasonicPos>(currentSensorPos)].selIdx);
@@ -211,14 +185,6 @@ void UltrasonicTask::updateSensorSelection() {
 	digitalWrite(ULTRA_SEL_1_PIN, (pos & 0x02) ? HIGH : LOW);
 	digitalWrite(ULTRA_SEL_2_PIN, (pos & 0x04) ? HIGH : LOW);
 	digitalWrite(ULTRA_SEL_3_PIN, (pos & 0x08) ? HIGH : LOW);
-}
-
-const Message::CODE UltrasonicTask::ultraPosToMsgCode(Common::UltrasonicPos pos) {
-	return static_cast<Message::CODE>(static_cast<int>(Message::CODE::Ultra0_1_EnvPoint) + static_cast<int>(pos) / 2);
-}
-
-bool UltrasonicTask::measurementCycleFinished() const {
-	return static_cast<int>(currentSensorPos) == ULTRA_NUM_SENSORS - 1;
 }
 
 void UltrasonicTask::Sensor::validate(int sampleIndex) {
@@ -288,10 +254,6 @@ Common::UltrasonicPos UltrasonicTask::getForwardPos(float steeringAngle) const {
 	}
 
 	return static_cast<Common::UltrasonicPos>(minPos);
-}
-
-float UltrasonicTask::getSensorViewAngle(Common::UltrasonicPos sensorPos) const {
-	return sensors[static_cast<int>(sensorPos)].viewAngle * RAD_TO_DEG;
 }
 
 void UltrasonicTask::executeMessage() {

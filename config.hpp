@@ -4,8 +4,6 @@
 #include <Arduino.h>
 #include <stdint.h>
 
-namespace rc_car {
-
 #define __DEBUG true
 
 /** @brief Configurations - car specifications, task period times, communication parameters, Arduino pinout, etc.
@@ -30,14 +28,14 @@ namespace rc_car {
 
 #define TASK_COUNT		4
 
-	// frequencies [ms]
+// frequencies [ms]
 
 #define TASK_PERIOD_TIME_ULTRASONIC			15
 #define TASK_PERIOD_TIME_COMMUNICATOR		20
 #define TASK_PERIOD_TIME_DRIVE				5
 #define TASK_PERIOD_TIME_ROT				15
 
-	// watchdog timeouts [ms]
+// watchdog timeouts [ms]
 
 #define TASK_WATCHDOG_TIMEOUT_ULTRASONIC	100
 #define TASK_WATCHDOG_TIMEOUT_COMMUNICATOR	1000
@@ -77,7 +75,7 @@ namespace rc_car {
 
 // MotorHandler
 
-	// ServoMotor
+// ServoMotor
 #define SERVO_PIN 9
 
 #define DC_MOTOR_FORWARD_PIN		5
@@ -86,12 +84,17 @@ namespace rc_car {
 // steering construction restrictions
 #define SERVO_ROT_MAX		60
 #define SERVO_POS_MID		90
-#define SERVO_POS_MIN		SERVO_POS_MID - SERVO_ROT_MAX
-#define SERVO_POS_MAX		SERVO_POS_MID + SERVO_ROT_MAX
+#define SERVO_POS_MIN		(SERVO_POS_MID - SERVO_ROT_MAX)
+#define SERVO_POS_MAX		(SERVO_POS_MID + SERVO_ROT_MAX)
 
-	// DCMotor
-#define DC_MAX_VALUE		255
-#define DC_MIN_VALUE		(-DC_MAX_VALUE)
+// Transfer rate between servo motor and wheel steering angle
+#define SERVO_STEERING_TR   1.17f
+
+#define SERVO_MAX_STEERING  (SERVO_ROT_MAX * SERVO_STEERING_TR)
+
+// DCMotor
+#define DC_MAX_value		255
+#define DC_MIN_value		(-DC_MAX_value)
 
 #define DC_MAX_SPEED		55.0f	// [cm/sec]
 
@@ -162,7 +165,7 @@ namespace rc_car {
 // -> unresponsive sensors will not be pinged again
 #define ULTRA_VALID_MAX_NON_RESPONSIVE_COUNT	10
 
-	// Sensor positions and view angles
+// Sensor positions and view angles
 // view angle defines the angle of the sensor relative to the RIGHT direction
 #define __ULTRA_VIEW_ANGLE		static_cast<float>(18.435f * RAD_TO_DEG)
 
@@ -257,6 +260,5 @@ namespace rc_car {
 #define ENV_ABS_AXIS_POINTS_NUM		static_cast<int>(ENV_ABS_POINTS_TOTAL_DIST / ENV_ABS_POINTS_DIST)	// number of absolute points stored in a direction (x or y)
 
 #define ENV_ABS_MIN_FIT_DIFF		(CAR_WIDTH / ENV_ABS_POINTS_DIST)	// minimum grid distance that car fits in (ratio of car width and environment points distance)
-}
 
 #endif // RC_CAR__CONFIG__HPP

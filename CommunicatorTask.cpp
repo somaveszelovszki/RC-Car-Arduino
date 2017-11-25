@@ -32,10 +32,6 @@ void CommunicatorTask::run() {
 		}
 }
 
-void CommunicatorTask::onTimedOut() {
-	restartTimeoutCheck();
-}
-
 const Message& CommunicatorTask::getReceivedMessage(int taskId) {
     __recvAvailable[taskId] = false;
     return recvMsg;
