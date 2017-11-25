@@ -10,106 +10,106 @@ namespace rc_car {
     /** @brief Callback function for checking ECHO signal. Called by NewPing library in every 24us while waiting for the ECHO.
     Calls the global UltrasonicTask's echoCheck() function, which checks if the ECHO signal has arrived, and if yes, gets distance.
     */
-	void ultrasonicEchoCheckIT();
+    void ultrasonicEchoCheckIT();
 
-	/** @brief Reads, validates and stores ultrasonic sensor data.
-	*/
-	class UltrasonicTask : public PeriodicTask {
-	private:
+    /** @brief Reads, validates and stores ultrasonic sensor data.
+    */
+    class UltrasonicTask : public PeriodicTask {
+    private:
         /** @brief Contains ultrasonic sensor data.
         */
-		class Sensor {
-		public:
+        class Sensor {
+        public:
             /** @brief Index of the sensor in the circuit.
             */
-			int selIdx;
+            int selIdx;
 
             /** @brief Current measured distance.
             */
-			int dist_measured;
+            int dist_measured;
 
             /** @brief Array of stored distances.
             */
-			int dist_stored[ULTRA_NUM_DIST_SAMPLES];
+            int dist_stored[ULTRA_NUM_DIST_SAMPLES];
 
             /** @brief Current validated distance.
             */
-			int dist_valid;
+            int dist_valid;
 
             /** @brief The sensor's position - relative to the car's current position.
             */
-			Point2f pos;
+            Point2f pos;
 
             /** @brief The sensor's view angle relative to the car's forward direction - in [rad].
             */
-			float viewAngle;
+            float viewAngle;
 
             /** @brief The sensed points position - relative to the car's current position.
             */
-			Point2f sensedPoint;
+            Point2f sensedPoint;
 
             /** @brief Validates measured points for all the sensors.
 
             @param sampleIndex The index of the sample that needs to be validated.
             NOTE: Always equals currentSampleIndex!
             */
-			void validate(int sampleIndex);
+            void validate(int sampleIndex);
 
             /** @brief Updates sensed point according to sensor's position, sensor's view angle and the current validated distance.
             */
-			void updatePoint();
-		};
+            void updatePoint();
+        };
 
         /** @brief Array of sensors containing sensor data and distances.
         */
-		Sensor sensors[ULTRA_NUM_SENSORS];
+        Sensor sensors[ULTRA_NUM_SENSORS];
 
         /** @brief Sensor connection makes the NewPing functions available.
         */
-		NewPing sensorConnection;
+        NewPing sensorConnection;
 
         /** @brief Validation object for maximum distance.
         When a sensor loses the signal, maximum distance will be returned by the NewPing library.
         As this often happens, max distance validation differs from default validation, that's why it has its own validation object.
         */
-		static const Common::Validation MAX_DIST_VALIDATION;
+        static const Common::Validation MAX_DIST_VALIDATION;
 
         /** @brief Validation object for all distances.
         */
-		static const Common::Validation DEF_VALIDATION;
+        static const Common::Validation DEF_VALIDATION;
 
         /** @brief Used for iterating through all sensors.
         */
-		Common::UltrasonicPos currentSensorPos;
+        Common::UltrasonicPos currentSensorPos;
 
         /** @brief Indicates if sensor connection is busy.
         NOTE: Next sensor should only be pinged when the busy flag is not set!
         */
-		bool busy;
+        bool busy;
 
         /** @brief Indicates if ultrasonic distance measuring is enabled.
         */
-		bool enabled;
+        bool enabled;
 
         /** @brief Index of current sample index in the stored distances array.
         */
-		int currentSampleIndex;
+        int currentSampleIndex;
 
         /** @brief Used for storing messages acquired from the CommunicatorTask.
         */
-		Message msg;
+        Message msg;
 
         /** @brief Indicates if environment point sending is enabled.
         */
-		bool sendEnvironmentEnabled;
+        bool sendEnvironmentEnabled;
 
         /** @brief Watchdog for ECHO timeout detection.
         */
-		Watchdog echoWatchdog;
+        Watchdog echoWatchdog;
 
         /** @brief Updates sensor selection - sets selection pins.
         */
-		void updateSensorSelection();
+        void updateSensorSelection();
 
         /** @brief Converts ultrasonic sensor position to message code.
 
@@ -120,10 +120,10 @@ namespace rc_car {
             return static_cast<Message::CODE>(static_cast<int>(Message::CODE::Ultra0_1_EnvPoint) + static_cast<int>(pos) / 2);
         }
 
-	public:
+    public:
         /** @brief Constructor - initializes period time, timeout and sensors' data, sets up sensor connection.
         */
-		UltrasonicTask();
+        UltrasonicTask();
 
         /** @brief Sets pin mode for selection pins, resets sensors' distances.
         NOTE: Compulsory TASK function - initializes task!
@@ -171,11 +171,11 @@ namespace rc_car {
 
         /** @brief Updates sensor position, and sends TRIGGER signal to the ultrasonic sensor.
         */
-		void pingNextSensor();
+        void pingNextSensor();
 
         /** @brief Checks if ECHO signal has arrived or if it has timed out, and sets sensor distance.
         */
-		void echoCheck();
+        void echoCheck();
 
         /** @brief Checks if measurement cycle has finished.
 
@@ -188,7 +188,7 @@ namespace rc_car {
         /** @brief Validates distances for all sensors and updates sensed points according to these validated distances.
         TODO: instead of this, validate and update instantly after every sensor (before next ping).
         */
-		void validateAndUpdateSensedPoints();
+        void validateAndUpdateSensedPoints();
 
         /** @brief Gets sensed point of the selected sensor.
 
@@ -198,13 +198,13 @@ namespace rc_car {
         const Point2f& getSensedPoint(Common::UltrasonicPos sensorPos) const {
             return sensors[static_cast<int>(sensorPos)].sensedPoint;
         }
-		/** @brief Gets the UltrasonicPos that is nearest to the current steering angle.
-		Therefore gives the direction of the car in UltrasonicPos.
+        /** @brief Gets the UltrasonicPos that is nearest to the current steering angle.
+        Therefore gives the direction of the car in UltrasonicPos.
 
         @param steeringAngle The current steering angle.
         @returns The UltrasonicPos nearest to the steering angle.
-		*/
-		Common::UltrasonicPos getForwardPos(float steeringAngle) const;
+        */
+        Common::UltrasonicPos getForwardPos(float steeringAngle) const;
 
         /** @brief Gets view angle of selected sensor.
 
@@ -217,8 +217,8 @@ namespace rc_car {
 
         /** @brief Executes message that has previously been acquired from the CommunicatorTask.
         */
-		void executeMessage();
-	};
+        void executeMessage();
+    };
 }
 
 #endif // RC_CAR__ULTRASONIC_TASK__HPP

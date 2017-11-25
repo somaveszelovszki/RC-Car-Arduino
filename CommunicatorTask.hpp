@@ -8,25 +8,25 @@
 #include "BoolArray.hpp"
 
 namespace rc_car {
-	/** @brief Handles communication with phone - sends and receives messages.
-	*/
-	class CommunicatorTask : public PeriodicTask {
+    /** @brief Handles communication with phone - sends and receives messages.
+    */
+    class CommunicatorTask : public PeriodicTask {
 
-	private:
+    private:
 
         /** @brief States of read state-machine.
         */
-		enum RecvState {
-			READ_SEPARATOR, READ_CODE, READ_DATA
-		};
+        enum RecvState {
+            READ_SEPARATOR, READ_CODE, READ_DATA
+        };
 
         /** @brief Buffer for received bytes.
         */
-		ByteArray<COMM_MSG_LENGTH> recvBuffer;
+        ByteArray<COMM_MSG_LENGTH> recvBuffer;
 
         /** @brief Stores buffer index of the next byte to be read.
         */
-		int recvByteIdx;
+        int recvByteIdx;
 
         /** @brief Stores the last received message.
         */
@@ -38,7 +38,7 @@ namespace rc_car {
 
         /** @brief Stores current of the message receiving operation.
         */
-		RecvState recvState = READ_SEPARATOR;
+        RecvState recvState = READ_SEPARATOR;
 
         /** @brief Stores received message availabilities (one for each task).
         With this the tasks can check if there is an unread message for them.
@@ -50,23 +50,23 @@ namespace rc_car {
         */
         bool __sendAvailable[TASK_COUNT];
 
-		/** @brief Reads characters from stream and stores them in the buffer or throws them away - according to the current state and the received byte's value
+        /** @brief Reads characters from stream and stores them in the buffer or throws them away - according to the current state and the received byte's value
 
-		@returns Boolean value indicating if a whole message has been received.
-		*/
-		bool receiveChars();
+        @returns Boolean value indicating if a whole message has been received.
+        */
+        bool receiveChars();
 
-		/** @brief Parses message from buffer byte array and stores it in recvMsg object.
-		*/
-		void fetchMessage();
+        /** @brief Parses message from buffer byte array and stores it in recvMsg object.
+        */
+        void fetchMessage();
 
         /** @brief Sends task's message and updates message availability.
 
         @param taskId The task id.
         */
-		int sendMessage(int taskId);
+        int sendMessage(int taskId);
 
-	public:
+    public:
         /** @brief Constructor - initializes parent.
         */
         CommunicatorTask() : PeriodicTask(TASK_PERIOD_TIME_COMMUNICATOR, TASK_WATCHDOG_TIMEOUT_COMMUNICATOR) {}
@@ -74,17 +74,17 @@ namespace rc_car {
         /** @brief Sets pin modes and resets availabilities.
         NOTE: Compulsory TASK function - initializes task!
         */
-		void initialize();
+        void initialize();
 
         /** @brief Receives characters, fetches message and sets message availabilities.
         NOTE: Compulsory TASK function - called in every cycle!
         */
-		void run();
+        void run();
 
         /** @brief Restarts timeout check.
         NOTE: Compulsory TASK function - called when task watchdog timed out!
         */
-		void onTimedOut() {
+        void onTimedOut() {
             restartTimeoutCheck();
         };
 
@@ -93,25 +93,25 @@ namespace rc_car {
         @param taskId The task id.
         @returns Boolean value indicating if a message is available for the task to read.
         */
-		bool isRecvMsgAvailable(int taskId) const {
-			return __recvAvailable[taskId];
-		}
+        bool isRecvMsgAvailable(int taskId) const {
+            return __recvAvailable[taskId];
+        }
 
         /** @brief Gets send message availability for the given task.
 
         @param taskId The task id.
         @returns Boolean value indicating if a message for the task is set for sending but has not been sent yet.
         */
-		bool isSendMsgAvailable(int taskId) const {
-			return __sendAvailable[taskId];
-		}
+        bool isSendMsgAvailable(int taskId) const {
+            return __sendAvailable[taskId];
+        }
 
         /** @brief Gets received message and updates message availability for the given task.
 
         @param taskId The task id.
         @returns The received message.
         */
-		const Message& getReceivedMessage(int taskId);
+        const Message& getReceivedMessage(int taskId);
 
         /** @brief Gets message to send for the given task.
 
@@ -129,8 +129,8 @@ namespace rc_car {
         @param taskId The task id.
         @returns Boolean value indicating if message has been set successfully.
         */
-		bool setMessageToSend(const Message& msg, int taskId);
-	};
+        bool setMessageToSend(const Message& msg, int taskId);
+    };
 }
 
 #endif // RC_CAR__COMMUNICATOR_TASK__HPP

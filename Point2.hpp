@@ -8,31 +8,31 @@ namespace rc_car {
 
     @tparam T Numeric type of the coordinates.
     */
-	template <typename T>
-	class Point2 {
-	public:
+    template <typename T>
+    class Point2 {
+    public:
         /** @brief The X coordinate.
         */
-		T X;
+        T X;
 
         /** @brief The Y coordinate.
         */
-		T Y;
+        T Y;
 
         /** @brief Contains the ORIGO.
         */
-		static const Point2<T> ORIGO;
+        static const Point2<T> ORIGO;
 
         /** @brief Constructor - does not initializes coordinates.
         */
-		Point2<T>() {}
+        Point2<T>() {}
 
         /** @brief Constructor - initializes X and Y coordinates.
 
         @param _X The X coordinate.
         @param _Y The Y coordinate.
         */
-		Point2<T>(T _X, T _Y) : X(_X), Y(_Y) {}
+        Point2<T>(T _X, T _Y) : X(_X), Y(_Y) {}
 
         /** @brief Copies coordinates of the other point.
 
@@ -50,9 +50,9 @@ namespace rc_car {
 
         @param other The other point.
         */
-		Point2(const Point2<T>& other) {
-			*this = other;
-		}
+        Point2(const Point2<T>& other) {
+            *this = other;
+        }
 
         /** @brief Adds coordinates of this and the other point.
 
@@ -161,11 +161,11 @@ namespace rc_car {
             return Common::pythagoreanHypotenuse(X, Y);
         }
 
-		/** @brief Calculates steering angle of given point using this point as the origo.
+        /** @brief Calculates steering angle of given point using this point as the origo.
 
         @param other The other point.
         @param dir Indicates which is the positive steering direction.
-		*/
+        */
         float getAngle(const Point2<T>& other, Common::SteeringDir dir) const;
 
         /** @brief Calculates weighted average of the two points.
@@ -183,66 +183,66 @@ namespace rc_car {
 
         @returns The point as a ByteArray object.
         */
-		ByteArray<2> toByteArray() const;
+        ByteArray<2> toByteArray() const;
 
         /** @brief Creates point from byte array.
 
         @param bytes The source ByteArray object.
         @returns The point created from the byte array.
         */
-		static Point2<T> fromByteArray(const ByteArray<2>& bytes);
-	};
+        static Point2<T> fromByteArray(const ByteArray<2>& bytes);
+    };
 
 
 
-	template <typename T>
-	const Point2<T> Point2<T>::ORIGO(static_cast<T>(0), static_cast<T>(0));
+    template <typename T>
+    const Point2<T> Point2<T>::ORIGO(static_cast<T>(0), static_cast<T>(0));
 
-	template <typename T>
-	float Point2<T>::getAngle(const Point2<T>& other, Common::SteeringDir dir) const {
-		float angle;
+    template <typename T>
+    float Point2<T>::getAngle(const Point2<T>& other, Common::SteeringDir dir) const {
+        float angle;
 
-		switch (dir) {
-		case Common::SteeringDir::LEFT:
-			if (Common::areEqual(X, other.X))
-				angle = other.Y > Y ? static_cast<float>(M_PI_2) : 3 * static_cast<float>(M_PI_2);
-			else if (other.X > X)
-				angle = other.Y >= Y ?
-				static_cast<float>(atan(static_cast<double>((other.Y - Y) / (other.X - X))))
-				: static_cast<float>(2 * M_PI + atan(static_cast<double>((other.Y - Y) / (other.X - X))));
-			else
-				angle = static_cast<float>(M_PI + atan(static_cast<double>((other.Y - Y) / (other.X - X))));
-			break;
+        switch (dir) {
+        case Common::SteeringDir::LEFT:
+            if (Common::areEqual(X, other.X))
+                angle = other.Y > Y ? static_cast<float>(M_PI_2) : 3 * static_cast<float>(M_PI_2);
+            else if (other.X > X)
+                angle = other.Y >= Y ?
+                static_cast<float>(atan(static_cast<double>((other.Y - Y) / (other.X - X))))
+                : static_cast<float>(2 * M_PI + atan(static_cast<double>((other.Y - Y) / (other.X - X))));
+            else
+                angle = static_cast<float>(M_PI + atan(static_cast<double>((other.Y - Y) / (other.X - X))));
+            break;
 
-		case Common::SteeringDir::RIGHT:
-			angle = -1 * getAngle(Point2<T>(2 * X - other.X, other.Y), Common::SteeringDir::LEFT);
-		}
+        case Common::SteeringDir::RIGHT:
+            angle = -1 * getAngle(Point2<T>(2 * X - other.X, other.Y), Common::SteeringDir::LEFT);
+        }
 
-		return angle;
-	}
+        return angle;
+    }
 
-	template<typename T>
-	ByteArray<2> Point2<T>::toByteArray() const {
-		ByteArray<2> result;
-		// maps X and Y coordinates to fit into a byte
-		int _X = Common::incarcerate(static_cast<int>(X * 128 / ULTRA_MAX_DIST), -128, 127),
-			_Y = Common::incarcerate(static_cast<int>(Y * 128 / ULTRA_MAX_DIST), -128, 127);
+    template<typename T>
+    ByteArray<2> Point2<T>::toByteArray() const {
+        ByteArray<2> result;
+        // maps X and Y coordinates to fit into a byte
+        int _X = Common::incarcerate(static_cast<int>(X * 128 / ULTRA_MAX_DIST), -128, 127),
+            _Y = Common::incarcerate(static_cast<int>(Y * 128 / ULTRA_MAX_DIST), -128, 127);
 
-		result[0] = static_cast<byte>(_X);
-		result[1] = static_cast<byte>(_Y);
+        result[0] = static_cast<byte>(_X);
+        result[1] = static_cast<byte>(_Y);
 
-		return result;
-	}
+        return result;
+    }
 
-	template<typename T>
-	Point2<T> Point2<T>::fromByteArray(const ByteArray<2>& bytes) {
-		return Point2<T>(
-			static_cast<T>(static_cast<int>(bytes[0]) * ULTRA_MAX_DIST / 128.0f),
-			static_cast<T>(static_cast<int>(bytes[1]) * ULTRA_MAX_DIST / 128.0f)
-		);
-	}
+    template<typename T>
+    Point2<T> Point2<T>::fromByteArray(const ByteArray<2>& bytes) {
+        return Point2<T>(
+            static_cast<T>(static_cast<int>(bytes[0]) * ULTRA_MAX_DIST / 128.0f),
+            static_cast<T>(static_cast<int>(bytes[1]) * ULTRA_MAX_DIST / 128.0f)
+        );
+    }
 
-	typedef Point2<float>	Point2f, Vec2f;
-	typedef Point2<int>		Point2i, Vec2i;
+    typedef Point2<float>    Point2f, Vec2f;
+    typedef Point2<int>        Point2i, Vec2i;
 }
 #endif // RC_CAR__POINT2__HPP

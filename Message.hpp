@@ -4,12 +4,12 @@
 #include "ByteArray.hpp"
 
 namespace rc_car {
-	/** @brief Stores a Message object.
+    /** @brief Stores a Message object.
     Handles code values and different types as data.
-	*/
-	class Message {
+    */
+    class Message {
 
-	public:
+    public:
 
         /** @brief Defines message priority.
         */
@@ -20,55 +20,55 @@ namespace rc_car {
 
         /** @brief Data value for indicating boolean TRUE.
         */
-		static const ByteArray<COMM_MSG_DATA_LENGTH> BOOL_value_TRUE;
+        static const ByteArray<COMM_MSG_DATA_LENGTH> BOOL_value_TRUE;
 
         /** @brief Data value for indicating boolean FALSE.
         */
-		static const ByteArray<COMM_MSG_DATA_LENGTH> BOOL_value_FALSE;
+        static const ByteArray<COMM_MSG_DATA_LENGTH> BOOL_value_FALSE;
 
         /** @brief Message separator byte array.
         */
         static const ByteArray<COMM_MSG_SEPARATOR_LENGTH> SEPARATOR;
 
-		enum CODE {
-			ACK_				= 0b00000000,		// for acknowledgements
-			Speed				= 0b00000001,       // [cm/sec] (>0 means FORWARD)
-			SteeringAngle		= 0b00000010,		// [degree] (>0 means LEFT)
-			DriveMode			= 0b00000011,		// values in Common::DriveMode
+        enum CODE {
+            ACK_                = 0b00000000,        // for acknowledgements
+            Speed                = 0b00000001,       // [cm/sec] (>0 means FORWARD)
+            SteeringAngle        = 0b00000010,        // [degree] (>0 means LEFT)
+            DriveMode            = 0b00000011,        // values in Common::DriveMode
 
-			Ultra0_1_EnvPoint	= 0b00001000,       // sensed points for sensors 0 and 1
-			Ultra2_3_EnvPoint	= 0b00001001,       // sensed points for sensors 2 and 3
-			Ultra4_5_EnvPoint	= 0b00001010,       // sensed points for sensors 4 and 5
-			Ultra6_7_EnvPoint	= 0b00001011,       // sensed points for sensors 6 and 7
-			Ultra8_9_EnvPoint	= 0b00001100,       // sensed points for sensors 8 and 9
-			Ultra10_11_EnvPoint	= 0b00001101,       // sensed points for sensors 10 and 11
-			Ultra12_13_EnvPoint	= 0b00001110,       // sensed points for sensors 12 and 13
-			Ultra14_15_EnvPoint	= 0b00001111,       // sensed points for sensors 14 and 15
-			EnableEnvironment	= 0b00010000        // enable/disable environment point sending
-		};
+            Ultra0_1_EnvPoint    = 0b00001000,       // sensed points for sensors 0 and 1
+            Ultra2_3_EnvPoint    = 0b00001001,       // sensed points for sensors 2 and 3
+            Ultra4_5_EnvPoint    = 0b00001010,       // sensed points for sensors 4 and 5
+            Ultra6_7_EnvPoint    = 0b00001011,       // sensed points for sensors 6 and 7
+            Ultra8_9_EnvPoint    = 0b00001100,       // sensed points for sensors 8 and 9
+            Ultra10_11_EnvPoint    = 0b00001101,       // sensed points for sensors 10 and 11
+            Ultra12_13_EnvPoint    = 0b00001110,       // sensed points for sensors 12 and 13
+            Ultra14_15_EnvPoint    = 0b00001111,       // sensed points for sensors 14 and 15
+            EnableEnvironment    = 0b00010000        // enable/disable environment point sending
+        };
 
         /** @brief Pre-defined acknowledge message.
         */
-		static const Message ACK;
+        static const Message ACK;
 
-	private:
+    private:
         /** @brief The message code.
         */
-		CODE code;
+        CODE code;
 
         /** @brief The message data.
         */
-		ByteArray<COMM_MSG_DATA_LENGTH> data;
+        ByteArray<COMM_MSG_DATA_LENGTH> data;
 
         /** @brief The message priority.
         */
         Prio prio;
 
-	public:
+    public:
 
         /** @brief Constructor - set priority to LOW_PRIO.
         */
-		Message() : prio(LOW_PRIO) {}
+        Message() : prio(LOW_PRIO) {}
 
         /** @brief Constructor - sets code, byte array data and priority.
 
@@ -86,7 +86,7 @@ namespace rc_car {
         @param _data The integer data to set.
         @param _prio The priority to set.
         */
-		Message(CODE _code, int32_t _data, Prio _prio = LOW_PRIO) : code(_code), prio(_prio) {
+        Message(CODE _code, int32_t _data, Prio _prio = LOW_PRIO) : code(_code), prio(_prio) {
             setData(_data);
         }
 
@@ -96,7 +96,7 @@ namespace rc_car {
         @param _data The float data to set.
         @param _prio The priority to set.
         */
-		Message(CODE _code, float _data, Prio _prio = LOW_PRIO) : code(_code), prio(_prio) {
+        Message(CODE _code, float _data, Prio _prio = LOW_PRIO) : code(_code), prio(_prio) {
             setData(_data);
         }
 
@@ -105,44 +105,44 @@ namespace rc_car {
         @param other The other message.
         @returns This message.
         */
-		Message& operator=(const Message& other) {
-			setCode(other.code);
-			setData(other.data);
+        Message& operator=(const Message& other) {
+            setCode(other.code);
+            setData(other.data);
             setPriority(other.prio);
-			return *this;
-		}
+            return *this;
+        }
 
         /** @brief Copy constructor - copies code, data and priority of the other message.
 
         @param other The other message.
         */
-		Message(const Message& other) {
-			*this = other;
-		}
+        Message(const Message& other) {
+            *this = other;
+        }
 
         /** @brief Gets message code.
 
         @returns The message code.
         */
-		CODE getCode() const {
-			return code;
-		}
+        CODE getCode() const {
+            return code;
+        }
 
         /** @brief Sets message code.
 
         @param _code The message code to set.
         */
-		void setCode(CODE _code) {
-			code = _code;
-		}
+        void setCode(CODE _code) {
+            code = _code;
+        }
 
         /** @brief Gets message code as a byte.
 
         @returns The message code as a byte.
         */
-		byte getCodeAsByte() const {
-			return static_cast<byte>(code);
-		}
+        byte getCodeAsByte() const {
+            return static_cast<byte>(code);
+        }
 
         /** @brief Sets message code.
 
@@ -156,73 +156,73 @@ namespace rc_car {
 
         @returns The message data.
         */
-		ByteArray<4> getData() const {
-			return data;
-		}
+        ByteArray<4> getData() const {
+            return data;
+        }
 
         /** @brief Sets message data.
 
         @param _data The message data to set.
         */
-		void setData(const ByteArray<4>& _data) {
-			data = _data;
-		}
+        void setData(const ByteArray<4>& _data) {
+            data = _data;
+        }
 
         /** @brief Sets message data.
 
         @param _data The message data to set.
         */
-		void setData(const byte _data[]) {
-			data = ByteArray<4>(_data);
-		}
+        void setData(const byte _data[]) {
+            data = ByteArray<4>(_data);
+        }
 
         /** @brief Gets message data as integer.
 
         @returns The message as integer.
         */
-		int32_t getDataAsInt() const {
-			return data.asInteger();
-		}
+        int32_t getDataAsInt() const {
+            return data.asInteger();
+        }
 
         /** @brief Sets message data.
 
         @param _data The integer data to set.
         */
-		void setData(int32_t _data) {
-			ByteArray<4>::fromInteger(_data, data);
-		}
+        void setData(int32_t _data) {
+            ByteArray<4>::fromInteger(_data, data);
+        }
 
         /** @brief Gets message data as float.
 
         @returns The message data as float.
         */
-		float getDataAsFloat() const {
-			return data.asFloat();
-		}
+        float getDataAsFloat() const {
+            return data.asFloat();
+        }
 
         /** @brief Sets message data.
 
         @param _data The float data to set.
         */
-		void setData(float _data) {
-			ByteArray<4>::fromFloat(_data, data);
-		}
+        void setData(float _data) {
+            ByteArray<4>::fromFloat(_data, data);
+        }
 
         /** @brief Gets message data as boolean.
 
         @returns The message data as boolean.
         */
-		bool getDataAsBool() const {
-			return data == BOOL_value_TRUE;
-		}
+        bool getDataAsBool() const {
+            return data == BOOL_value_TRUE;
+        }
 
         /** @brief Sets message data.
 
         @param _data The boolean data to set.
         */
-		void setData(bool _data) {
-			data = _data ? BOOL_value_TRUE : BOOL_value_FALSE;
-		}
+        void setData(bool _data) {
+            data = _data ? BOOL_value_TRUE : BOOL_value_FALSE;
+        }
 
         /** @brief Gets message priority.
 
@@ -244,23 +244,23 @@ namespace rc_car {
 
         @returns The message as a ByteArray object.
         */
-		ByteArray<COMM_MSG_LENGTH> toBytes() const;
+        ByteArray<COMM_MSG_LENGTH> toBytes() const;
 
         /** @brief Creates message from a byte array.
 
         @param bytes The source ByteArray object.
         @param result The result message.
         */
-		static void fromBytes(const ByteArray<COMM_MSG_LENGTH>& bytes, Message& result);
+        static void fromBytes(const ByteArray<COMM_MSG_LENGTH>& bytes, Message& result);
 
 #if __DEBUG
         /** @brief Builds String from Message object.
 
         @returns The message as a String.
         */
-		String toString() const;
+        String toString() const;
 #endif // __DEBUG
-	};
+    };
 }
 
 #endif // RC_CAR__MESSAGE__HPP

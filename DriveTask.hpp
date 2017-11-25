@@ -6,18 +6,18 @@
 #include "Environment.hpp"
 
 namespace rc_car {
-	/** @brief Makes driving decisions from sensor data and car state. Controls motors with the MotorHandler.
-	*/
-	class DriveTask : public PeriodicTask {
+    /** @brief Makes driving decisions from sensor data and car state. Controls motors with the MotorHandler.
+    */
+    class DriveTask : public PeriodicTask {
 
-	private:
+    private:
         /** @brief Drive mode determines how much influence the firmware has got in making driving decisions.
         */
-		Common::DriveMode mode;
+        Common::DriveMode mode;
 
         /** @brief Handles the DC and servo motors.
         */
-		MotorHandler motorHandler;
+        MotorHandler motorHandler;
 
         /** @brief Watchdog for message receiving.
         NOTE: If no messages arrive in a given period of time (so the connection is probably broken), the car has to be stopped!
@@ -34,16 +34,16 @@ namespace rc_car {
 
         /** @brief Calculates environment points according to sensed points received from the UltrasonicTask.
         */
-		Environment environment;
+        Environment environment;
 
         /** @brief Calculates car trajectory accroding to steering angle
         and if an obstacle is found, calculates remaining time until the crash.
         */
-		Trajectory trajectory;
+        Trajectory trajectory;
 
         /** @brief Will store the received message whenever there is a new one.
         */
-		Message msg;
+        Message msg;
 
         /** @brief Indicates if force steering is active.
         */
@@ -55,13 +55,13 @@ namespace rc_car {
 
         /** @brief Executes message that has previously been acquired from the CommunicatorTask.
         */
-		void executeMessage();
+        void executeMessage();
 
         /** @brief Updates environment grid points according to sensed points acquired from the UltrasonicTask.
         */
-		void updateEnvironmentGridPoints();
+        void updateEnvironmentGridPoints();
 
-		int gridPrintCntr = 0;	// TODO remove this variable
+        int gridPrintCntr = 0;    // TODO remove this variable
 
         /** @brief Checks if given distance is critical.
 
@@ -73,14 +73,14 @@ namespace rc_car {
         */
         static bool isDistanceCritical(float dist, float minDist);
 
-	public:
+    public:
         /** @brief Constructor - sets watchdog timeouts.
         */
-		DriveTask() : PeriodicTask(TASK_PERIOD_TIME_DRIVE, TASK_WATCHDOG_TIMEOUT_DRIVE),
-			msgWatchdog(DRIVE_MSG_WATCHDOG_TIMEOUT),
-			forceSteeringWatchdog(DRIVE_FORCE_STEERING_TIME, Watchdog::State::STOPPED),
-			forceStopWatchdog(DRIVE_FORCE_STOP_TIME, Watchdog::State::STOPPED),
-			mode(Common::DriveMode::SAFE_DRIVE) {}
+        DriveTask() : PeriodicTask(TASK_PERIOD_TIME_DRIVE, TASK_WATCHDOG_TIMEOUT_DRIVE),
+            msgWatchdog(DRIVE_MSG_WATCHDOG_TIMEOUT),
+            forceSteeringWatchdog(DRIVE_FORCE_STEERING_TIME, Watchdog::State::STOPPED),
+            forceStopWatchdog(DRIVE_FORCE_STOP_TIME, Watchdog::State::STOPPED),
+            mode(Common::DriveMode::SAFE_DRIVE) {}
 
         /** @brief Initializes motor handler.
         NOTE: Compulsory TASK function - initializes task!

@@ -11,7 +11,7 @@ extern UltrasonicTask ultrasonicTask;
 extern RotaryTask rotaryTask;
 
 void DriveTask::initialize() {
-	motorHandler.initialize();
+    motorHandler.initialize();
 }
 
 void DriveTask::run() {
@@ -87,17 +87,17 @@ void DriveTask::run() {
             forceSteeringWatchdog.restart();
 
             //for (int i = 0; !newFwdPosFound && i < ENV_SECTIONS_NUM; ++i) {
-            //	if (!isDistanceCritical(remainingTimes[i], DRIVE_PRE_CRASH_TIME_DRIVE_CMD_DISABLE)) {
-            //		newFwdPosFound = true;
-            //		Common::UltrasonicPos newFwdPos = static_cast<Common::UltrasonicPos>(static_cast<int>(globalStartPos) + i);
+            //    if (!isDistanceCritical(remainingTimes[i], DRIVE_PRE_CRASH_TIME_DRIVE_CMD_DISABLE)) {
+            //        newFwdPosFound = true;
+            //        Common::UltrasonicPos newFwdPos = static_cast<Common::UltrasonicPos>(static_cast<int>(globalStartPos) + i);
             //                 DEBUG_println("newFwdPos: " + String(newFwdPos) + " -> " + ((static_cast<int>(newFwdPos) % 6) / 3 ? 1 : -1));
-            //		float newSteeringAngle = SERVO_POS_MID + ((static_cast<int>(newFwdPos) % 6) / 3 ? 1 : -1) * SERVO_ROT_MAX;
-            //		motorHandler.updateSteeringAngle(newSteeringAngle);
-            //		forceSteeringWatchdog.restart();
-            //		forceSteeringActive = true;
-            //		//DEBUG_println("new fwd pos: " + String(newFwdPos) + " -> " + String(ultrasonicTask.getSensorViewAngle(newFwdPos)));
-            //		//motorHandler.updateSteeringAngle(ultrasonicTask.getSensorViewAngle(newFwdPos));
-            //	}
+            //        float newSteeringAngle = SERVO_POS_MID + ((static_cast<int>(newFwdPos) % 6) / 3 ? 1 : -1) * SERVO_ROT_MAX;
+            //        motorHandler.updateSteeringAngle(newSteeringAngle);
+            //        forceSteeringWatchdog.restart();
+            //        forceSteeringActive = true;
+            //        //DEBUG_println("new fwd pos: " + String(newFwdPos) + " -> " + String(ultrasonicTask.getSensorViewAngle(newFwdPos)));
+            //        //motorHandler.updateSteeringAngle(ultrasonicTask.getSensorViewAngle(newFwdPos));
+            //    }
             //}
 
             if (!newFwdPosFound && remainingTimes[fwdRelPos] <= DRIVE_PRE_CRASH_TIME_FORCE_STOP) {
@@ -140,44 +140,44 @@ void DriveTask::run() {
 }
 
 void DriveTask::executeMessage() {
-	switch (msg.getCode()) {
+    switch (msg.getCode()) {
 
-	case Message::CODE::Speed:
-		if (!forceStopActive)
-			motorHandler.setDesiredSpeed(msg.getDataAsFloat());
-		break;
+    case Message::CODE::Speed:
+        if (!forceStopActive)
+            motorHandler.setDesiredSpeed(msg.getDataAsFloat());
+        break;
 
-	case Message::CODE::SteeringAngle:
-		if (!forceSteeringActive)
-			motorHandler.updateSteeringAngle(msg.getDataAsFloat());
-		break;
+    case Message::CODE::SteeringAngle:
+        if (!forceSteeringActive)
+            motorHandler.updateSteeringAngle(msg.getDataAsFloat());
+        break;
 
-	case Message::CODE::DriveMode:
-		mode = static_cast<Common::DriveMode>(msg.getDataAsInt());
-		communicatorTask.setMessageToSend(Message::ACK, getTaskId());
-		break;
-	}
+    case Message::CODE::DriveMode:
+        mode = static_cast<Common::DriveMode>(msg.getDataAsInt());
+        communicatorTask.setMessageToSend(Message::ACK, getTaskId());
+        break;
+    }
 }
 
 void rc_car::DriveTask::updateEnvironmentGridPoints() {
-	Point2f sectionStart, sectionEnd;
+    Point2f sectionStart, sectionEnd;
 
-	Common::UltrasonicPos sectionStartPos = Common::UltrasonicPos::RIGHT_FRONT;
+    Common::UltrasonicPos sectionStartPos = Common::UltrasonicPos::RIGHT_FRONT;
 
-	for (int i = 0; i < ULTRA_NUM_SENSORS; ++i) {
-		sectionEnd = ultrasonicTask.getSensedPoint(sectionStartPos = Common::nextUltrasonicPos(sectionStartPos));
-		environment.setSection(sectionStart, sectionEnd);
+    for (int i = 0; i < ULTRA_NUM_SENSORS; ++i) {
+        sectionEnd = ultrasonicTask.getSensedPoint(sectionStartPos = Common::nextUltrasonicPos(sectionStartPos));
+        environment.setSection(sectionStart, sectionEnd);
 
-		while (environment.nextSectionPointExists()) {
-			Point2f sectionPoint = environment.nextSectionPoint();
-			environment.setRelativePointObstacle(sectionPoint);
-		}
+        while (environment.nextSectionPointExists()) {
+            Point2f sectionPoint = environment.nextSectionPoint();
+            environment.setRelativePointObstacle(sectionPoint);
+        }
 
-		sectionStart = sectionEnd;
-	}
+        sectionStart = sectionEnd;
+    }
 
-	if (!(gridPrintCntr++ % 500) && false)
-		environment.print();
+    if (!(gridPrintCntr++ % 500) && false)
+        environment.print();
 }
 
 bool rc_car::DriveTask::isDistanceCritical(float dist, float minDist) {

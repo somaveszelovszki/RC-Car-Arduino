@@ -35,9 +35,9 @@ namespace rc_car {
         /** @brief Drive mode defines the working mechanism of the DriveTask.
         */
         enum DriveMode {
-            FREE_DRIVE = 1,		// user has total control, no override
-            SAFE_DRIVE = 2,		// user has limited control, crash avoidance
-            AUTOPILOT = 3		// user has no control, program drives
+            FREE_DRIVE = 1,        // user has total control, no override
+            SAFE_DRIVE = 2,        // user has limited control, crash avoidance
+            AUTOPILOT = 3        // user has no control, program drives
         };
 
         /** @brief Defines steering direction.
@@ -124,8 +124,8 @@ namespace rc_car {
         /** @brief Contains validation data - hepls when validating values according to previous values.
         */
         struct Validation {
-            int minSampleNum;	// minimum validation sample num
-            float relErr;		// relative error
+            int minSampleNum;    // minimum validation sample num
+            float relErr;        // relative error
         };
 
         /** @brief If the array contains the item, return its index, otherwise returns -1.

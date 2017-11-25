@@ -4,38 +4,38 @@
 #include "PeriodicTask.hpp"
 
 namespace rc_car {
-	/** @brief Handles rotary encoder - reads counter value periodically.
-	*/
-	class RotaryTask : public PeriodicTask {
+    /** @brief Handles rotary encoder - reads counter value periodically.
+    */
+    class RotaryTask : public PeriodicTask {
 
-	private:
+    private:
         /** @brief Stores rotary sample's data.
         */
-		class __Sample {
-		public:
+        class __Sample {
+        public:
             /** @brief Time (relative to program start) in [ms].
             */
-			unsigned long time;
+            unsigned long time;
 
             /** @brief Absolute rotary position.
             */
-			int pos;
+            int pos;
 
             /** @brief Constructor - does not initialize data.
             */
-			__Sample() {}
+            __Sample() {}
 
             /** @brief Constructor - initializes time and position.
 
             @param _time The time (relative to program start) in [ms].
             @param _pos The absolute rotary position.
             */
-			__Sample(unsigned long _time, int _pos) : time(_time), pos(_pos) {}
-		};
+            __Sample(unsigned long _time, int _pos) : time(_time), pos(_pos) {}
+        };
 
         /** @brief Stores previous sample - needed to calculate difference.
         */
-		__Sample prev;
+        __Sample prev;
 
         /** @brief Stores the calculated speed - gets updated in every cycle.
         This is the output of the process.
@@ -46,26 +46,26 @@ namespace rc_car {
 
         @returns The rotary position.
         */
-		int readPosition() const;
+        int readPosition() const;
 
         /** @brief Enebles/disables counter.
 
         @param enabled Indicates if counter should be enabled or disabled.
         */
-		void setEnabled(bool enabled) {
-			digitalWrite(ROT_EN_PIN, static_cast<uint8_t>(enabled));
-		}
+        void setEnabled(bool enabled) {
+            digitalWrite(ROT_EN_PIN, static_cast<uint8_t>(enabled));
+        }
 
         /** @brief Updates new rotary position so that position overflow will not affect difference calculations.
 
         @param pNewPos Pointer to the new rotary position.
         */
-		void updateOverflowPos(int *pNewPos) const;
+        void updateOverflowPos(int *pNewPos) const;
 
-	public:
+    public:
         /** @brief Constructor - sets task period time and timeout.
         */
-		RotaryTask() : PeriodicTask(TASK_PERIOD_TIME_ROT, TASK_WATCHDOG_TIMEOUT_ROTARY) {}
+        RotaryTask() : PeriodicTask(TASK_PERIOD_TIME_ROT, TASK_WATCHDOG_TIMEOUT_ROTARY) {}
 
         /** @brief Sets pin mode for data and enable pins, initializes previous sample object and speed.
         NOTE: Compulsory TASK function - initializes task!
@@ -91,7 +91,7 @@ namespace rc_car {
         float getSpeed() const {
             return speed;
         }
-	};
+    };
 
 }
 #endif // RC_CAR__ROTARY_TASK__HPP

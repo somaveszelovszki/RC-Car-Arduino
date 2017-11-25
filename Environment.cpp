@@ -13,19 +13,19 @@ Coordinate is relative to car, grid position is a position in the grid (0-indexe
 #define GRID_POS_TO_COORD(pos) ((pos - ENV_ABS_AXIS_POINTS_NUM / 2) * ENV_ABS_POINTS_DIST)
 
 void Environment::SectionPointCalculator::setSection(const Point2f& _startPoint, const Point2f& _endPoint) {
-	startPoint = _startPoint;
-	Vec2f wholeDiff = _endPoint - startPoint;
-	float wholeDiffLength = wholeDiff.length();
+    startPoint = _startPoint;
+    Vec2f wholeDiff = _endPoint - startPoint;
+    float wholeDiffLength = wholeDiff.length();
 
-	pointsCount = min(wholeDiffLength / ENV_SECTION_POINTS_DIST + 1, ENV_SECTION_POINTS_MAX_NUM);
-	diff = wholeDiff / pointsCount;
-	currentPointIdx = 0;
+    pointsCount = min(wholeDiffLength / ENV_SECTION_POINTS_DIST + 1, ENV_SECTION_POINTS_MAX_NUM);
+    diff = wholeDiff / pointsCount;
+    currentPointIdx = 0;
 }
 
 Environment::Environment() : carPos(Point2f::ORIGO), carFwdAngle_Rad(M_PI_2), carFwdAngle_Cos(0.0f), carFwdAngle_Sin(1.0f) {
-	for (int x = 0; x < ENV_ABS_AXIS_POINTS_NUM; ++x)
-		for (int y = 0; y < ENV_ABS_AXIS_POINTS_NUM; ++y)
-			envGrid.set(x, y, false);
+    for (int x = 0; x < ENV_ABS_AXIS_POINTS_NUM; ++x)
+        for (int y = 0; y < ENV_ABS_AXIS_POINTS_NUM; ++y)
+            envGrid.set(x, y, false);
 }
 
 Point2i rc_car::Environment::relPointToGridPoint(const Point2f & relPoint) const {
@@ -37,15 +37,15 @@ Point2i rc_car::Environment::relPointToGridPoint(const Point2f & relPoint) const
 }
 
 void Environment::setRelativePointObstacle(const Point2f& relPoint) {
-	// TODO handle grid overflow
+    // TODO handle grid overflow
 
     Point2i gridPos = relPointToGridPoint(relPoint);
 
-	if (static_cast<unsigned int>(gridPos.X) < ENV_ABS_AXIS_POINTS_NUM && static_cast<unsigned int>(gridPos.Y) < ENV_ABS_AXIS_POINTS_NUM)
-		envGrid.set(gridPos.X, gridPos.Y, true);
+    if (static_cast<unsigned int>(gridPos.X) < ENV_ABS_AXIS_POINTS_NUM && static_cast<unsigned int>(gridPos.Y) < ENV_ABS_AXIS_POINTS_NUM)
+        envGrid.set(gridPos.X, gridPos.Y, true);
 #if __DEBUG && false
-	else
-		DEBUG_println("Invalid grid positions: " + String(x) + ", " + String(y) + " - " + point.toString());
+    else
+        DEBUG_println("Invalid grid positions: " + String(x) + ", " + String(y) + " - " + point.toString());
 #endif
 }
 
