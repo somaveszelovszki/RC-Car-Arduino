@@ -3,7 +3,7 @@ RC Car with self-driving features for Arduino.
 
 ### Watch video of car:
 
-[![Watch video of car](https://img.youtube.com/vi/D-heAh4WQEI/3.jpg)](https://www.youtube.com/watch?v=D-heAh4WQEI)
+[![Watch video of car](https://img.youtube.com/vi/ePNNKM2OuNE/0.jpg)](https://www.youtube.com/watch?v=ePNNKM2OuNE)
 
 Controller Android application source code can be found [here](https://github.com/somaveszelovszki/RC-Car-Android).
 
@@ -12,9 +12,9 @@ Controller Android application source code can be found [here](https://github.co
 
 **Safe Drive**
 - user has control over the car
-- car has permission to perform safety interventions if needed
-  - emergency break
-  - obstacle evasion
+- automatic collision avoidance by
+  - emergency breaking
+  - overriding steering angle
 
 **Autopilot - to be implemented**
 - car drives itself to the given destination without any user interference
