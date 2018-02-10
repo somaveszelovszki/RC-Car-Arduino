@@ -32,7 +32,7 @@ void MotorHandler::updateSpeed(float actualSpeed) {
     // if controller's period time has been reached, speed has to be updated
     // -> controller's 'run' method is called with the error (difference between desired and actual speed)
     if (speedCtrl.periodTimeReached()) {
-        if (desiredSpeed == 0.0f && Common::isBetween(actualSpeed, -DC_ZERO_SPEED_BOUNDARY, DC_ZERO_SPEED_BOUNDARY))
+        if (desiredSpeed == 0.0f && Common::isBtw(actualSpeed, -DC_ZERO_SPEED_BOUNDARY, DC_ZERO_SPEED_BOUNDARY))
             DC_Motor.writeValue(0);
         else {
             float error = desiredSpeed - actualSpeed;

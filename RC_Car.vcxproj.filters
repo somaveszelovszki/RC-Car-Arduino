@@ -66,13 +66,13 @@
     <ClInclude Include="Message.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BoolGrid.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BoolArray.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Point2.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Array.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Grid.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

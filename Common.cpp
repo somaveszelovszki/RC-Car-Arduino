@@ -22,12 +22,12 @@ void Common::intToBytes(int32_t value, byte dest[4]) {
     dest[2] = static_cast<byte>(value >> 8);
     dest[3] = static_cast<byte>(value);
 
-    //arrayCopy<4>(reinterpret_cast<byte*>(&value), dest);
+    //copy<4>(reinterpret_cast<byte*>(&value), dest);
 }
 
 void Common::floatToBytes(float value, byte dest[4]) {
     int32_t intVal = *reinterpret_cast<int32_t*>(&value);
     intToBytes(intVal, dest);
 
-    //arrayCopy<4>(reinterpret_cast<byte*>(&value), dest);
+    //copy<4>(reinterpret_cast<byte*>(&value), dest);
 }

@@ -20,73 +20,73 @@ sensorConnection(ULTRA_TRIGGER_PIN, ULTRA_ECHO_PIN, ULTRA_MAX_DIST), echoWatchdo
 
     setEnabled(false);
 
-    sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_FRONT)].pos.X = ULTRA_POS_X_RF;
-    sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_FRONT)].pos.Y = ULTRA_POS_Y_RF;
-    sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_FRONT)].viewAngle = ULTRA_VIEW_ANGLE_RF;
-    sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_FRONT)].selIdx = ULTRA_IDX_RF;
+    sensors[Common::UltrasonicPos::RIGHT_FRONT].pos.X = ULTRA_POS_X_RF;
+    sensors[Common::UltrasonicPos::RIGHT_FRONT].pos.Y = ULTRA_POS_Y_RF;
+    sensors[Common::UltrasonicPos::RIGHT_FRONT].viewAngle = ULTRA_VIEW_ANGLE_RF;
+    sensors[Common::UltrasonicPos::RIGHT_FRONT].selIdx = ULTRA_IDX_RF;
 
 
 
-    sensors[static_cast<int>(Common::UltrasonicPos::FRONT_RIGHT_CORNER)].pos.X = ULTRA_POS_X_FRC;
-    sensors[static_cast<int>(Common::UltrasonicPos::FRONT_RIGHT_CORNER)].pos.Y = ULTRA_POS_Y_FRC;
-    sensors[static_cast<int>(Common::UltrasonicPos::FRONT_RIGHT_CORNER)].viewAngle = ULTRA_VIEW_ANGLE_FRC;
-    sensors[static_cast<int>(Common::UltrasonicPos::FRONT_RIGHT_CORNER)].selIdx = ULTRA_IDX_FRC;
+    sensors[Common::UltrasonicPos::FRONT_RIGHT_CORNER].pos.X = ULTRA_POS_X_FRC;
+    sensors[Common::UltrasonicPos::FRONT_RIGHT_CORNER].pos.Y = ULTRA_POS_Y_FRC;
+    sensors[Common::UltrasonicPos::FRONT_RIGHT_CORNER].viewAngle = ULTRA_VIEW_ANGLE_FRC;
+    sensors[Common::UltrasonicPos::FRONT_RIGHT_CORNER].selIdx = ULTRA_IDX_FRC;
 
-    sensors[static_cast<int>(Common::UltrasonicPos::FRONT_RIGHT)].pos.X = ULTRA_POS_X_FR;
-    sensors[static_cast<int>(Common::UltrasonicPos::FRONT_RIGHT)].pos.Y = ULTRA_POS_Y_FR;
-    sensors[static_cast<int>(Common::UltrasonicPos::FRONT_RIGHT)].viewAngle = ULTRA_VIEW_ANGLE_FR;
-    sensors[static_cast<int>(Common::UltrasonicPos::FRONT_RIGHT)].selIdx = ULTRA_IDX_FR;
+    sensors[Common::UltrasonicPos::FRONT_RIGHT].pos.X = ULTRA_POS_X_FR;
+    sensors[Common::UltrasonicPos::FRONT_RIGHT].pos.Y = ULTRA_POS_Y_FR;
+    sensors[Common::UltrasonicPos::FRONT_RIGHT].viewAngle = ULTRA_VIEW_ANGLE_FR;
+    sensors[Common::UltrasonicPos::FRONT_RIGHT].selIdx = ULTRA_IDX_FR;
 
-    sensors[static_cast<int>(Common::UltrasonicPos::FRONT_LEFT)].pos.X = ULTRA_POS_X_FL;
-    sensors[static_cast<int>(Common::UltrasonicPos::FRONT_LEFT)].pos.Y = ULTRA_POS_Y_FL;
-    sensors[static_cast<int>(Common::UltrasonicPos::FRONT_LEFT)].viewAngle = ULTRA_VIEW_ANGLE_FL;
-    sensors[static_cast<int>(Common::UltrasonicPos::FRONT_LEFT)].selIdx = ULTRA_IDX_FL;
+    sensors[Common::UltrasonicPos::FRONT_LEFT].pos.X = ULTRA_POS_X_FL;
+    sensors[Common::UltrasonicPos::FRONT_LEFT].pos.Y = ULTRA_POS_Y_FL;
+    sensors[Common::UltrasonicPos::FRONT_LEFT].viewAngle = ULTRA_VIEW_ANGLE_FL;
+    sensors[Common::UltrasonicPos::FRONT_LEFT].selIdx = ULTRA_IDX_FL;
 
-    sensors[static_cast<int>(Common::UltrasonicPos::FRONT_LEFT_CORNER)].pos.X = ULTRA_POS_X_FLC;
-    sensors[static_cast<int>(Common::UltrasonicPos::FRONT_LEFT_CORNER)].pos.Y = ULTRA_POS_Y_FLC;
-    sensors[static_cast<int>(Common::UltrasonicPos::FRONT_LEFT_CORNER)].viewAngle = ULTRA_VIEW_ANGLE_FLC;
-    sensors[static_cast<int>(Common::UltrasonicPos::FRONT_LEFT_CORNER)].selIdx = ULTRA_IDX_FLC;
-
-
-
-    sensors[static_cast<int>(Common::UltrasonicPos::LEFT_FRONT)].pos.X = ULTRA_POS_X_LF;
-    sensors[static_cast<int>(Common::UltrasonicPos::LEFT_FRONT)].pos.Y = ULTRA_POS_Y_LF;
-    sensors[static_cast<int>(Common::UltrasonicPos::LEFT_FRONT)].viewAngle = ULTRA_VIEW_ANGLE_LF;
-    sensors[static_cast<int>(Common::UltrasonicPos::LEFT_FRONT)].selIdx = ULTRA_IDX_LF;
-
-    sensors[static_cast<int>(Common::UltrasonicPos::LEFT_REAR)].pos.X = ULTRA_POS_X_LR;
-    sensors[static_cast<int>(Common::UltrasonicPos::LEFT_REAR)].pos.Y = ULTRA_POS_Y_LR;
-    sensors[static_cast<int>(Common::UltrasonicPos::LEFT_REAR)].viewAngle = ULTRA_VIEW_ANGLE_LR;
-    sensors[static_cast<int>(Common::UltrasonicPos::LEFT_REAR)].selIdx = ULTRA_IDX_LR;
+    sensors[Common::UltrasonicPos::FRONT_LEFT_CORNER].pos.X = ULTRA_POS_X_FLC;
+    sensors[Common::UltrasonicPos::FRONT_LEFT_CORNER].pos.Y = ULTRA_POS_Y_FLC;
+    sensors[Common::UltrasonicPos::FRONT_LEFT_CORNER].viewAngle = ULTRA_VIEW_ANGLE_FLC;
+    sensors[Common::UltrasonicPos::FRONT_LEFT_CORNER].selIdx = ULTRA_IDX_FLC;
 
 
 
-    sensors[static_cast<int>(Common::UltrasonicPos::REAR_LEFT_CORNER)].pos.X = ULTRA_POS_X_RLC;
-    sensors[static_cast<int>(Common::UltrasonicPos::REAR_LEFT_CORNER)].pos.Y = ULTRA_POS_Y_RLC;
-    sensors[static_cast<int>(Common::UltrasonicPos::REAR_LEFT_CORNER)].viewAngle = ULTRA_VIEW_ANGLE_RLC;
-    sensors[static_cast<int>(Common::UltrasonicPos::REAR_LEFT_CORNER)].selIdx = ULTRA_IDX_RLC;
+    sensors[Common::UltrasonicPos::LEFT_FRONT].pos.X = ULTRA_POS_X_LF;
+    sensors[Common::UltrasonicPos::LEFT_FRONT].pos.Y = ULTRA_POS_Y_LF;
+    sensors[Common::UltrasonicPos::LEFT_FRONT].viewAngle = ULTRA_VIEW_ANGLE_LF;
+    sensors[Common::UltrasonicPos::LEFT_FRONT].selIdx = ULTRA_IDX_LF;
 
-    sensors[static_cast<int>(Common::UltrasonicPos::REAR_LEFT)].pos.X = ULTRA_POS_X_RL;
-    sensors[static_cast<int>(Common::UltrasonicPos::REAR_LEFT)].pos.Y = ULTRA_POS_Y_RL;
-    sensors[static_cast<int>(Common::UltrasonicPos::REAR_LEFT)].viewAngle = ULTRA_VIEW_ANGLE_RL;
-    sensors[static_cast<int>(Common::UltrasonicPos::REAR_LEFT)].selIdx = ULTRA_IDX_RL;
-
-    sensors[static_cast<int>(Common::UltrasonicPos::REAR_RIGHT)].pos.X = ULTRA_POS_X_RR;
-    sensors[static_cast<int>(Common::UltrasonicPos::REAR_RIGHT)].pos.Y = ULTRA_POS_Y_RR;
-    sensors[static_cast<int>(Common::UltrasonicPos::REAR_RIGHT)].viewAngle = ULTRA_VIEW_ANGLE_RR;
-    sensors[static_cast<int>(Common::UltrasonicPos::REAR_RIGHT)].selIdx = ULTRA_IDX_RR;
-
-    sensors[static_cast<int>(Common::UltrasonicPos::REAR_RIGHT_CORNER)].pos.X = ULTRA_POS_X_RRC;
-    sensors[static_cast<int>(Common::UltrasonicPos::REAR_RIGHT_CORNER)].pos.Y = ULTRA_POS_Y_RRC;
-    sensors[static_cast<int>(Common::UltrasonicPos::REAR_RIGHT_CORNER)].viewAngle = ULTRA_VIEW_ANGLE_RRC;
-    sensors[static_cast<int>(Common::UltrasonicPos::REAR_RIGHT_CORNER)].selIdx = ULTRA_IDX_RRC;
+    sensors[Common::UltrasonicPos::LEFT_REAR].pos.X = ULTRA_POS_X_LR;
+    sensors[Common::UltrasonicPos::LEFT_REAR].pos.Y = ULTRA_POS_Y_LR;
+    sensors[Common::UltrasonicPos::LEFT_REAR].viewAngle = ULTRA_VIEW_ANGLE_LR;
+    sensors[Common::UltrasonicPos::LEFT_REAR].selIdx = ULTRA_IDX_LR;
 
 
 
-    sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_REAR)].pos.X = ULTRA_POS_X_RiR;
-    sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_REAR)].pos.Y = ULTRA_POS_Y_RiR;
-    sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_REAR)].viewAngle = ULTRA_VIEW_ANGLE_RiR;
-    sensors[static_cast<int>(Common::UltrasonicPos::RIGHT_REAR)].selIdx = ULTRA_IDX_RiR;
+    sensors[Common::UltrasonicPos::REAR_LEFT_CORNER].pos.X = ULTRA_POS_X_RLC;
+    sensors[Common::UltrasonicPos::REAR_LEFT_CORNER].pos.Y = ULTRA_POS_Y_RLC;
+    sensors[Common::UltrasonicPos::REAR_LEFT_CORNER].viewAngle = ULTRA_VIEW_ANGLE_RLC;
+    sensors[Common::UltrasonicPos::REAR_LEFT_CORNER].selIdx = ULTRA_IDX_RLC;
+
+    sensors[Common::UltrasonicPos::REAR_LEFT].pos.X = ULTRA_POS_X_RL;
+    sensors[Common::UltrasonicPos::REAR_LEFT].pos.Y = ULTRA_POS_Y_RL;
+    sensors[Common::UltrasonicPos::REAR_LEFT].viewAngle = ULTRA_VIEW_ANGLE_RL;
+    sensors[Common::UltrasonicPos::REAR_LEFT].selIdx = ULTRA_IDX_RL;
+
+    sensors[Common::UltrasonicPos::REAR_RIGHT].pos.X = ULTRA_POS_X_RR;
+    sensors[Common::UltrasonicPos::REAR_RIGHT].pos.Y = ULTRA_POS_Y_RR;
+    sensors[Common::UltrasonicPos::REAR_RIGHT].viewAngle = ULTRA_VIEW_ANGLE_RR;
+    sensors[Common::UltrasonicPos::REAR_RIGHT].selIdx = ULTRA_IDX_RR;
+
+    sensors[Common::UltrasonicPos::REAR_RIGHT_CORNER].pos.X = ULTRA_POS_X_RRC;
+    sensors[Common::UltrasonicPos::REAR_RIGHT_CORNER].pos.Y = ULTRA_POS_Y_RRC;
+    sensors[Common::UltrasonicPos::REAR_RIGHT_CORNER].viewAngle = ULTRA_VIEW_ANGLE_RRC;
+    sensors[Common::UltrasonicPos::REAR_RIGHT_CORNER].selIdx = ULTRA_IDX_RRC;
+
+
+
+    sensors[Common::UltrasonicPos::RIGHT_REAR].pos.X = ULTRA_POS_X_RiR;
+    sensors[Common::UltrasonicPos::RIGHT_REAR].pos.Y = ULTRA_POS_Y_RiR;
+    sensors[Common::UltrasonicPos::RIGHT_REAR].viewAngle = ULTRA_VIEW_ANGLE_RiR;
+    sensors[Common::UltrasonicPos::RIGHT_REAR].selIdx = ULTRA_IDX_RiR;
 }
 
 void UltrasonicTask::initialize() {
@@ -132,7 +132,7 @@ void UltrasonicTask::run() {
 
                 msg.setCode(ultraPosToMsgCode(currentSensorPos));
                 msg.setData(sensors[static_cast<int>(currentSensorPos) - 1].sensedPoint.toByteArray()
-                    + sensors[static_cast<int>(currentSensorPos)].sensedPoint.toByteArray());
+                    + sensors[currentSensorPos].sensedPoint.toByteArray());
 
                 communicatorTask.setMessageToSend(msg, getTaskId());
             }
@@ -159,11 +159,11 @@ void UltrasonicTask::pingNextSensor() {
 
 void UltrasonicTask::echoCheck() {
     if (sensorConnection.check_timer()) {
-        sensors[static_cast<int>(currentSensorPos)].dist_measured = sensorConnection.ping_result / US_ROUNDTRIP_CM;
+        sensors[currentSensorPos].dist_measured = sensorConnection.ping_result / US_ROUNDTRIP_CM;
         busy = false;
 
     } else if (echoWatchdog.hasTimedOut()) {
-        sensors[static_cast<int>(currentSensorPos)].dist_measured = ULTRA_MAX_DIST;
+        sensors[currentSensorPos].dist_measured = ULTRA_MAX_DIST;
         busy = false;
         sensorConnection.timer_stop();
     }
@@ -171,14 +171,14 @@ void UltrasonicTask::echoCheck() {
 
 void UltrasonicTask::validateAndUpdateSensedPoints() {
     for (int pos = 0; pos < ULTRA_NUM_SENSORS; ++pos) {
-        sensors[static_cast<Common::UltrasonicPos>(pos)].validate(currentSampleIndex);
-        sensors[static_cast<Common::UltrasonicPos>(pos)].updatePoint();
+        sensors[pos].validate(currentSampleIndex);
+        sensors[pos].updatePoint();
     }
 }
 
 void UltrasonicTask::updateSensorSelection() {
 
-    uint8_t pos = static_cast<uint8_t>(sensors[static_cast<Common::UltrasonicPos>(currentSensorPos)].selIdx);
+    uint8_t pos = static_cast<uint8_t>(sensors[currentSensorPos].selIdx);
 
     // writes position to selection wires (as binary value)
     digitalWrite(ULTRA_SEL_0_PIN, (pos & 0x01) ? HIGH : LOW);
@@ -209,28 +209,22 @@ void UltrasonicTask::Sensor::validate(int sampleIndex) {
         int sampleCount = 0;
         bool outOfRangeFound = false;
 
-        // iterates through stored values (from latest to earliest) and counts how many values are also out of range of previous validated value (sign of error is also important to match)
-        // latest (minSampleNum - 1) results should be out of range for us to believe that current value is valid
-
-
-        // TODO compare previous values with current measured value, instead of checking if they are also out of range
-
+        // iterates through stored values (from latest to earliest) and counts how many values are in the given range of this value
+        // latest (minSampleNum - 1) results should be in the range for us to believe that current value is valid
 
         for (int idx = (sampleIndex + ULTRA_NUM_DIST_SAMPLES - 1) % ULTRA_NUM_DIST_SAMPLES;
             !outOfRangeFound && (idx != sampleIndex) && sampleCount < validation.minSampleNum;
             idx = (idx + ULTRA_NUM_DIST_SAMPLES - 1) % ULTRA_NUM_DIST_SAMPLES) {
 
-            if (!Common::isInRange(dist_stored[idx], prevValidatedValue, validation.relErr,
-                currentStoredValue < prevValidatedValue ? Common::ErrorSign::NEGATIVE : Common::ErrorSign::POSITIVE)) {
+            if (Common::isInRange(dist_stored[idx], dist_measured, validation.relErr))
                 ++sampleCount;
-            } else
+            else
                 outOfRangeFound = true;
         }
 
         // validation OK -> we believe that distance is really what we measured
         // validation FAILED -> validated value will be previous validated value
-        dist_valid = sampleCount >= validation.minSampleNum - 1 ?
-            currentStoredValue : prevValidatedValue;
+        dist_valid = sampleCount >= validation.minSampleNum - 1 ? currentStoredValue : prevValidatedValue;
     }
 }
 

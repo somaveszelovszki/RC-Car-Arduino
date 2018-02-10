@@ -63,10 +63,10 @@
 // DriveTask
 
 #define DRIVE_MSG_WATCHDOG_TIMEOUT                1000    // [ms]
-#define DRIVE_FORCE_STEERING_TIME                1000    // [ms]
+#define DRIVE_FORCE_STEERING_TIME                500    // [ms]
 #define DRIVE_FORCE_STOP_TIME                    3000    // [ms]
 #define DRIVE_PRE_CRASH_TIME_FORCE_STOP            0.5f        // critical time until crash - in [sec]
-#define DRIVE_PRE_CRASH_TIME_DRIVE_CMD_DISABLE    1.0f
+#define DRIVE_PRE_CRASH_TIME_DRIVE_CMD_DISABLE    0.8f
 
 
 // minimum distance to keep from obstacles - in [cm]
@@ -157,7 +157,7 @@
 #define ULTRA_VALID_MAX_DIST_SAMPLE_NUM            5        // -> if the result has been ULTRA_MAX_DIST for 2 times in a row, we believe it
 #define ULTRA_VALID_MAX_DIST_REL_ERR        0
 #define ULTRA_VALID_DEF_SAMPLE_NUM            2
-#define ULTRA_VALID_DEF_REL_ERR        0.5F
+#define ULTRA_VALID_DEF_REL_ERR        0.5f
 
 #define ULTRA_NUM_DIST_SAMPLES    max(ULTRA_VALID_MAX_DIST_SAMPLE_NUM, ULTRA_VALID_DEF_SAMPLE_NUM)
 
@@ -255,10 +255,33 @@
 
 // Absolute position is measured from the start position
 // (the moment the car is powered on, its position is saved as absolute origo)
-#define ENV_ABS_POINTS_TOTAL_DIST    400.0f
-#define ENV_ABS_POINTS_DIST            (CAR_WIDTH / 2)    // distance between stored absoulte points [cm]
-#define ENV_ABS_AXIS_POINTS_NUM        static_cast<int>(ENV_ABS_POINTS_TOTAL_DIST / ENV_ABS_POINTS_DIST)    // number of absolute points stored in a direction (x or y)
+#define ENV_ABS_POINTS_TOTAL_DIST   400.0f
+#define ENV_ABS_POINTS_DIST         (CAR_WIDTH / 2)    // distance between stored absoulte points [cm]
+#define ENV_ABS_AXIS_POINTS_NUM     static_cast<int>(ENV_ABS_POINTS_TOTAL_DIST / ENV_ABS_POINTS_DIST)    // number of absolute points stored in a direction (x or y)
 
 #define ENV_ABS_MIN_FIT_DIFF        (CAR_WIDTH / ENV_ABS_POINTS_DIST)    // minimum grid distance that car fits in (ratio of car width and environment points distance)
+
+#define ENV_ABS_POINTS_BIT_DEPTH    2
+
+// Array: supported bit depths
+
+#if ENV_ABS_POINTS_BIT_DEPTH == 1
+#   define ARRAY_1_EN true
+#else
+#   define ARRAY_1_EN false
+#endif // ENV_ABS_POINTS_BIT_DEPTH == 1
+
+#if ENV_ABS_POINTS_BIT_DEPTH == 2
+#   define ARRAY_2_EN true
+#else
+#   define ARRAY_2_EN false
+#endif // ENV_ABS_POINTS_BIT_DEPTH == 2
+
+#if ENV_ABS_POINTS_BIT_DEPTH == 4
+#   define ARRAY_4_EN true
+#else
+#   define ARRAY_4_EN false
+#endif // ENV_ABS_POINTS_BIT_DEPTH == 4
+
 
 #endif // RC_CAR__CONFIG__HPP
