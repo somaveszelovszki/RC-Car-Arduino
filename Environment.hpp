@@ -135,15 +135,11 @@ public:
 
     @returns The car position.
     */
-    const Point2f& getCarPosition() const {
+    const Point2f& getCarPos() const {
         return carPos;
     }
 
-    /** Sets relative point an obstacle - updates point in the environment grid.
-
-    @param relPoint The relative point to set as an obstacle.
-    */
-    void setRelativePointObstacle(const Point2f& relPoint);
+    Point2i getCarGridPos() const;
 
     /** @brief Gets grid point at the given coordinates.
 
@@ -162,7 +158,7 @@ public:
     */
     bool isRelativePointObstacle(const Point2f& relPoint) const;
 
-    void updateGrid(const Point2f *points[ULTRA_NUM_SENSORS]);
+    void updateGrid(const Point2f *sensedPoints[ULTRA_NUM_SENSORS]);
 
 #if __DEBUG
     /** @brief Prints grid points to the Serial port.

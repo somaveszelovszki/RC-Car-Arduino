@@ -24,6 +24,8 @@ private:
 
 public:
     typedef Array<B, Y>::type type;
+    static type dataMin = Array<B, Y>::dataMin;
+    static type dataMax = Array<B, Y>::dataMax;
 
     /** @brief Gets value at given X,Y coordinate.
 
@@ -44,7 +46,24 @@ public:
     void set(int x, int y, type value) {
         data[x].set(y, value);
     }
+
+    void increment(int x, int y);
+
+    void decrement(int x, int y);
 };
+template<int B, int X, int Y, int VPB>
+void Grid<B, X, Y, VPB>::increment(int x, int y) {
+    type value = get(x, y);
+    if (value < dataMax)
+        set(x, y, value + 1);
+}
+
+template<int B, int X, int Y, int VPB>
+void Grid<B, X, Y, VPB>::decrement(int x, int y) {
+    type value = get(x, y);
+    if (value > dataMin)
+        set(x, y, value - 1);
+}
 }
 
 #endif // RC_CAR__GRID__HPP

@@ -53,6 +53,8 @@ struct Selector;
 template <>
 struct Selector<1> {
     typedef bool type;
+    bool min = false;
+    bool max = true;
 };
 
 /** @brief Selects type and mask array for bit length of 2.
@@ -60,6 +62,8 @@ struct Selector<1> {
 template <>
 struct Selector<2> {
     typedef uint2_t type;
+    uint2_t min = static_cast<uint2_t>(0);
+    uint2_t max = static_cast<uint2_t>(3);
 };
 
 /** @brief Selects type and mask array for bit length of 4.
@@ -67,6 +71,8 @@ struct Selector<2> {
 template <>
 struct Selector<4> {
     typedef uint4_t type;
+    uint4_t min = static_cast<uint4_t>(0);
+    uint4_t max = static_cast<uint4_t>(15);
 };
 
 /** @brief Array for storing values requiring less than 8 bits.
@@ -87,6 +93,8 @@ private:
 
 public:
     typedef Selector<B>::type type;
+    static type dataMin = Selector<B>::min;
+    static type dataMax = Selector<B>::max;
 
     /** @brief Gets value at given position.
 

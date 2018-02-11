@@ -184,27 +184,26 @@ public:
 
     @tparam T Type of the elements.
     @param value The value to check.
-    @param boundaryLow The lower boundary.
-    @param boundaryHigh The higher boundary.
+    @param b1 The first boundary.
+    @param b2 The second boundary.
     @returns Boolean value indicating if the value is between the boundaries.
     */
     template <typename T>
-    static bool isBtw(T value, T boundaryLow, T boundaryHigh) {
-        return boundaryHigh >= boundaryLow ? value >= boundaryLow && value <= boundaryHigh
-            : value >= boundaryHigh && value <= boundaryLow;
+    static bool isBtw(T value, T b1, T b2) {
+        return b2 >= b1 ? value >= b1 && value <= b2 : value >= b2 && value <= b1;
     }
 
     /** @brief Incarcerates value between the given boundaries.
 
     @tparam T Type of the elements.
     @param value The value to incarcerate.
-    @param boundaryLow The lower boundary.
-    @param boundaryHigh The higher boundary.
+    @param b1 The lower boundary.
+    @param b2 The higher boundary.
     @returns The incarcerated value.
     */
     template <typename T>
-    static T incarcerate(T value, T boundaryLow, T boundaryHigh) {
-        return min(max(value, boundaryLow), boundaryHigh);
+    static T incarcerate(T value, T b1, T b2) {
+        return min(max(value, b1), b2);
     }
 
     /** @brief Copies elements of the source array into the destination array.

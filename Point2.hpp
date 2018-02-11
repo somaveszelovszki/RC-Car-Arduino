@@ -204,9 +204,9 @@ public:
     // NOTE: numPoints must be at least 1
     static void bbox(const Point2<T> *points[], int numPoints, Point2<T> *pBottomLeft, Point2<T> *pTopRight);
 
-    bool isInside(const Point2<T>& a, const Point2<T>& b, const Point2<T>& c) const;
-
     Common::Sign getAngleSign(const Vec2<T>& other, Common::RotationDir dir) const;
+
+    bool isInside(const Point2<T>& a, const Point2<T>& b, const Point2<T>& c) const;
 };
 
 template <typename T>
@@ -275,14 +275,6 @@ void Point2<T>::bbox(const Point2<T> *points[], int numPoints, Point2<T> *pBotto
 }
 
 template<typename T>
-bool Point2<T>::isInside(const Point2<T>& a, const Point2<T>& b, const Point2<T>& c) const {
-    Vec2<T> ap = *this - a, bp = *this - b, cp = *this - c,
-        ab = b - a, bc = c - b, ca = a - c;
-
-
-}
-
-template<typename T>
 Common::Sign Point2<T>::getAngleSign(const Vec2<T>& other, Common::RotationDir dir) const {
     float m;
     if (Common::isZero(X)) {
@@ -297,6 +289,30 @@ Common::Sign Point2<T>::getAngleSign(const Vec2<T>& other, Common::RotationDir d
     if (dir == Common::RotationDir::RIGHT)
         sign = static_cast<Common::RotationDir>(static_cast<int>(sign) * -1);
     return sign;
+}
+
+template<typename T>
+bool Point2<T>::isInside(const Point2<T>& a, const Point2<T>& b, const Point2<T>& c) const {
+    Vec2<T> ap = *this - a, bp = *this - b, cp = *this - c,
+        ab = b - a, bc = c - b, ca = a - c;
+
+    Common::RotationDir dir = Common::RotationDir::LEFT;
+
+    Common::Sign sA = ab.getAngleSign(ap, dir), sB = bc.getAngleSign(bp, dir), sC = ca.getAngleSign(cp, dir);
+
+    // if point is in line of the side, determines it if it is outside or on the line
+    if (sA == Common::Sign::ZERO && !Common::isBtw(ap.X, 0, ab.X))
+        return false;
+
+    if (sB == Common::Sign::ZERO && !Common::isBtw(bp.X, 0, bc.X))
+        return false;
+
+    if (sC == Common::Sign::ZERO && !Common::isBtw(cp.X, 0, ca.X))
+        return false;
+
+    // sum can be +-3 when all values are either POSITIVE or NEGATIVE,
+    // or it can be +-2 if one of the results is ZERO
+    return abs(static_cast<int>(sA) + static_cast<int>(sB) + static_cast<int>(sC)) >= 2;
 }
 
 }
