@@ -103,6 +103,24 @@ public:
         return *this;
     }
 
+    /** @brief Checks if two points are equal
+
+    @param other The other point.
+    @returns Boolean value indicating if the two points are equal.
+    */
+    bool operator==(const Point2<T>& other) {
+        return X == other.X && Y == other.Y;
+    }
+
+    /** @brief Checks if two points are not equal
+
+    @param other The other point.
+    @returns Boolean value indicating if the two points are not equal.
+    */
+    bool operator!=(const Point2<T>& other) {
+        return X != other.X || Y != other.Y;
+    }
+
     /** @brief Multiplies coordinates of the point with the given constant.
 
     @param c The constant.
@@ -153,6 +171,7 @@ public:
         return p * c;
     }
 
+
     /** @brief Calculates distance between the two points.
 
     @param other The other point.
@@ -202,7 +221,7 @@ public:
     static Point2<T> fromByteArray(const ByteArray<2>& bytes);
 
     // NOTE: numPoints must be at least 1
-    static void bbox(const Point2<T> *points[], int numPoints, Point2<T> *pBottomLeft, Point2<T> *pTopRight);
+    static void bbox(const Point2<T> points[], int numPoints, Point2<T> *pBottomLeft, Point2<T> *pTopRight);
 
     Common::Sign getAngleSign(const Vec2<T>& other, Common::RotationDir dir) const;
 
@@ -257,8 +276,8 @@ Point2<T> Point2<T>::fromByteArray(const ByteArray<2>& bytes) {
 }
 
 template<typename T>
-void Point2<T>::bbox(const Point2<T> *points[], int numPoints, Point2<T> *pBottomLeft, Point2<T> *pTopRight) {
-    *pBottomLeft = *pTopRight = points[0];
+void Point2<T>::bbox(const Point2<T> points[], int numPoints, Point2<T> *pBottomLeft, Point2<T> *pTopRight) {
+    *pBottomLeft = *pTopRight = &points[0];
     for (int i = 1; i < numPoints; ++i) {
         Point2<T> p = points[i];
 

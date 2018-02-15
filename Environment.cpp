@@ -12,12 +12,12 @@ Coordinate is relative to car, grid position is a position in the grid (0-indexe
 */
 #define GRID_POS_TO_COORD(pos) ((pos - ENV_ABS_AXIS_POINTS_NUM / 2) * ENV_ABS_POINTS_DIST)
 
-void Environment::SectionPointCalculator::setSection(const Point2f *pStartPoint, const Point2f *pEndPoint) {
+void Environment::SectionPointCalculator::setSection(const Point2f *pStartPoint, const Point2f *pEndPoint, float fixDiff = 0.0f) {
     startPoint = *pStartPoint;
     Vec2f wholeDiff = *pEndPoint - startPoint;
     float wholeDiffLength = wholeDiff.length();
 
-    pointsCount = min(wholeDiffLength / ENV_SECTION_POINTS_DIST + 1, ENV_SECTION_POINTS_MAX_NUM);
+    pointsCount = fixDiff ? wholeDiffLength / fixDiff : min(wholeDiffLength / ENV_SECTION_POINTS_DIST + 1, ENV_SECTION_POINTS_MAX_NUM);
     diff = wholeDiff / pointsCount;
     currentPointIdx = 0;
 }
@@ -48,41 +48,56 @@ bool Environment::isRelativePointObstacle(const Point2f& relPoint) const {
         && envGrid.get(gridPos.X, gridPos.Y);
 }
 
-void rc_car::Environment::updateGrid(const Point2f *sensedPoints[ULTRA_NUM_SENSORS]) {
-    Point2f bottomLeft, topRight;
-    Point2f::bbox(sensedPoints, ULTRA_NUM_SENSORS, &bottomLeft, &topRight);
+void rc_car::Environment::updateGrid(const Point2f const *sensedPoints[ULTRA_NUM_SENSORS]) {
+    const Point2f *pSectionStart, *pSectionEnd;
+    Common::UltrasonicPos sectionStartPos = Common::UltrasonicPos::RIGHT_FRONT;
 
-    Point2i gridBottomLeft = relPointToGridPoint(bottomLeft),
-        gridTopRight = relPointToGridPoint(topRight),
-        carGridPos = getCarGridPos();
+    pSectionStart = ultrasonicTask.getSensedPoint(sectionStartPos);
 
-    for (int x = gridBottomLeft.X; x <= gridTopRight.X; ++x) {
-        for (int y = gridBottomLeft.Y; y <= gridTopRight.Y; ++y) {
-            Point2i current(x, y), p1 = relPointToGridPoint(*sensedPoints[ULTRA_NUM_SENSORS - 1]);
-
-            // check if current point is inside polygon determined by the sensed points
-            // iterates through all sensed points and checks if current point is in the triangle determined by the 2 adjacent sensed points and the car position
-            bool isInside = false;
-            for (int i = 0; !isInside && i < ULTRA_NUM_SENSORS; ++i) {
-                Point2i p2 = relPointToGridPoint(*sensedPoints[i]);
-                isInside = current.isInside(carGridPos, p1, p2);
-                p1 = p2;
-            }
-
-            if (isInside)
-                envGrid.decrement(x, y);        // not obstacle
-            else
-                envGrid.increment(x, y);        // obstacle
-        }
-    }
-
+    // updates all sections in the grid (obstacle probability indexes of the points between the sensed points are incremented, inner points are decreased)
     for (int i = 0; i < ULTRA_NUM_SENSORS; ++i) {
-        Common::UltrasonicPos pos1 = static_cast<Common::UltrasonicPos>(i), pos2 = Common::nextUltrasonicPos(pos1);
-        // TODO calculate triangle (car middle and two adjacent sensed points)
 
+        pSectionEnd = ultrasonicTask.getSensedPoint(sectionStartPos = Common::nextUltrasonicPos(sectionStartPos));
+        sectionPointCalculator.setSection(pSectionStart, pSectionEnd, ENV_ABS_POINTS_DIST);
 
+        Point2i prevGridPoint = Point2i::ORIGO;
+        int currentGridPointIdx = 0;
+        while (sectionPointCalculator.nextExists()) {
+            Point2i gridPoint = relPointToGridPoint(sectionPointCalculator.next());
+            if (gridPoint != prevGridPoint) {
+                if (currentGridPointIdx < ENV_ABS_SECTION_POINTS_MAX_NUM)
+                    sectionGridPoints[currentGridPointIdx++] = gridPoint;
 
+                envGrid.increment(gridPoint.X, gridPoint.Y);
+                prevGridPoint = gridPoint;
+            }
+        }
 
+        int sectionGridPointsNum = currentGridPointIdx;
+
+        Point2i bl, tr; // bottom left, top right corners of the trinagle bounding box
+        Point2i carGridPos = relPointToGridPoint(carPos),
+            startGridPos = relPointToGridPoint(*pSectionStart),
+            endGridPos = relPointToGridPoint(*pSectionEnd);
+
+        Point2i triangle[3] = {
+            carGridPos,
+            startGridPos,
+            endGridPos
+        };
+
+        // checks points defined by the bounding box of the car position and the start and end points if the are inside the triangle defined by these points
+        Point2i::bbox(triangle, 3, &bl, &tr);
+        for (int x = bl.X; x <= tr.X; ++x) {
+            for (int y = bl.Y; y <= tr.Y; ++y) {
+                Point2i current(x, y);
+                // checks if current point is inside the triangle determined by the car position and start and end points
+                // if yes (and it is not a section point, then decrements its obstacle probability, because it has not been sensed as an obstacle)
+                if (current.isInside(carGridPos, startGridPos, endGridPos) && !Common::contains(current, sectionGridPoints, sectionGridPointsNum))
+                    envGrid.decrement(current.X, current.Y);
+            }
+        }
+
+        pSectionStart = pSectionEnd;
     }
-
 }

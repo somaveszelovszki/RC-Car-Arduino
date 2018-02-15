@@ -146,6 +146,7 @@ void rc_car::DriveTask::updateEnvironmentGridPoints() {
     const Point2f *pSectionStart, *pSectionEnd;
 
     Common::UltrasonicPos sectionStartPos = Common::UltrasonicPos::RIGHT_FRONT;
+    pSectionStart = ultrasonicTask.getSensedPoint(sectionStartPos);
 
     for (int i = 0; i < ULTRA_NUM_SENSORS; ++i) {
         pSectionEnd = ultrasonicTask.getSensedPoint(sectionStartPos = Common::nextUltrasonicPos(sectionStartPos));

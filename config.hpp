@@ -263,6 +263,8 @@
 
 #define ENV_ABS_POINTS_BIT_DEPTH    2
 
+#define ENV_ABS_SECTION_POINTS_MAX_NUM      10  // max number of grid points in a section 
+
 // Array: supported bit depths
 
 #if ENV_ABS_POINTS_BIT_DEPTH == 1

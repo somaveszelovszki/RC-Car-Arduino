@@ -30,6 +30,10 @@ private:
     */
     Grid<ENV_ABS_POINTS_BIT_DEPTH, ENV_ABS_AXIS_POINTS_NUM, ENV_ABS_AXIS_POINTS_NUM> envGrid;
 
+    /** @brief Array containing the grid points of the current section.
+    */
+    Point2i sectionGridPoints[ENV_ABS_SECTION_POINTS_MAX_NUM];
+
     /** @brief Calculates section points.
     Sections are a subset of the environment points - they are between two sensed points.
     The whole set of sections equals the environment points' set.
@@ -60,8 +64,9 @@ private:
 
         @param pStartPoint Pointer to the starting point of the section.
         @param pEndPoint Pointer to the end point of the section.
+        @param fixDiff If set, section points will be chosen with this difference relative to each other.
         */
-        void setSection(const Point2f *pStartPoint, const Point2f *pEndPoint);
+        void setSection(const Point2f *pStartPoint, const Point2f *pEndPoint, float fixDiff = 0.0f);
 
         /** @brief Checks if there still exists a point in the section that has not been acquired.
 
@@ -158,7 +163,7 @@ public:
     */
     bool isRelativePointObstacle(const Point2f& relPoint) const;
 
-    void updateGrid(const Point2f *sensedPoints[ULTRA_NUM_SENSORS]);
+    void updateGrid(const Point2f const *sensedPoints[ULTRA_NUM_SENSORS]);
 
 #if __DEBUG
     /** @brief Prints grid points to the Serial port.
