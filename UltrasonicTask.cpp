@@ -131,8 +131,11 @@ void UltrasonicTask::run() {
             if (sendEnvironmentEnabled && currentSensorPos % 2) {
 
                 msg.setCode(ultraPosToMsgCode(currentSensorPos));
-                msg.setData(sensors[static_cast<int>(currentSensorPos) - 1].sensedPoint.toByteArray()
-                    + sensors[currentSensorPos].sensedPoint.toByteArray());
+
+                ByteArray<2> lowBytes, highBytes;
+                sensors[static_cast<int>(currentSensorPos) - 1].sensedPoint.toByteArray(lowBytes);
+                sensors[currentSensorPos].sensedPoint.toByteArray(highBytes);
+                msg.setData(lowBytes + highBytes);
 
                 communicatorTask.setMessageToSend(msg, getTaskId());
             }

@@ -209,9 +209,9 @@ public:
 
     /** @brief Converts point to byte array.
 
-    @returns The point as a ByteArray object.
+    @param The result ByteArray object.
     */
-    ByteArray<2> toByteArray() const;
+    void toByteArray(ByteArray<2>& result) const;
 
     /** @brief Creates point from byte array.
 
@@ -255,16 +255,13 @@ float Point2<T>::getAngle(const Vec2<T>& other, Common::RotationDir dir) const {
 }
 
 template<typename T>
-ByteArray<2> Point2<T>::toByteArray() const {
-    ByteArray<2> result;
+void Point2<T>::toByteArray(ByteArray<2>& result) const {
     // maps X and Y coordinates to fit into a byte
     int _X = Common::incarcerate(static_cast<int>(X * 128 / ULTRA_MAX_DIST), -128, 127),
         _Y = Common::incarcerate(static_cast<int>(Y * 128 / ULTRA_MAX_DIST), -128, 127);
 
     result[0] = static_cast<byte>(_X);
     result[1] = static_cast<byte>(_Y);
-
-    return result;
 }
 
 template<typename T>

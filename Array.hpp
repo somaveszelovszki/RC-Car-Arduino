@@ -75,21 +75,27 @@ struct Selector<4> {
     uint4_t max = static_cast<uint4_t>(15);
 };
 
-/** @brief Array for storing values requiring less than 8 bits.
+/** @brief Array for storing values requiring less than __array_container_bits bits.
 Values are stored in a byte array to reduce memory need.
 
 @tparam B Bit length of the stored values (1, 2 or 4).
 @tparam N Number of binary values stored in the array.
 NOTE: (B * N) must be a multiple of 8!
-@tparam VPB Stored values per byte.
-NOTE: Do not set this parameter explicitly!
 */
-template <int B, int N, int VPB = 8 / B>
+template <int B, int N>
 class Array {
 private:
+    /** @brief Array container type - type of the chunks in which the data is stored.
+    */
+    typedef byte container_type;
+
+    /** @brief Stored values per byte.
+    */
+    static int VPB = (sizeof(container_type) * 8) / B;
+
     /** @brief Byte array containing the binary values.
     */
-    byte data[N / VPB];
+    container_type data[N / VPB];
 
 public:
     typedef Selector<B>::type type;
@@ -110,14 +116,58 @@ public:
     @param pos The position of the value to set.
     @param value The value to set.
     */
-    void set(int pos, type value) {
-        byte container = mask[pos % VPB];
-        if (value)
-            data[pos / VPB] |= mask[pos % VPB];
-        else
-            data[pos / VPB] &= ~mask[pos % VPB];
-    }
+    void set(int pos, type value);
+
+    class StreamWriter {
+    private:
+        int pos = -1;
+        Array<B, N>& ar;
+
+    public:
+        /** @brief Sets array reference and resets position.
+
+        @param _ar The array reference.
+        */
+        void setArray(Array<B, N>& _ar) {
+            ar = _ar;
+            pos = 0;
+        }
+
+        /** @brief Writes next segment to byte array.
+
+        @param result The result byte array.
+        @returns Boolean value indicating if whole array has been written.
+        */
+        bool next(ByteArray<COMM_MSG_DATA_LENGTH>& result);
+    };
+
+    friend class StreamWriter;
 };
+
+template<int B, int N>
+void Array<B, N>::set(int pos, type value) {
+    byte container = mask[pos % VPB];
+    if (value)
+        data[pos / VPB] |= mask[pos % VPB];
+    else
+        data[pos / VPB] &= ~mask[pos % VPB];
+}
+
+bool Array<B, N>::StreamWriter::next(ByteArray<COMM_MSG_DATA_LENGTH>& result) {
+
+    for (int n = 0; n < COMM_MSG_DATA_LENGTH / sizeof(container_type) && pos < N; ++n, ++pos) {
+        result[n] = ar.data[pos];
+    }
+
+    bool finished = false;
+
+    if (pos == N) {
+        pos = 0;
+        finished = true;
+    }
+
+    return finished;
+}
 }
 
 #endif // RC_CAR__ARRAY__HPP
