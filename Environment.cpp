@@ -54,19 +54,22 @@ void rc_car::Environment::updateGrid(const Point2f const *sensedPoints[ULTRA_NUM
 
     pSectionStart = ultrasonicTask.getSensedPoint(sectionStartPos);
 
-    // updates all sections in the grid (obstacle probability indexes of the points between the sensed points are incremented, inner points are decreased)
+    // updates all sections in the grid (obstacle probability of the points between the sensed points are incremented, inner points are decremented)
     for (int i = 0; i < ULTRA_NUM_SENSORS; ++i) {
 
         pSectionEnd = ultrasonicTask.getSensedPoint(sectionStartPos = Common::nextUltrasonicPos(sectionStartPos));
         sectionPointCalculator.setSection(pSectionStart, pSectionEnd, ENV_ABS_POINTS_DIST);
 
+        // section points cannot be in the origo, so it's a good initial value
         Point2i prevGridPoint = Point2i::ORIGO;
         int currentGridPointIdx = 0;
-        while (sectionPointCalculator.nextExists()) {
+
+        // iterates through section points, adds them to the section grid points array,
+        // and increments obstacle probabilities (section points are sensed as obstacles)
+        while (sectionPointCalculator.nextExists() && currentGridPointIdx < ENV_ABS_SECTION_POINTS_MAX_NUM) {
             Point2i gridPoint = relPointToGridPoint(sectionPointCalculator.next());
             if (gridPoint != prevGridPoint) {
-                if (currentGridPointIdx < ENV_ABS_SECTION_POINTS_MAX_NUM)
-                    sectionGridPoints[currentGridPointIdx++] = gridPoint;
+                sectionGridPoints[currentGridPointIdx++] = gridPoint;
 
                 envGrid.increment(gridPoint.X, gridPoint.Y);
                 prevGridPoint = gridPoint;
@@ -75,7 +78,7 @@ void rc_car::Environment::updateGrid(const Point2f const *sensedPoints[ULTRA_NUM
 
         int sectionGridPointsNum = currentGridPointIdx;
 
-        Point2i bl, tr; // bottom left, top right corners of the trinagle bounding box
+        Point2i bl, tr;     // bottom left, top right corners of the triangle bounding box
         Point2i carGridPos = relPointToGridPoint(carPos),
             startGridPos = relPointToGridPoint(*pSectionStart),
             endGridPos = relPointToGridPoint(*pSectionEnd);

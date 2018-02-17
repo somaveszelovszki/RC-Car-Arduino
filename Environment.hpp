@@ -163,6 +163,12 @@ public:
     */
     bool isRelativePointObstacle(const Point2f& relPoint) const;
 
+    /** @brief Updates environment grid.
+    For points that has been sensed as obstacles, increments obstacle probability,
+    for points that are between the car and the sensed points (where there is no obstacle) decrements obstacle probability.
+
+    @param sensedPoints Array of the sensed points.
+    */
     void updateGrid(const Point2f const *sensedPoints[ULTRA_NUM_SENSORS]);
 
 #if __DEBUG
