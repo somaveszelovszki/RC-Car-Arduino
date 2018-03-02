@@ -274,19 +274,19 @@ Point2<T> Point2<T>::fromByteArray(const ByteArray<2>& bytes) {
 
 template<typename T>
 void Point2<T>::bbox(const Point2<T> points[], int numPoints, Point2<T> *pBottomLeft, Point2<T> *pTopRight) {
-    *pBottomLeft = *pTopRight = &points[0];
+    *pBottomLeft = *pTopRight = points[0];
     for (int i = 1; i < numPoints; ++i) {
         Point2<T> p = points[i];
 
         if (p.X < pBottomLeft->X)
-            *pBottomLeft->X = p.X;
+            pBottomLeft->X = p.X;
         else if (p.X > pTopRight->X)
             pTopRight->X = p.X;
 
         if (p.Y < pBottomLeft->Y)
-            *pBottomLeft->Y = p.Y;
+            pBottomLeft->Y = p.Y;
         else if (p.Y > pTopRight->Y)
-            *pTopRight->Y = p.Y;
+            pTopRight->Y = p.Y;
     }
 }
 
@@ -295,7 +295,7 @@ Common::Sign Point2<T>::getAngleSign(const Vec2<T>& other, Common::RotationDir d
     float m;
     if (Common::isZero(X)) {
         m = Y > 0 ? -other.X : other.X;
-    } else if (Comomn::isZero(other.X)) {
+    } else if (Common::isZero(other.X)) {
         m = other.Y > 0 ? X : -X;
     } else {
         m = Y / static_cast<float>(X) - other.Y / static_cast<float>(other.X);
@@ -303,7 +303,7 @@ Common::Sign Point2<T>::getAngleSign(const Vec2<T>& other, Common::RotationDir d
 
     Common::Sign sign = Common::sgn(m);
     if (dir == Common::RotationDir::RIGHT)
-        sign = static_cast<Common::RotationDir>(static_cast<int>(sign) * -1);
+        sign = static_cast<Common::Sign>(static_cast<int>(sign) * -1);
     return sign;
 }
 

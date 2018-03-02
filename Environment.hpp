@@ -89,10 +89,14 @@ private:
     */
     SectionPointCalculator sectionPointCalculator;
 
+    const Point2f *sensedPoints;
+
 public:
-    /** @brief Constructor - resets grid.
+    /** @brief Constructor - resets grid and sets sensed points array.
+
+    @param _sensedPoints Array of the sensed points (provided by the UltrasonicTask).
     */
-    Environment();
+    Environment(const Point2f *_sensedPoints);
 
     /** @brief Converts relative point to grid point.
     Relative points' coordinates are relative to the car's current position.
@@ -166,10 +170,8 @@ public:
     /** @brief Updates environment grid.
     For points that has been sensed as obstacles, increments obstacle probability,
     for points that are between the car and the sensed points (where there is no obstacle) decrements obstacle probability.
-
-    @param sensedPoints Array of the sensed points.
     */
-    void updateGrid(const Point2f const *sensedPoints[ULTRA_NUM_SENSORS]);
+    void updateGrid();
 
 #if __DEBUG
     /** @brief Prints grid points to the Serial port.

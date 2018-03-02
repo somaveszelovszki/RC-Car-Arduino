@@ -38,13 +38,13 @@ const Message& CommunicatorTask::getReceivedMessage(int taskId) {
 }
 
 bool CommunicatorTask::setMessageToSend(const Message& msg, int taskId) {
-    bool noHighPrioInBuff = !__sendAvailable[taskId] || sendMsgs[taskId].getPriority() < Message::HIGH_PRIO;
-    if (noHighPrioInBuff) {
+    bool isBufferFree = !__sendAvailable[taskId];
+    if (isBufferFree) {
         sendMsgs[taskId] = msg;
         __sendAvailable[taskId] = true;
     }
 
-    return noHighPrioInBuff;
+    return isBufferFree;
 }
 
 bool CommunicatorTask::receiveChars() {

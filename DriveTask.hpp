@@ -82,11 +82,7 @@ private:
 public:
     /** @brief Constructor - sets watchdog timeouts.
     */
-    DriveTask() : PeriodicTask(TASK_PERIOD_TIME_DRIVE, TASK_WATCHDOG_TIMEOUT_DRIVE),
-        msgWatchdog(DRIVE_MSG_WATCHDOG_TIMEOUT),
-        forceSteeringWatchdog(DRIVE_FORCE_STEERING_TIME, Watchdog::State::STOPPED),
-        forceStopWatchdog(DRIVE_FORCE_STOP_TIME, Watchdog::State::STOPPED),
-        mode(Common::DriveMode::SAFE_DRIVE) {}
+    DriveTask();
 
     /** @brief Initializes motor handler.
     NOTE: Compulsory TASK function - initializes task!

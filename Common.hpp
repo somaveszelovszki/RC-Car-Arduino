@@ -129,7 +129,7 @@ public:
 
     template <typename T>
     static sgn(const T& value) {
-        return value > static_cast<T>(0) ? Sign::POSITIVE ? value < static_cast<T>(0) ? Sign::NEGATIVE : Sign::ZERO;
+        return value > static_cast<T>(0) ? Sign::POSITIVE : value < static_cast<T>(0) ? Sign::NEGATIVE : Sign::ZERO;
     }
 
     /** @brief Contains validation data - hepls when validating values according to previous values.
@@ -261,14 +261,14 @@ public:
     @param value The integer value.
     @param dest The destination byte array.
     */
-    static void intToBytes(int32_t value, byte dest[4]);
+    static void intToBytes(int32_t value, byte dest[]);
 
     /** @brief Converts float value to byte array.
 
     @param value The float value.
     @param dest The destination byte array.
     */
-    static void floatToBytes(float value, byte dest[4]);
+    static void floatToBytes(float value, byte dest[]);
 
     /** @brief Sets binary variable to given value and returns its previous state.
     NOTE: Interrupt are disabled during the operation, so it is atomic!

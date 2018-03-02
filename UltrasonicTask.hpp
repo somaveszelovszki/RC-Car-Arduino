@@ -44,20 +44,12 @@ private:
         */
         float viewAngle;
 
-        /** @brief The sensed points position - relative to the car's current position.
-        */
-        Point2f sensedPoint;
-
         /** @brief Validates measured points for all the sensors.
 
         @param sampleIndex The index of the sample that needs to be validated.
         NOTE: Always equals currentSampleIndex!
         */
         void validate(int sampleIndex);
-
-        /** @brief Updates sensed point according to sensor's position, sensor's view angle and the current validated distance.
-        */
-        void updatePoint();
     };
 
     /** @brief Array of sensors containing sensor data and distances.
@@ -111,16 +103,25 @@ private:
     */
     void updateSensorSelection();
 
-    /** @brief Converts ultrasonic sensor position to message code.
+    /** @brief Updates sensed point according to sensor's position, sensor's view angle and the current validated distance.
+
+    @param sensorPos The sensor position.
+    */
+    void updatePoint(Common::UltrasonicPos sensorPos);
+
+    /** @brief Converts ultrasonic sensor position to message code byte.
 
     @param pos The ultrasonic sensor position.
-    @returns The message code.
+    @returns The message code byte.
     */
-    Message::CODE ultraPosToMsgCode(Common::UltrasonicPos pos) {
-        return static_cast<Message::CODE>(static_cast<int>(Message::CODE::Ultra0_1_EnvPoint) + static_cast<int>(pos) / 2);
+    byte ultraPosToMsgCode(Common::UltrasonicPos pos) {
+        return Message::CODES[Message::CODE::UltraEnvPoint].codeByte + pos / 2;
     }
 
 public:
+    /** @brief The sensed points position - relative to the car's current position.
+    */
+    Point2f sensedPoints[ULTRA_NUM_SENSORS];
     /** @brief Constructor - initializes period time, timeout and sensors' data, sets up sensor connection.
     */
     UltrasonicTask();
@@ -190,14 +191,6 @@ public:
     */
     void validateAndUpdateSensedPoints();
 
-    /** @brief Gets sensed point of the selected sensor.
-
-    @param sensorPos The position of the sensor.
-    @returns The sensed point of the selected sensor.
-    */
-    const Point2f* getSensedPoint(Common::UltrasonicPos sensorPos) const {
-        return &sensors[sensorPos].sensedPoint;
-    }
     /** @brief Gets the UltrasonicPos that is nearest to the current steering angle.
     Therefore gives the direction of the car in UltrasonicPos.
 

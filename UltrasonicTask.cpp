@@ -133,8 +133,8 @@ void UltrasonicTask::run() {
                 msg.setCode(ultraPosToMsgCode(currentSensorPos));
 
                 ByteArray<2> lowBytes, highBytes;
-                sensors[static_cast<int>(currentSensorPos) - 1].sensedPoint.toByteArray(lowBytes);
-                sensors[currentSensorPos].sensedPoint.toByteArray(highBytes);
+                sensedPoints[static_cast<int>(currentSensorPos) - 1].toByteArray(lowBytes);
+                sensedPoints[currentSensorPos].toByteArray(highBytes);
                 msg.setData(lowBytes + highBytes);
 
                 communicatorTask.setMessageToSend(msg, getTaskId());
@@ -175,7 +175,7 @@ void UltrasonicTask::echoCheck() {
 void UltrasonicTask::validateAndUpdateSensedPoints() {
     for (int pos = 0; pos < ULTRA_NUM_SENSORS; ++pos) {
         sensors[pos].validate(currentSampleIndex);
-        sensors[pos].updatePoint();
+        updatePoint(static_cast<Common::UltrasonicPos>(pos));
     }
 }
 
@@ -231,11 +231,12 @@ void UltrasonicTask::Sensor::validate(int sampleIndex) {
     }
 }
 
-void UltrasonicTask::Sensor::updatePoint() {
+void UltrasonicTask::updatePoint(Common::UltrasonicPos sensorPos) {
     // view angles are relative to the y-axis, but now we need the angle frm the x-axis
     // the conversion is defined by dirAngleToXY(viewAngle)
-    sensedPoint.X = pos.X + dist_valid * cos(dirAngleToXY(viewAngle));
-    sensedPoint.Y = pos.Y + dist_valid * sin(dirAngleToXY(viewAngle));
+    Sensor& sensor = sensors[sensorPos];
+    sensedPoints[sensorPos].X = sensor.pos.X + sensor.dist_valid * cos(dirAngleToXY(sensor.viewAngle));
+    sensedPoints[sensorPos].Y = sensor.pos.Y + sensor.dist_valid * sin(dirAngleToXY(sensor.viewAngle));
 }
 
 Common::UltrasonicPos UltrasonicTask::getForwardPos(float steeringAngle) const {
@@ -256,7 +257,7 @@ Common::UltrasonicPos UltrasonicTask::getForwardPos(float steeringAngle) const {
 void UltrasonicTask::executeMessage() {
     switch (msg.getCode()) {
 
-    case Message::CODE::EnableEnvironment:
+    case Message::CODE::EnvEn:
         sendEnvironmentEnabled = static_cast<bool>(msg.getDataAsInt());
         communicatorTask.setMessageToSend(Message::ACK, getTaskId());
         break;

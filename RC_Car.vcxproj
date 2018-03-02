@@ -101,6 +101,7 @@
     <ClInclude Include="__vm\.RC_Car.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Array.cpp" />
     <ClCompile Include="Message.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="CommunicatorTask.cpp" />

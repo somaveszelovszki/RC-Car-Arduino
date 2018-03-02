@@ -10,6 +10,13 @@ extern CommunicatorTask communicatorTask;
 extern UltrasonicTask ultrasonicTask;
 extern RotaryTask rotaryTask;
 
+DriveTask::DriveTask() : PeriodicTask(TASK_PERIOD_TIME_DRIVE, TASK_WATCHDOG_TIMEOUT_DRIVE),
+    msgWatchdog(DRIVE_MSG_WATCHDOG_TIMEOUT),
+    forceSteeringWatchdog(DRIVE_FORCE_STEERING_TIME, Watchdog::State::STOPPED),
+    forceStopWatchdog(DRIVE_FORCE_STOP_TIME, Watchdog::State::STOPPED),
+    mode(Common::DriveMode::SAFE_DRIVE),
+    environment(ultrasonicTask.sensedPoints) {}
+
 void DriveTask::initialize() {
     motorHandler.initialize();
 }
@@ -134,16 +141,11 @@ void DriveTask::executeMessage() {
     }
 }
 
-void rc_car::DriveTask::updateEnvironmentGridPoints() {
-
-    const Point2f *sensedPoints[ULTRA_NUM_SENSORS];
-    for (int i = 0; i < ULTRA_NUM_SENSORS; ++i)
-        sensedPoints[i] = ultrasonicTask.getSensedPoint(static_cast<Common::UltrasonicPos>(i));
-
-    environment.updateGrid(sensedPoints);
+void DriveTask::updateEnvironmentGridPoints() {
+    environment.updateGrid();
 
     //--------------------------------------------------
-    const Point2f *pSectionStart, *pSectionEnd;
+    /*const Point2f *pSectionStart, *pSectionEnd;
 
     Common::UltrasonicPos sectionStartPos = Common::UltrasonicPos::RIGHT_FRONT;
     pSectionStart = ultrasonicTask.getSensedPoint(sectionStartPos);
@@ -161,15 +163,15 @@ void rc_car::DriveTask::updateEnvironmentGridPoints() {
     }
 
     if (!(gridPrintCntr++ % 500) && false)
-        environment.print();
+        environment.print();*/
 }
 
-bool rc_car::DriveTask::isDistanceCritical(float dist, float minDist) {
+bool DriveTask::isDistanceCritical(float dist, float minDist) {
     return dist == dist       // not NaN
         && dist > 0 && dist <= minDist;
 }
 
-void rc_car::DriveTask::calculateRemainingTimes(Common::UltrasonicPos startPos) {
+void DriveTask::calculateRemainingTimes(Common::UltrasonicPos startPos) {
 
     const Point2f *pSectionStart, *pSectionEnd;
 
@@ -179,8 +181,8 @@ void rc_car::DriveTask::calculateRemainingTimes(Common::UltrasonicPos startPos) 
     //DEBUG_println("####################");
 
     for (int i = 0; i < ENV_SECTIONS_NUM; ++i) {
-        pSectionStart = ultrasonicTask.getSensedPoint(startPos);
-        pSectionEnd = ultrasonicTask.getSensedPoint(startPos = Common::nextUltrasonicPos(startPos));
+        pSectionStart = &ultrasonicTask.sensedPoints[startPos];
+        pSectionEnd = &ultrasonicTask.sensedPoints[startPos = Common::nextUltrasonicPos(startPos)];
         environment.setSection(pSectionStart, pSectionEnd);
 
         float minRemainingTime;

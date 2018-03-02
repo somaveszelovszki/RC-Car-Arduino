@@ -16,7 +16,7 @@ float Common::bytesToFloat(const byte bytes[], int startIndex = 0) {
     //return *reinterpret_cast<const float*>(&bytes[startIndex]);
 }
 
-void Common::intToBytes(int32_t value, byte dest[4]) {
+void Common::intToBytes(int32_t value, byte dest[]) {
     dest[0] = static_cast<byte>(value >> 24);
     dest[1] = static_cast<byte>(value >> 16);
     dest[2] = static_cast<byte>(value >> 8);
@@ -25,7 +25,7 @@ void Common::intToBytes(int32_t value, byte dest[4]) {
     //copy<4>(reinterpret_cast<byte*>(&value), dest);
 }
 
-void Common::floatToBytes(float value, byte dest[4]) {
+void Common::floatToBytes(float value, byte dest[]) {
     int32_t intVal = *reinterpret_cast<int32_t*>(&value);
     intToBytes(intVal, dest);
 

@@ -40,7 +40,7 @@ public:
 
     @param _value The array of byte values to convert to ByteArray.
     */
-    explicit ByteArray(const byte _value[size]) {
+    explicit ByteArray(const byte _value[]) {
         setValue(_value);
     }
 
@@ -48,7 +48,7 @@ public:
 
     @param dest The destination byte array.
     */
-    void getValue(byte dest[size]) const {
+    void getValue(byte dest[]) const {
         Common::copy<size>(value, dest);
     }
 
@@ -56,7 +56,7 @@ public:
 
     @param _value The source byte array.
     */
-    void setValue(const byte _value[size]) {
+    void setValue(const byte _value[]) {
         Common::copy<size>(_value, value);
     }
 

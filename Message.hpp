@@ -11,41 +11,44 @@ class Message {
 
 public:
 
-    /** @brief Defines message priority.
-    */
-    enum Prio {
-        LOW_PRIO = 0,
-        HIGH_PRIO
-    };
-
     /** @brief Data value for indicating boolean TRUE.
     */
-    static const ByteArray<COMM_MSG_DATA_LENGTH> BOOL_value_TRUE;
+    static const ByteArray<COMM_MSG_DATA_LENGTH> BOOL_TRUE;
 
     /** @brief Data value for indicating boolean FALSE.
     */
-    static const ByteArray<COMM_MSG_DATA_LENGTH> BOOL_value_FALSE;
+    static const ByteArray<COMM_MSG_DATA_LENGTH> BOOL_FALSE;
 
     /** @brief Message separator byte array.
     */
     static const ByteArray<COMM_MSG_SEPARATOR_LENGTH> SEPARATOR;
 
     enum CODE {
-        ACK_ = 0b00000000,        // for acknowledgements
-        Speed = 0b00000001,       // [cm/sec] (>0 means FORWARD)
-        SteeringAngle = 0b00000010,        // [degree] (>0 means LEFT)
-        DriveMode = 0b00000011,        // values in Common::DriveMode
-
-        Ultra0_1_EnvPoint = 0b00001000,       // sensed points for sensors 0 and 1
-        Ultra2_3_EnvPoint = 0b00001001,       // sensed points for sensors 2 and 3
-        Ultra4_5_EnvPoint = 0b00001010,       // sensed points for sensors 4 and 5
-        Ultra6_7_EnvPoint = 0b00001011,       // sensed points for sensors 6 and 7
-        Ultra8_9_EnvPoint = 0b00001100,       // sensed points for sensors 8 and 9
-        Ultra10_11_EnvPoint = 0b00001101,       // sensed points for sensors 10 and 11
-        Ultra12_13_EnvPoint = 0b00001110,       // sensed points for sensors 12 and 13
-        Ultra14_15_EnvPoint = 0b00001111,       // sensed points for sensors 14 and 15
-        EnableEnvironment = 0b00010000        // enable/disable environment point sending
+        ACK_ = 0,       // for acknowledgements
+        Speed,          // [cm/sec] (>0 means FORWARD)
+        SteeringAngle,  // [degree] (>0 means LEFT)
+        DriveMode,      // values in Common::DriveMode
+        EnvEn,          // enable/disable environment point sending
+        UltraEnvPoint,  // group for sensed points
+        EnvGrid,        // group for environment grid points
+        NUM_CODES
     };
+
+    class Code {
+    public:
+        CODE codeIdx;
+        byte codeByte;
+        byte matchPattern;
+
+        Code() {}
+
+        Code(CODE _codeIdx, byte _codeByte, byte _matchPattern = static_cast<byte>(0b11111111))
+            : codeIdx(_codeIdx), codeByte(_codeByte), matchPattern(_matchPattern) {}
+
+        static CODE apply(byte code);
+    };
+
+    static const Code CODES[CODE::NUM_CODES];
 
     /** @brief Pre-defined acknowledge message.
     */
@@ -54,65 +57,101 @@ public:
 private:
     /** @brief The message code.
     */
-    CODE code;
+    Code code;
+
+    /** @brief The message code byte - may be different from the code in case of code groups.
+    */
+    byte codeByte;
 
     /** @brief The message data.
     */
     ByteArray<COMM_MSG_DATA_LENGTH> data;
 
-    /** @brief The message priority.
-    */
-    Prio prio;
-
 public:
 
-    /** @brief Constructor - set priority to LOW_PRIO.
+    /** @brief Constructor.
     */
-    Message() : prio(LOW_PRIO) {}
+    Message() {}
 
-    /** @brief Constructor - sets code, byte array data and priority.
+    /** @brief Constructor - sets code and byte array data.
 
     @param _code The code to set.
     @param _data The byte array data to set.
-    @param _prio The priority to set.
     */
-    Message(CODE _code, const ByteArray<4>& _data, Prio _prio = LOW_PRIO) : code(_code), prio(_prio) {
+    Message(CODE _code, const ByteArray<4>& _data) {
+        code = CODES[_code];
+        codeByte = code.codeByte;
         setData(_data);
     }
 
-    /** @brief Constructor - sets code, integer data and priority.
+    /** @brief Constructor - sets code and integer data.
 
     @param _code The code to set.
     @param _data The integer data to set.
-    @param _prio The priority to set.
     */
-    Message(CODE _code, int32_t _data, Prio _prio = LOW_PRIO) : code(_code), prio(_prio) {
+    Message(CODE _code, int32_t _data) {
+        code = CODES[_code];
+        codeByte = code.codeByte;
         setData(_data);
     }
 
-    /** @brief Constructor - sets code, float data and priority.
+    /** @brief Constructor - sets code and float data.
 
     @param _code The code to set.
     @param _data The float data to set.
-    @param _prio The priority to set.
     */
-    Message(CODE _code, float _data, Prio _prio = LOW_PRIO) : code(_code), prio(_prio) {
+    Message(CODE _code, float _data) {
+        code = CODES[_code];
+        codeByte = code.codeByte;
         setData(_data);
     }
 
-    /** @brief Copies code, data and priority of the other message.
+    /** @brief Constructor - sets code and byte array data.
+
+    @param _codeByte The code byte to set.
+    @param _data The byte array data to set.
+    */
+    Message(byte _codeByte, const ByteArray<4>& _data) {
+        codeByte = _codeByte;
+        code = CODES[Code::apply(_codeByte)];
+        setData(_data);
+    }
+
+    /** @brief Constructor - sets code and byte array data.
+
+    @param _codeByte The code byte to set.
+    @param _data The byte array data to set.
+    */
+    Message(byte _codeByte, int32_t _data) {
+        codeByte = _codeByte;
+        code = CODES[Code::apply(_codeByte)];
+        setData(_data);
+    }
+
+    /** @brief Constructor - sets code and byte array data.
+
+    @param _codeByte The code byte to set.
+    @param _data The byte array data to set.
+    */
+    Message(byte _codeByte, float _data) {
+        codeByte = _codeByte;
+        code = CODES[Code::apply(_codeByte)];
+        setData(_data);
+    }
+
+    /** @brief Copies code, data of the other message.
 
     @param other The other message.
     @returns This message.
     */
     Message& operator=(const Message& other) {
-        setCode(other.code);
+        code = other.code;
+        codeByte = other.codeByte;
         setData(other.data);
-        setPriority(other.prio);
         return *this;
     }
 
-    /** @brief Copy constructor - copies code, data and priority of the other message.
+    /** @brief Copy constructor - copies code, data of the other message.
 
     @param other The other message.
     */
@@ -125,31 +164,7 @@ public:
     @returns The message code.
     */
     CODE getCode() const {
-        return code;
-    }
-
-    /** @brief Sets message code.
-
-    @param _code The message code to set.
-    */
-    void setCode(CODE _code) {
-        code = _code;
-    }
-
-    /** @brief Gets message code as a byte.
-
-    @returns The message code as a byte.
-    */
-    byte getCodeAsByte() const {
-        return static_cast<byte>(code);
-    }
-
-    /** @brief Sets message code.
-
-    @param _data The byte code to set.
-    */
-    void setCode(byte _code) {
-        code = static_cast<CODE>(_code);
+        return code.codeIdx;
     }
 
     /** @brief Gets message data.
@@ -184,6 +199,24 @@ public:
         return data.asInteger();
     }
 
+    /** @brief Sets code and code byte.
+
+    @param _codeIdx The code to set.
+    */
+    void setCode(CODE _codeIdx) {
+        code = CODES[_codeIdx];
+        codeByte = code.codeByte;
+    }
+
+    /** @brief Sets code and code byte.
+
+    @param _codeByte The code byte to set.
+    */
+    void setCode(byte _codeByte) {
+        codeByte = _codeByte;
+        code = CODES[Code::apply(codeByte)];
+    }
+
     /** @brief Sets message data.
 
     @param _data The integer data to set.
@@ -213,7 +246,7 @@ public:
     @returns The message data as boolean.
     */
     bool getDataAsBool() const {
-        return data == BOOL_value_TRUE;
+        return data == BOOL_TRUE;
     }
 
     /** @brief Sets message data.
@@ -221,23 +254,7 @@ public:
     @param _data The boolean data to set.
     */
     void setData(bool _data) {
-        data = _data ? BOOL_value_TRUE : BOOL_value_FALSE;
-    }
-
-    /** @brief Gets message priority.
-
-    @returns The message priority.
-    */
-    Prio getPriority() const {
-        return prio;
-    }
-
-    /** @brief Sets message priority.
-
-    @param _prio The message priority to set.
-    */
-    void setPriority(Prio _prio) {
-        prio = _prio;
+        data = _data ? BOOL_TRUE : BOOL_FALSE;
     }
 
     /** @brief Converts message to byte array.

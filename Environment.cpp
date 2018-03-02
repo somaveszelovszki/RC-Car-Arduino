@@ -22,7 +22,8 @@ void Environment::SectionPointCalculator::setSection(const Point2f *pStartPoint,
     currentPointIdx = 0;
 }
 
-Environment::Environment() : carPos(Point2f::ORIGO), carFwdAngle_Rad(M_PI_2), carFwdAngle_Cos(0.0f), carFwdAngle_Sin(1.0f) {
+Environment::Environment(const Point2f *_sensedPoints)
+    : sensedPoints(_sensedPoints), carPos(Point2f::ORIGO), carFwdAngle_Rad(M_PI_2), carFwdAngle_Cos(0.0f), carFwdAngle_Sin(1.0f) {
     for (int x = 0; x < ENV_ABS_AXIS_POINTS_NUM; ++x)
         for (int y = 0; y < ENV_ABS_AXIS_POINTS_NUM; ++y)
             envGrid.set(x, y, static_cast<uint2_t>(0));
@@ -48,16 +49,16 @@ bool Environment::isRelativePointObstacle(const Point2f& relPoint) const {
         && envGrid.get(gridPos.X, gridPos.Y);
 }
 
-void rc_car::Environment::updateGrid(const Point2f const *sensedPoints[ULTRA_NUM_SENSORS]) {
+void rc_car::Environment::updateGrid() {
     const Point2f *pSectionStart, *pSectionEnd;
     Common::UltrasonicPos sectionStartPos = Common::UltrasonicPos::RIGHT_FRONT;
 
-    pSectionStart = ultrasonicTask.getSensedPoint(sectionStartPos);
+    pSectionStart = &sensedPoints[sectionStartPos];
 
     // updates all sections in the grid (obstacle probability of the points between the sensed points are incremented, inner points are decremented)
     for (int i = 0; i < ULTRA_NUM_SENSORS; ++i) {
 
-        pSectionEnd = ultrasonicTask.getSensedPoint(sectionStartPos = Common::nextUltrasonicPos(sectionStartPos));
+        pSectionEnd = &sensedPoints[sectionStartPos = Common::nextUltrasonicPos(sectionStartPos)];
         sectionPointCalculator.setSection(pSectionStart, pSectionEnd, ENV_ABS_POINTS_DIST);
 
         // section points cannot be in the origo, so it's a good initial value

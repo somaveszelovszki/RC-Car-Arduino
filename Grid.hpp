@@ -27,9 +27,9 @@ private:
     array_type data[Y];
 
 public:
-    typedef array_type::type type;
-    static type dataMin = array_type::dataMin;
-    static type dataMax = array_type::dataMax;
+    typedef typename array_type::type type;
+    static const type dataMin;
+    static const type dataMax;
 
     /** @brief Gets value at given X,Y coordinate.
 
@@ -59,7 +59,7 @@ public:
     private:
         int y = -1;
         Grid<B, X, Y>& grid;
-        array_type::StreamWriter arrayWriter;
+        typename array_type::StreamWriter arrayWriter;
 
     public:
         /** @brief Sets grid reference and resets position.
@@ -75,13 +75,20 @@ public:
         /** @brief Writes next segment to byte array.
 
         @param result The result byte array.
-        @returns Boolean value indicating if whole grid has been written.
+        @param maxBytesNum Max number of bytes to write (COMM_MSG_DATA_LENGTH by default).
+        @returns If whole grid has not been written yet: number of bytes written, else: -1 * (number of bytes written).
         */
-        bool next(ByteArray<COMM_MSG_DATA_LENGTH>& result);
+        int next(ByteArray<COMM_MSG_DATA_LENGTH>& result, int maxBytesNum = COMM_MSG_DATA_LENGTH);
     };
 
     friend class StreamWriter;
 };
+
+template<int B, int X, int Y>
+const typename Grid<B, X, Y>::type Grid<B, X, Y>::dataMin = Array<B, X>::dataMin;
+
+template<int B, int X, int Y>
+const typename Grid<B, X, Y>::type Grid<B, X, Y>::dataMax = Array<B, X>::dataMax;
 
 template<int B, int X, int Y>
 void Grid<B, X, Y>::increment(int x, int y) {
@@ -98,18 +105,25 @@ void Grid<B, X, Y>::decrement(int x, int y) {
 }
 
 template<int B, int X, int Y>
-bool Grid<B, X, Y>::StreamWriter::next(ByteArray<COMM_MSG_DATA_LENGTH>& result) {
-    bool finished = false;
-    if (arrayWriter.next(result)) {     // row finished, checks if all rows has been written
-        if (++y == Y) {
-            finished = true;
+int Grid<B, X, Y>::StreamWriter::next(ByteArray<COMM_MSG_DATA_LENGTH>& result, int maxBytesNum = COMM_MSG_DATA_LENGTH) {
+    int bytesWritten = arrayWriter.next(result, maxBytesNum);
+    if (bytesWritten < 0) {     // whole row array has been written
+
+        bool finished = ++y == Y;
+        if (finished) {
+            // bytesWritten is already negative, no need to change it
             y = 0;
         }
 
         arrayWriter.setArray(grid.data[y]);
+
+        if (!finished && ((bytesWritten *= -1) < maxBytesNum)) {    // not all data bytes have been filled yet
+            ByteArray<COMM_MSG_DATA_LENGTH> sub(&result[bytesWritten]);
+            bytesWritten += arrayWriter.next(sub, maxBytesNum - bytesWritten);
+        }
     }
 
-    return finished;
+    return bytesWritten;
 }
 }
 
