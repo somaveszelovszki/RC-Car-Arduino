@@ -28,8 +28,9 @@ public:
         Speed,          // [cm/sec] (>0 means FORWARD)
         SteeringAngle,  // [degree] (>0 means LEFT)
         DriveMode,      // values in Common::DriveMode
-        EnvEn,          // enable/disable environment point sending
-        UltraEnvPoint,  // group for sensed points
+        RelEnvEn,       // enable/disable relative environment point sending
+        RelEnvPoint,    // group for sensed relative points
+        EnvGridEn,      // enable/disable environment grid sending
         EnvGrid,        // group for environment grid points
         NUM_CODES
     };

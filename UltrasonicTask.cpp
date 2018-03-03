@@ -16,7 +16,8 @@ const Common::Validation UltrasonicTask::DEF_VALIDATION = {
 };
 
 UltrasonicTask::UltrasonicTask() : PeriodicTask(TASK_PERIOD_TIME_ULTRASONIC, TASK_WATCHDOG_TIMEOUT_ULTRASONIC),
-sensorConnection(ULTRA_TRIGGER_PIN, ULTRA_ECHO_PIN, ULTRA_MAX_DIST), echoWatchdog(ULTRA_ECHO_TIMEOUT) {
+sensorConnection(ULTRA_TRIGGER_PIN, ULTRA_ECHO_PIN, ULTRA_MAX_DIST),
+echoWatchdog(ULTRA_ECHO_TIMEOUT) {
 
     setEnabled(false);
 
@@ -108,7 +109,7 @@ void UltrasonicTask::initialize() {
     currentSensorPos = static_cast<Common::UltrasonicPos>(ULTRA_NUM_SENSORS - 1);
     currentSampleIndex = ULTRA_NUM_DIST_SAMPLES - 1;
 
-    sendEnvironmentEnabled = false;
+    sendRelEnvEnabled = false;
 }
 
 void UltrasonicTask::run() {
@@ -121,15 +122,7 @@ void UltrasonicTask::run() {
 
         if (!isBusy()) {
 
-            // checks if all the ultrasonic sensors have been pinged in this cycle
-            // and if yes, stores and validates distances
-
-            // TODO validate each sensor in their turn, don't wait until cycle finished
-            if (measurementCycleFinished())
-                validateAndUpdateSensedPoints();
-
-            if (sendEnvironmentEnabled && currentSensorPos % 2) {
-
+            if (sendRelEnvEnabled && !currentRelEnvPointSent && currentSensorPos % 2) {
                 msg.setCode(ultraPosToMsgCode(currentSensorPos));
 
                 ByteArray<2> lowBytes, highBytes;
@@ -138,6 +131,8 @@ void UltrasonicTask::run() {
                 msg.setData(lowBytes + highBytes);
 
                 communicatorTask.setMessageToSend(msg, getTaskId());
+
+                currentRelEnvPointSent = true;
             }
 
             pingNextSensor();
@@ -150,8 +145,13 @@ void UltrasonicTask::pingNextSensor() {
     if (measurementCycleFinished())
         currentSampleIndex = (currentSampleIndex + 1) % ULTRA_NUM_DIST_SAMPLES;
 
+    // validates previously measured point
+    sensors[currentSensorPos].validate(currentSampleIndex);
+    updatePoint(static_cast<Common::UltrasonicPos>(currentSensorPos));
+
     // increments sensor position
     currentSensorPos = Common::nextUltrasonicPos(currentSensorPos);
+    currentRelEnvPointSent = false;
 
     updateSensorSelection();
     busy = true;
@@ -169,13 +169,6 @@ void UltrasonicTask::echoCheck() {
         sensors[currentSensorPos].dist_measured = ULTRA_MAX_DIST;
         busy = false;
         sensorConnection.timer_stop();
-    }
-}
-
-void UltrasonicTask::validateAndUpdateSensedPoints() {
-    for (int pos = 0; pos < ULTRA_NUM_SENSORS; ++pos) {
-        sensors[pos].validate(currentSampleIndex);
-        updatePoint(static_cast<Common::UltrasonicPos>(pos));
     }
 }
 
@@ -257,8 +250,8 @@ Common::UltrasonicPos UltrasonicTask::getForwardPos(float steeringAngle) const {
 void UltrasonicTask::executeMessage() {
     switch (msg.getCode()) {
 
-    case Message::CODE::EnvEn:
-        sendEnvironmentEnabled = static_cast<bool>(msg.getDataAsInt());
+    case Message::CODE::RelEnvEn:
+        sendRelEnvEnabled = static_cast<bool>(msg.getDataAsInt());
         communicatorTask.setMessageToSend(Message::ACK, getTaskId());
         break;
     }

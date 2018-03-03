@@ -3,13 +3,14 @@
 using namespace rc_car;
 
 const Message::Code Message::CODES[Message::CODE::NUM_CODES] = {
-    Code(CODE::ACK_, 0b00000000),
-    Code(CODE::Speed, 0b00000001),
-    Code(CODE::SteeringAngle, 0b00000010),
-    Code(CODE::DriveMode, 0b00000011),
-    Code(CODE::EnvEn, 0b00000111),
-    Code(CODE::UltraEnvPoint, 0b00001000, 0b11111000),
-    Code(CODE::EnvGrid, 0b01000000, 0b11000000)
+    Code(CODE::ACK_,            0b00000000                  ),
+    Code(CODE::Speed,           0b00000001                  ),
+    Code(CODE::SteeringAngle,   0b00000010                  ),
+    Code(CODE::DriveMode,       0b00000011                  ),
+    Code(CODE::RelEnvEn,        0b00000111                  ),
+    Code(CODE::RelEnvPoint,     0b00001000,     0b11111000  ),
+    Code(CODE::EnvGridEn,       0b00000100                  ),
+    Code(CODE::EnvGrid,         0b01000000,     0b11000000  )
 };
 
 Message::CODE Message::Code::apply(byte code) {

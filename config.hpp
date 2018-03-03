@@ -61,7 +61,7 @@
 #define COMM_MSG_SEPARATOR          static_cast<int32_t>(0x7fffffff)    // forbidden as data value
 
 // DriveTask
-
+#define DRIVE_ENV_GRID_SEND_TIMEOUT             1000    // [ms]
 #define DRIVE_MSG_WATCHDOG_TIMEOUT              1000    // [ms]
 #define DRIVE_FORCE_STEERING_TIME               500     // [ms]
 #define DRIVE_FORCE_STOP_TIME                   3000    // [ms]
@@ -147,9 +147,9 @@
 #define ULTRA_SEL_2_PIN     11
 #define ULTRA_SEL_3_PIN     10
 
-#define ULTRA_NUM_SENSORS   12
-#define ULTRA_MAX_DIST      200u
-#define ULTRA_ECHO_TIMEOUT  10
+#define ULTRA_NUM_SENSORS           12
+#define ULTRA_MAX_DIST              200u
+#define ULTRA_ECHO_TIMEOUT          10
 
 // defines how many stored measured values need to be ULTRA_MAX_DIST, so that we can validate value
 //     ->    many times the sensors do not respond, which equals ULTRA_MAX_DIST as a value,

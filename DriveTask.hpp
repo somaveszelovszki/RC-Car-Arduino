@@ -45,6 +45,14 @@ private:
     */
     Message msg;
 
+    /** @brief Indicates if environment grid sending is enabled.
+    */
+    bool sendEnvGridEnabled;
+
+    /** @brief Watchdog for environment grid sending.
+    */
+    Watchdog sendEnvGridWatchdog;
+
     /** @brief Remaining time until crash for each section.
     */
     float remainingTimes[ENV_SECTIONS_NUM];

@@ -91,9 +91,13 @@ private:
     */
     Message msg;
 
-    /** @brief Indicates if environment point sending is enabled.
+    /** @brief Indicates if relative environment point sending is enabled.
     */
-    bool sendEnvironmentEnabled;
+    bool sendRelEnvEnabled;
+
+    /** @brief Indicates if current relative environment point has been sent.
+    */
+    bool currentRelEnvPointSent;
 
     /** @brief Watchdog for ECHO timeout detection.
     */
@@ -115,7 +119,7 @@ private:
     @returns The message code byte.
     */
     byte ultraPosToMsgCode(Common::UltrasonicPos pos) {
-        return Message::CODES[Message::CODE::UltraEnvPoint].codeByte + pos / 2;
+        return Message::CODES[Message::CODE::RelEnvPoint].codeByte + pos / 2;
     }
 
 public:
@@ -185,11 +189,6 @@ public:
     bool measurementCycleFinished() const {
         return static_cast<int>(currentSensorPos) == ULTRA_NUM_SENSORS - 1;
     }
-
-    /** @brief Validates distances for all sensors and updates sensed points according to these validated distances.
-    TODO: instead of this, validate and update instantly after every sensor (before next ping).
-    */
-    void validateAndUpdateSensedPoints();
 
     /** @brief Gets the UltrasonicPos that is nearest to the current steering angle.
     Therefore gives the direction of the car in UltrasonicPos.

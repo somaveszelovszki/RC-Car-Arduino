@@ -15,10 +15,12 @@ DriveTask::DriveTask() : PeriodicTask(TASK_PERIOD_TIME_DRIVE, TASK_WATCHDOG_TIME
     forceSteeringWatchdog(DRIVE_FORCE_STEERING_TIME, Watchdog::State::STOPPED),
     forceStopWatchdog(DRIVE_FORCE_STOP_TIME, Watchdog::State::STOPPED),
     mode(Common::DriveMode::SAFE_DRIVE),
-    environment(ultrasonicTask.sensedPoints) {}
+    environment(ultrasonicTask.sensedPoints),
+    sendEnvGridWatchdog(DRIVE_ENV_GRID_SEND_TIMEOUT) {}
 
 void DriveTask::initialize() {
     motorHandler.initialize();
+    sendEnvGridEnabled = false;
 }
 
 void DriveTask::run() {
@@ -30,6 +32,13 @@ void DriveTask::run() {
 
     if (isNewMsgAvailable)
         msg = communicatorTask.getReceivedMessage(getTaskId());
+
+    if (sendEnvGridEnabled && sendEnvGridWatchdog.hasTimedOut()) {
+        sendEnvGridWatchdog.restart();
+
+
+
+    }
 
     switch (mode) {
     case Common::SAFE_DRIVE:
@@ -136,6 +145,11 @@ void DriveTask::executeMessage() {
 
     case Message::CODE::DriveMode:
         mode = static_cast<Common::DriveMode>(msg.getDataAsInt());
+        communicatorTask.setMessageToSend(Message::ACK, getTaskId());
+        break;
+    case Message::CODE::EnvGridEn:
+        sendEnvGridEnabled = static_cast<bool>(msg.getDataAsInt());
+        sendEnvGridWatchdog.restart();
         communicatorTask.setMessageToSend(Message::ACK, getTaskId());
         break;
     }
