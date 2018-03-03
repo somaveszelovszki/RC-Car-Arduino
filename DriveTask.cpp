@@ -36,8 +36,11 @@ void DriveTask::run() {
     if (sendEnvGridEnabled && sendEnvGridWatchdog.hasTimedOut()) {
         sendEnvGridWatchdog.restart();
 
-
-
+        if (!communicatorTask.isSendMsgAvailable(getTaskId())) {
+            ByteArray<COMM_MSG_DATA_LENGTH> envGridPart;
+            Point2i gridCoords = environment.nextToStream(envGridPart);
+            communicatorTask.setMessageToSend(Message(Environment::gridCoordsToCodeByte(gridCoords), envGridPart), getTaskId());
+        }
     }
 
     switch (mode) {
@@ -148,8 +151,9 @@ void DriveTask::executeMessage() {
         communicatorTask.setMessageToSend(Message::ACK, getTaskId());
         break;
     case Message::CODE::EnvGridEn:
-        sendEnvGridEnabled = static_cast<bool>(msg.getDataAsInt());
-        sendEnvGridWatchdog.restart();
+        if ((sendEnvGridEnabled = static_cast<bool>(msg.getDataAsInt())))
+            sendEnvGridWatchdog.restart();
+
         communicatorTask.setMessageToSend(Message::ACK, getTaskId());
         break;
     }

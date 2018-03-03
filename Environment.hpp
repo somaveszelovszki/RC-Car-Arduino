@@ -26,9 +26,15 @@ private:
     */
     float carFwdAngle_Sin;
 
+    /** @brief The grid type.
+    */
+    typedef Grid<ENV_ABS_POINTS_BIT_DEPTH, ENV_ABS_AXIS_POINTS_NUM, ENV_ABS_AXIS_POINTS_NUM> grid_type;
+
     /** @brief Boolean grid indicating for each point if there is an obstacle there.
     */
-    Grid<ENV_ABS_POINTS_BIT_DEPTH, ENV_ABS_AXIS_POINTS_NUM, ENV_ABS_AXIS_POINTS_NUM> envGrid;
+    grid_type grid;
+
+    typename grid_type::StreamWriter gridWriter;
 
     /** @brief Array containing the grid points of the current section.
     */
@@ -157,7 +163,7 @@ public:
     @returns The grid point's value.
     */
     bool getGridPoint(int x, int y) const {
-        return envGrid.get(x, y);
+        return grid.get(x, y);
     }
 
     /** Checks if relative point is an obstacle - checks point in the environment grid.
@@ -172,6 +178,31 @@ public:
     for points that are between the car and the sensed points (where there is no obstacle) decrements obstacle probability.
     */
     void updateGrid();
+
+    /** @brief Writes next segment to byte array.
+
+    @param result The result byte array.
+    @returns Point containing the X and Y coordinates of the first written byte.
+    */
+    Point2i nextToStream(ByteArray<COMM_MSG_DATA_LENGTH>& result);
+
+    /** @brief Gets environment grid message code from grid coordinates.
+
+    @param coords The grid coordinates.
+    @returns The code byte.
+    */
+    static byte gridCoordsToCodeByte(const Point2i& coords) {
+        return Message::CODES[Message::CODE::EnvGrid].codeByte + (coords.X << 4) + coords.Y;
+    }
+
+    /** @brief Gets grid coordinates from environment grid message code.
+
+    @param codeByte The code byte.
+    @returns The grid coordinates.
+    */
+    static Point2i codeByteToGridCoords(byte codeByte) {
+        return Point2i((codeByte & 0b00110000) >> 4, codeByte & 0b00001111);
+    }
 
 #if __DEBUG
     /** @brief Prints grid points to the Serial port.

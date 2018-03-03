@@ -101,9 +101,13 @@ public:
     class StreamWriter {
     private:
         int pos = -1;
-        Array<B, N>& ar;
+        const Array<B, N>& ar;
 
     public:
+        /** @brief Constructor - does not set anything.
+        */
+        StreamWriter() {}
+
         /** @brief Sets array reference and resets position.
 
         @param _ar The array reference.
@@ -116,10 +120,11 @@ public:
         /** @brief Writes next segment to byte array.
 
         @param result The result byte array.
+        @param pWrittenPos Will contain the position of the first written byte.
         @param maxBytesNum Max number of bytes to write (COMM_MSG_DATA_LENGTH by default).
         @returns If whole array has not been written yet: number of bytes written, else: -1 * (number of bytes written).
         */
-        int next(ByteArray<COMM_MSG_DATA_LENGTH>& result, int maxBytesNum = COMM_MSG_DATA_LENGTH);
+        int next(ByteArray<COMM_MSG_DATA_LENGTH>& result, int *pWrittenPos, int maxBytesNum = COMM_MSG_DATA_LENGTH);
     };
 
     friend class StreamWriter;
@@ -144,7 +149,9 @@ void Array<B, N, VPB>::set(int pos, type value) {
 }
 
 template<int B, int N, int VPB>
-int Array<B, N, VPB>::StreamWriter::next(ByteArray<COMM_MSG_DATA_LENGTH>& result, int maxBytesNum = COMM_MSG_DATA_LENGTH) {
+int Array<B, N, VPB>::StreamWriter::next(ByteArray<COMM_MSG_DATA_LENGTH>& result, int *pWrittenPos, int maxBytesNum = COMM_MSG_DATA_LENGTH) {
+
+    *pWrittenPos = pos;
 
     int bytesWritten;
     for (bytesWritten = 0; bytesWritten < maxBytesNum / sizeof(byte) && pos < N; ++bytesWritten, ++pos) {

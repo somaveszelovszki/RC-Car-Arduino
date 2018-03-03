@@ -58,10 +58,14 @@ public:
     class StreamWriter {
     private:
         int y = -1;
-        Grid<B, X, Y>& grid;
+        const Grid<B, X, Y>& grid;
         typename array_type::StreamWriter arrayWriter;
 
     public:
+        /** @brief Constructor - does not set anything.
+        */
+        StreamWriter() {}
+
         /** @brief Sets grid reference and resets position.
 
         @param _grid The grid reference.
@@ -75,10 +79,12 @@ public:
         /** @brief Writes next segment to byte array.
 
         @param result The result byte array.
+        @param pWrittenX The X coordinate of the first written byte.
+        @param pWrittenY The Y coordinate of the first written byte.
         @param maxBytesNum Max number of bytes to write (COMM_MSG_DATA_LENGTH by default).
         @returns If whole grid has not been written yet: number of bytes written, else: -1 * (number of bytes written).
         */
-        int next(ByteArray<COMM_MSG_DATA_LENGTH>& result, int maxBytesNum = COMM_MSG_DATA_LENGTH);
+        int next(ByteArray<COMM_MSG_DATA_LENGTH>& result, int *pWrittenX, int *pWrittenY, int maxBytesNum = COMM_MSG_DATA_LENGTH);
     };
 
     friend class StreamWriter;
@@ -105,8 +111,11 @@ void Grid<B, X, Y>::decrement(int x, int y) {
 }
 
 template<int B, int X, int Y>
-int Grid<B, X, Y>::StreamWriter::next(ByteArray<COMM_MSG_DATA_LENGTH>& result, int maxBytesNum = COMM_MSG_DATA_LENGTH) {
-    int bytesWritten = arrayWriter.next(result, maxBytesNum);
+int Grid<B, X, Y>::StreamWriter::next(ByteArray<COMM_MSG_DATA_LENGTH>& result, int *pWrittenX, int *pWrittenY, int maxBytesNum = COMM_MSG_DATA_LENGTH) {
+
+    *pWrittenY = y;
+
+    int bytesWritten = arrayWriter.next(result, pWrittenX, maxBytesNum);
     if (bytesWritten < 0) {     // whole row array has been written
 
         bool finished = ++y == Y;

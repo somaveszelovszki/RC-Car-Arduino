@@ -61,7 +61,7 @@
 #define COMM_MSG_SEPARATOR          static_cast<int32_t>(0x7fffffff)    // forbidden as data value
 
 // DriveTask
-#define DRIVE_ENV_GRID_SEND_TIMEOUT             1000    // [ms]
+#define DRIVE_ENV_GRID_SEND_TIMEOUT             2       // [ms]
 #define DRIVE_MSG_WATCHDOG_TIMEOUT              1000    // [ms]
 #define DRIVE_FORCE_STEERING_TIME               500     // [ms]
 #define DRIVE_FORCE_STOP_TIME                   3000    // [ms]

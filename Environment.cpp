@@ -26,7 +26,9 @@ Environment::Environment(const Point2f *_sensedPoints)
     : sensedPoints(_sensedPoints), carPos(Point2f::ORIGO), carFwdAngle_Rad(M_PI_2), carFwdAngle_Cos(0.0f), carFwdAngle_Sin(1.0f) {
     for (int x = 0; x < ENV_ABS_AXIS_POINTS_NUM; ++x)
         for (int y = 0; y < ENV_ABS_AXIS_POINTS_NUM; ++y)
-            envGrid.set(x, y, static_cast<uint2_t>(0));
+            grid.set(x, y, static_cast<uint2_t>(0));
+
+    gridWriter.setGrid(grid);
 }
 
 Point2i rc_car::Environment::relPointToGridPoint(const Point2f& relPoint) const {
@@ -46,7 +48,7 @@ bool Environment::isRelativePointObstacle(const Point2f& relPoint) const {
 
     return gridPos.X < ENV_ABS_AXIS_POINTS_NUM
         && gridPos.Y < ENV_ABS_AXIS_POINTS_NUM
-        && envGrid.get(gridPos.X, gridPos.Y);
+        && grid.get(gridPos.X, gridPos.Y);
 }
 
 void rc_car::Environment::updateGrid() {
@@ -72,7 +74,7 @@ void rc_car::Environment::updateGrid() {
             if (gridPoint != prevGridPoint) {
                 sectionGridPoints[currentGridPointIdx++] = gridPoint;
 
-                envGrid.increment(gridPoint.X, gridPoint.Y);
+                grid.increment(gridPoint.X, gridPoint.Y);
                 prevGridPoint = gridPoint;
             }
         }
@@ -98,10 +100,16 @@ void rc_car::Environment::updateGrid() {
                 // checks if current point is inside the triangle determined by the car position and start and end points
                 // if yes (and it is not a section point, then decrements its obstacle probability, because it has not been sensed as an obstacle)
                 if (current.isInside(carGridPos, startGridPos, endGridPos) && !Common::contains(current, sectionGridPoints, sectionGridPointsNum))
-                    envGrid.decrement(current.X, current.Y);
+                    grid.decrement(current.X, current.Y);
             }
         }
 
         pSectionStart = pSectionEnd;
     }
+}
+
+rc_car::Point2i rc_car::Environment::nextToStream(ByteArray<COMM_MSG_DATA_LENGTH>& result) {
+    Point2i firstByte;
+    gridWriter.next(result, &firstByte.X, &firstByte.Y);
+    return firstByte;
 }
