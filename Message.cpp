@@ -42,8 +42,8 @@ void Message::fromBytes(const ByteArray<COMM_MSG_LENGTH>& bytes, Message& result
     result.setData(&bytes[COMM_MSG_SEPARATOR_LENGTH + COMM_MSG_CODE_LENGTH]);
 }
 
-#if __DEBUG
+#if _DEBUG
 String Message::toString() const {
     return String(codeByte) + ": " + data.toString();
 }
-#endif // __DEBUG
+#endif // _DEBUG

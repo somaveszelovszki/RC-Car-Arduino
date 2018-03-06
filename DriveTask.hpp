@@ -32,6 +32,14 @@ private:
     */
     Watchdog forceStopWatchdog;
 
+    /** @brief Indicates if environment grid sending is enabled.
+    */
+    bool sendEnvGridEnabled;
+
+    /** @brief Watchdog for environment grid sending.
+    */
+    Watchdog sendEnvGridWatchdog;
+
     /** @brief Calculates environment points according to sensed points received from the UltrasonicTask.
     */
     Environment environment;
@@ -44,14 +52,6 @@ private:
     /** @brief Will store the received message whenever there is a new one.
     */
     Message msg;
-
-    /** @brief Indicates if environment grid sending is enabled.
-    */
-    bool sendEnvGridEnabled;
-
-    /** @brief Watchdog for environment grid sending.
-    */
-    Watchdog sendEnvGridWatchdog;
 
     /** @brief Remaining time until crash for each section.
     */

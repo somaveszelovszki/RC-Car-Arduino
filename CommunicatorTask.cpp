@@ -4,9 +4,6 @@ using namespace rc_car;
 
 void CommunicatorTask::initialize() {
 
-    pinMode(COMM_RX_PIN, INPUT);
-    pinMode(COMM_TX_PIN, OUTPUT);
-
     for (int i = 0; i < TASK_COUNT; ++i) {
         __recvAvailable[i] = false;
         __sendAvailable[i] = false;

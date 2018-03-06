@@ -271,13 +271,13 @@ public:
     */
     static void fromBytes(const ByteArray<COMM_MSG_LENGTH>& bytes, Message& result);
 
-#if __DEBUG
+#if _DEBUG
     /** @brief Builds String from Message object.
 
     @returns The message as a String.
     */
     String toString() const;
-#endif // __DEBUG
+#endif // _DEBUG
 };
 }
 

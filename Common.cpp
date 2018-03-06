@@ -2,7 +2,7 @@
 
 using namespace rc_car;
 
-int32_t Common::bytesToInt(const byte bytes[], int startIndex = 0) {
+int32_t Common::bytesToInt(const byte bytes[], int startIndex) {
     return (static_cast<int32_t>(bytes[startIndex]) << 24)
         | (static_cast<int32_t>(bytes[startIndex + 1]) << 16)
         | (static_cast<int32_t>(bytes[startIndex + 2]) << 8)
@@ -10,7 +10,7 @@ int32_t Common::bytesToInt(const byte bytes[], int startIndex = 0) {
     //return *reinterpret_cast<const int*>(&bytes[startIndex]);
 }
 
-float Common::bytesToFloat(const byte bytes[], int startIndex = 0) {
+float Common::bytesToFloat(const byte bytes[], int startIndex) {
     int32_t intVal = bytesToInt(bytes, startIndex);
     return *reinterpret_cast<float*>(&intVal);
     //return *reinterpret_cast<const float*>(&bytes[startIndex]);

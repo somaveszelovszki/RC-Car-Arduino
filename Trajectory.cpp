@@ -69,11 +69,12 @@ Trajectory::TrackDistance Trajectory::trackdistancePoint(const Point2f& relative
             // this angle specifies this difference
             float dAngle = 0.0;
 
-            if (td.isCritical())
+            if (td.isCritical()) {
                 if (innerDist < min(outerDist, abs(R_frontNear - R_inner)))
                     dAngle = atan(CAR_PIVOT_DIST_FRONT_REAR / R_inner) * (innerDist / abs(R_frontNear - R_inner));
                 else
                     dAngle = atan(CAR_PIVOT_DIST_FRONT_REAR / R_inner);
+            }
 
             float hitAngle = obsAngle - dAngle;
 

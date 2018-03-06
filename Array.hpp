@@ -64,7 +64,7 @@ struct Selector<4> {
 Values are stored in a byte array to reduce memory need.
 
 @tparam B Bit length of the stored values (1, 2 or 4).
-@tparam N Number of binary values stored in the array.
+@tparam N Number of values stored in the array.
 NOTE: (B * N) must be a multiple of 8!
 @tparam VPB Number of values per byte.
 NOTE: Do not set this number explicitly!
@@ -81,6 +81,10 @@ public:
     static const type dataMin;
     static const type dataMax;
     static const byte *mask;
+
+    /** @brief Constructor - does not initialize elements.
+    */
+    Array() {}
 
     /** @brief Gets value at given position.
 
@@ -101,7 +105,7 @@ public:
     class StreamWriter {
     private:
         int pos = -1;
-        const Array<B, N>& ar;
+        const Array<B, N> *pArray;
 
     public:
         /** @brief Constructor - does not set anything.
@@ -110,24 +114,56 @@ public:
 
         /** @brief Sets array reference and resets position.
 
-        @param _ar The array reference.
+        @param _pArray Pointer to the array.
         */
-        void setArray(Array<B, N>& _ar) {
-            ar = _ar;
-            pos = 0;
+        void setArray(const Array<B, N> *_pArray) {
+            this->pArray = _pArray;
+            this->pos = 0;
         }
 
         /** @brief Writes next segment to byte array.
 
         @param result The result byte array.
-        @param pWrittenPos Will contain the position of the first written byte.
         @param maxBytesNum Max number of bytes to write (COMM_MSG_DATA_LENGTH by default).
+        @param pWrittenPos Will contain the position of the first written byte.
         @returns If whole array has not been written yet: number of bytes written, else: -1 * (number of bytes written).
         */
-        int next(ByteArray<COMM_MSG_DATA_LENGTH>& result, int *pWrittenPos, int maxBytesNum = COMM_MSG_DATA_LENGTH);
+        int next(ByteArray<COMM_MSG_DATA_LENGTH>& result, int maxBytesNum = COMM_MSG_DATA_LENGTH, int *pWrittenPos = NULL) {
+
+            if (pWrittenPos)
+                *pWrittenPos = this->pos;
+
+            int bytesWritten;
+            for (bytesWritten = 0; (bytesWritten < maxBytesNum / (int)sizeof(byte)) && (this->pos < N); ++bytesWritten, ++this->pos) {
+                result[bytesWritten] = pArray->data[this->pos];
+            }
+
+            if (this->pos == N) {
+                this->pos = 0;
+                bytesWritten *= -1;
+            }
+
+            return bytesWritten;
+        }
     };
 
     friend class StreamWriter;
+
+#if _DEBUG
+    /** @brief Prints array elements.
+    */
+    void print() const {
+        for (int i = 0; i < N - 1; ++i) {
+            DEBUG_print(this->get(i));
+            DEBUG_print(" ");
+        }
+
+        if (N > 0)
+            DEBUG_print(this->get(N - 1));
+
+        DEBUG_println();
+    }
+#endif // _DEBUG
 };
 
 template <int B, int N, int VPB>
@@ -141,29 +177,10 @@ const byte *Array<B, N, VPB>::mask = Selector<B>::mask;
 
 template<int B, int N, int VPB>
 void Array<B, N, VPB>::set(int pos, type value) {
-    byte container = mask[pos % VPB];
     if (value)
         data[pos / VPB] |= mask[pos % VPB];
     else
         data[pos / VPB] &= ~mask[pos % VPB];
-}
-
-template<int B, int N, int VPB>
-int Array<B, N, VPB>::StreamWriter::next(ByteArray<COMM_MSG_DATA_LENGTH>& result, int *pWrittenPos, int maxBytesNum = COMM_MSG_DATA_LENGTH) {
-
-    *pWrittenPos = pos;
-
-    int bytesWritten;
-    for (bytesWritten = 0; bytesWritten < maxBytesNum / sizeof(byte) && pos < N; ++bytesWritten, ++pos) {
-        result[bytesWritten] = ar.data[pos];
-    }
-
-    if (pos == N) {
-        pos = 0;
-        bytesWritten *= -1;
-    }
-
-    return bytesWritten;
 }
 }
 

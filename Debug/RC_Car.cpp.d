@@ -31,4 +31,8 @@ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\RC_Car.cpp.o: \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\MotorHandler.hpp \
  C:\Users\Soma\Documents\Arduino\libraries\ServoTimer1/ServoTimer1.h \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\PD_Controller.hpp \
- C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\Trajectory.hpp
+ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\Trajectory.hpp \
+ C:\Program\ Files\ (x86)\Microsoft\ Visual\ Studio\2017\Enterprise\Common7\IDE\Extensions\xaohtdp2.q2m\Micro\ Platforms\default\debuggers\VM_DBG/VM_DBG.h \
+ C:\Program\ Files\ (x86)\Microsoft\ Visual\ Studio\2017\Enterprise\Common7\IDE\Extensions\xaohtdp2.q2m\Micro\ Platforms\default\debuggers\VM_DBG/VM_Boards.h \
+ C:\Program\ Files\ (x86)\Microsoft\ Visual\ Studio\2017\Enterprise\Common7\IDE\Extensions\xaohtdp2.q2m\Micro\ Platforms\default\debuggers\VM_DBG/VM_mem_check.h \
+ C:\Program\ Files\ (x86)\Microsoft\ Visual\ Studio\2017\Enterprise\Common7\IDE\Extensions\xaohtdp2.q2m\Micro\ Platforms\default\debuggers\VM_DBG/VM_mem_check.h

@@ -12,7 +12,7 @@ Coordinate is relative to car, grid position is a position in the grid (0-indexe
 */
 #define GRID_POS_TO_COORD(pos) ((pos - ENV_ABS_AXIS_POINTS_NUM / 2) * ENV_ABS_POINTS_DIST)
 
-void Environment::SectionPointCalculator::setSection(const Point2f *pStartPoint, const Point2f *pEndPoint, float fixDiff = 0.0f) {
+void Environment::SectionPointCalculator::setSection(const Point2f *pStartPoint, const Point2f *pEndPoint, float fixDiff) {
     startPoint = *pStartPoint;
     Vec2f wholeDiff = *pEndPoint - startPoint;
     float wholeDiffLength = wholeDiff.length();
@@ -22,13 +22,18 @@ void Environment::SectionPointCalculator::setSection(const Point2f *pStartPoint,
     currentPointIdx = 0;
 }
 
-Environment::Environment(const Point2f *_sensedPoints)
-    : sensedPoints(_sensedPoints), carPos(Point2f::ORIGO), carFwdAngle_Rad(M_PI_2), carFwdAngle_Cos(0.0f), carFwdAngle_Sin(1.0f) {
+Environment::Environment(const Point2f *_sensedPoints) :
+    carPos(Point2f::ORIGO),
+    carFwdAngle_Rad(M_PI_2),
+    carFwdAngle_Cos(0.0f),
+    carFwdAngle_Sin(1.0f),
+    sensedPoints(_sensedPoints) {
+
     for (int x = 0; x < ENV_ABS_AXIS_POINTS_NUM; ++x)
         for (int y = 0; y < ENV_ABS_AXIS_POINTS_NUM; ++y)
             grid.set(x, y, static_cast<uint2_t>(0));
 
-    gridWriter.setGrid(grid);
+    gridWriter.setGrid(&grid);
 }
 
 Point2i rc_car::Environment::relPointToGridPoint(const Point2f& relPoint) const {
@@ -52,6 +57,7 @@ bool Environment::isRelativePointObstacle(const Point2f& relPoint) const {
 }
 
 void rc_car::Environment::updateGrid() {
+    DEBUG_println("updateGrid");
     const Point2f *pSectionStart, *pSectionEnd;
     Common::UltrasonicPos sectionStartPos = Common::UltrasonicPos::RIGHT_FRONT;
 
@@ -67,11 +73,17 @@ void rc_car::Environment::updateGrid() {
         Point2i prevGridPoint = Point2i::ORIGO;
         int currentGridPointIdx = 0;
 
+        Serial.print("1");
+
         // iterates through section points, adds them to the section grid points array,
         // and increments obstacle probabilities (section points are sensed as obstacles)
         while (sectionPointCalculator.nextExists() && currentGridPointIdx < ENV_ABS_SECTION_POINTS_MAX_NUM) {
+            Serial.print(" 2");
+
             Point2i gridPoint = relPointToGridPoint(sectionPointCalculator.next());
             if (gridPoint != prevGridPoint) {
+                Serial.print(" 3");
+
                 sectionGridPoints[currentGridPointIdx++] = gridPoint;
 
                 grid.increment(gridPoint.X, gridPoint.Y);
@@ -110,6 +122,6 @@ void rc_car::Environment::updateGrid() {
 
 rc_car::Point2i rc_car::Environment::nextToStream(ByteArray<COMM_MSG_DATA_LENGTH>& result) {
     Point2i firstByte;
-    gridWriter.next(result, &firstByte.X, &firstByte.Y);
+    gridWriter.next(result, COMM_MSG_DATA_LENGTH, &firstByte.X, &firstByte.Y);
     return firstByte;
 }

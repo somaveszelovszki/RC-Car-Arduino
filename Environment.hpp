@@ -3,6 +3,7 @@
 
 #include "Point2.hpp"
 #include "Grid.hpp"
+#include "Message.hpp"
 
 namespace rc_car {
 
@@ -204,11 +205,11 @@ public:
         return Point2i((codeByte & 0b00110000) >> 4, codeByte & 0b00001111);
     }
 
-#if __DEBUG
+#if _DEBUG
     /** @brief Prints grid points to the Serial port.
     */
     void print() const {
-        for (int y = 0; y < ENV_ABS_AXIS_POINTS_NUM; ++y) {
+        /*for (int y = 0; y < ENV_ABS_AXIS_POINTS_NUM; ++y) {
             for (int x = 0; x < ENV_ABS_AXIS_POINTS_NUM; ++x)
                 if (x == ENV_ABS_AXIS_POINTS_NUM / 2 && y == ENV_ABS_AXIS_POINTS_NUM / 2)
                     DEBUG_print("X");
@@ -216,9 +217,11 @@ public:
                     DEBUG_print(String(getGridPoint(x, y) ? "1" : "0"));
             DEBUG_println();
         }
-        DEBUG_println();
+        DEBUG_println();*/
+
+        grid.print();
     }
-#endif // __DEBUG
+#endif // _DEBUG
 };
 }
 

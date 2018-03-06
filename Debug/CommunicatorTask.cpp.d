@@ -18,4 +18,7 @@ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\CommunicatorTask.cpp.
  C:\Users\Soma\AppData\Local\arduino15\packages\arduino\hardware\avr\1.6.18\variants\standard/pins_arduino.h \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\Periodic.hpp \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\Message.hpp \
- C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\ByteArray.hpp
+ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\ByteArray.hpp \
+ C:\Program\ Files\ (x86)\Microsoft\ Visual\ Studio\2017\Enterprise\Common7\IDE\Extensions\xaohtdp2.q2m\Micro\ Platforms\default\debuggers\VM_DBG/VM_DBG.h \
+ C:\Program\ Files\ (x86)\Microsoft\ Visual\ Studio\2017\Enterprise\Common7\IDE\Extensions\xaohtdp2.q2m\Micro\ Platforms\default\debuggers\VM_DBG/VM_Boards.h \
+ C:\Program\ Files\ (x86)\Microsoft\ Visual\ Studio\2017\Enterprise\Common7\IDE\Extensions\xaohtdp2.q2m\Micro\ Platforms\default\debuggers\VM_DBG/VM_mem_check.h

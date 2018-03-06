@@ -275,7 +275,7 @@ public:
         return index;
     }
 
-#if __DEBUG
+#if _DEBUG
     /** @brief Converts ByteArray to displayable String.
 
     @returns ByteArray as String.
@@ -292,7 +292,7 @@ public:
         str += " ]";
         return str;
     }
-#endif // __DEBUG
+#endif // _DEBUG
 };
 }
 

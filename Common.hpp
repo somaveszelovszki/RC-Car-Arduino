@@ -17,13 +17,13 @@
 // Converts sec to millisec
 #define SEC_TO_MSEC 1000
 
-#if __DEBUG
+#if _DEBUG
 // Prints string to Serial port
 #define DEBUG_print(str) Serial.print(str)
 
 // Prints string to Serial port with endline character
 #define DEBUG_println(str) Serial.println(str)
-#endif // __DEBUG
+#endif // _DEBUG
 
 namespace rc_car {
 
@@ -128,7 +128,7 @@ public:
     };
 
     template <typename T>
-    static sgn(const T& value) {
+    static Sign sgn(const T& value) {
         return value > static_cast<T>(0) ? Sign::POSITIVE : value < static_cast<T>(0) ? Sign::NEGATIVE : Sign::ZERO;
     }
 
@@ -148,7 +148,7 @@ public:
     @returns The index of the item or -1 if the array does not contain the item.
     */
     template <typename T>
-    static int indexOf(T item, const T array[], int arraySize) {
+    static int indexOf(const T& item, const T array[], int arraySize) {
         int idx = -1;
         for (int i = 0; idx == -1 && i < arraySize; ++i)
             if (array[i] == item)

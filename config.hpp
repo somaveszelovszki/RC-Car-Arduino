@@ -4,8 +4,6 @@
 #include <Arduino.h>
 #include <stdint.h>
 
-#define __DEBUG     true
-
 /** @brief Configurations - car specifications, task period times, communication parameters, Arduino pinout, etc.
 */
 

@@ -254,6 +254,16 @@ void UltrasonicTask::executeMessage() {
         sendRelEnvEnabled = static_cast<bool>(msg.getDataAsInt());
         communicatorTask.setMessageToSend(Message::ACK, getTaskId());
         break;
+
+    case Message::CODE::ACK_:
+    case Message::CODE::Speed:
+    case Message::CODE::SteeringAngle:
+    case Message::CODE::DriveMode:
+    case Message::CODE::RelEnvPoint:
+    case Message::CODE::EnvGridEn:
+    case Message::CODE::EnvGrid:
+    case Message::CODE::NUM_CODES:
+        break;
     }
 }
 

@@ -108,7 +108,7 @@ public:
     @param other The other point.
     @returns Boolean value indicating if the two points are equal.
     */
-    bool operator==(const Point2<T>& other) {
+    bool operator==(const Point2<T>& other) const {
         return X == other.X && Y == other.Y;
     }
 
@@ -117,7 +117,7 @@ public:
     @param other The other point.
     @returns Boolean value indicating if the two points are not equal.
     */
-    bool operator!=(const Point2<T>& other) {
+    bool operator!=(const Point2<T>& other) const {
         return X != other.X || Y != other.Y;
     }
 

@@ -80,7 +80,7 @@ public:
 
     @param newDesiredSpeed The desired speed to set.
     */
-    void MotorHandler::setDesiredSpeed(float newDesiredSpeed) {
+    void setDesiredSpeed(float newDesiredSpeed) {
         desiredSpeed = newDesiredSpeed;
     }
 
@@ -101,19 +101,19 @@ public:
     }
     /** @brief Positions servo motor to middle position.
     */
-    void MotorHandler::positionServoMiddle() {
+    void positionServoMiddle() {
         updateSteeringAngle(0.0f);
     }
 
     /** @brief Attaches servo motor to the configured pin.
     */
-    void MotorHandler::attachServo() {
+    void attachServo() {
         servoMotor.attach(SERVO_PIN);
     }
 
     /** @brief Detaches servo motor.
     */
-    void MotorHandler::detachServo() {
+    void detachServo() {
         servoMotor.detach();
     }
 };

@@ -30,4 +30,7 @@ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\DriveTask.cpp.o: \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\CommunicatorTask.hpp \
  C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\UltrasonicTask.hpp \
  F:\Program\ Files\ (x86)\Arduino\libraries\NewPing/NewPing.h \
- C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\RotaryTask.hpp
+ C:\Users\Soma\AppData\Local\Temp\VMBuilds\RC_Car\uno\Debug\RotaryTask.hpp \
+ C:\Program\ Files\ (x86)\Microsoft\ Visual\ Studio\2017\Enterprise\Common7\IDE\Extensions\xaohtdp2.q2m\Micro\ Platforms\default\debuggers\VM_DBG/VM_DBG.h \
+ C:\Program\ Files\ (x86)\Microsoft\ Visual\ Studio\2017\Enterprise\Common7\IDE\Extensions\xaohtdp2.q2m\Micro\ Platforms\default\debuggers\VM_DBG/VM_Boards.h \
+ C:\Program\ Files\ (x86)\Microsoft\ Visual\ Studio\2017\Enterprise\Common7\IDE\Extensions\xaohtdp2.q2m\Micro\ Platforms\default\debuggers\VM_DBG/VM_mem_check.h
