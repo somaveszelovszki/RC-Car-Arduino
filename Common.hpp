@@ -23,6 +23,17 @@
 
 // Prints string to Serial port with endline character
 #define DEBUG_println(str) Serial.println(str)
+
+// Prints byte to Serial port.
+#define DEBUG_printByte(b)                  \
+DEBUG_print((b & 0b10000000) ? "1" : "0");  \
+DEBUG_print((b & 0b01000000) ? "1" : "0");  \
+DEBUG_print((b & 0b00100000) ? "1" : "0");  \
+DEBUG_print((b & 0b00010000) ? "1" : "0");  \
+DEBUG_print((b & 0b00001000) ? "1" : "0");  \
+DEBUG_print((b & 0b00000100) ? "1" : "0");  \
+DEBUG_print((b & 0b00000010) ? "1" : "0");  \
+DEBUG_print((b & 0b00000001) ? "1" : "0");
 #endif // _DEBUG
 
 namespace rc_car {

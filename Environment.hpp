@@ -39,7 +39,7 @@ private:
 
     /** @brief Array containing the grid points of the current section.
     */
-    Point2i sectionGridPoints[ENV_ABS_SECTION_POINTS_MAX_NUM];
+    Point2ui8 sectionGridPoints[ENV_ABS_SECTION_POINTS_MAX_NUM];
 
     /** @brief Calculates section points.
     Sections are a subset of the environment points - they are between two sensed points.
@@ -112,7 +112,7 @@ public:
     @param relPoint The relative point.
     @returns The grid point.
     */
-    Point2i relPointToGridPoint(const Point2f& relPoint) const;
+    Point2ui8 relPointToGridPoint(const Point2f& relPoint) const;
 
     /** @brief Sets section parameters.
 
@@ -155,7 +155,7 @@ public:
         return carPos;
     }
 
-    Point2i getCarGridPos() const;
+    Point2ui8 getCarGridPos() const;
 
     /** @brief Gets grid point at the given coordinates.
 
@@ -185,14 +185,14 @@ public:
     @param result The result byte array.
     @returns Point containing the X and Y coordinates of the first written byte.
     */
-    Point2i nextToStream(ByteArray<COMM_MSG_DATA_LENGTH>& result);
+    Point2ui8 nextToStream(ByteArray<COMM_MSG_DATA_LENGTH>& result);
 
     /** @brief Gets environment grid message code from grid coordinates.
 
     @param coords The grid coordinates.
     @returns The code byte.
     */
-    static byte gridCoordsToCodeByte(const Point2i& coords) {
+    static byte gridCoordsToCodeByte(const Point2ui8& coords) {
         return Message::CODES[Message::CODE::EnvGrid].codeByte + (coords.X << 4) + coords.Y;
     }
 
@@ -201,8 +201,8 @@ public:
     @param codeByte The code byte.
     @returns The grid coordinates.
     */
-    static Point2i codeByteToGridCoords(byte codeByte) {
-        return Point2i((codeByte & 0b00110000) >> 4, codeByte & 0b00001111);
+    static Point2ui8 codeByteToGridCoords(byte codeByte) {
+        return Point2ui8((codeByte & 0b00110000) >> 4, codeByte & 0b00001111);
     }
 
 #if _DEBUG
@@ -215,9 +215,9 @@ public:
                     DEBUG_print("X");
                 else
                     DEBUG_print(String(getGridPoint(x, y) ? "1" : "0"));
-            DEBUG_println();
+            //DEBUG_println();
         }
-        DEBUG_println();*/
+        //DEBUG_println();*/
 
         grid.print();
     }

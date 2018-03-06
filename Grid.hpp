@@ -15,7 +15,7 @@ NOTE: (Y * N) must be a multiple of 8!
 @tparam VPB Stored values per byte.
 NOTE: Do not set this parameter explicitly!
 */
-template <int B, int X, int Y>
+template <uint8_t B, uint8_t X, uint8_t Y>
 class Grid {
 private:
     /** @brief Type of the arrays that stores the horizontal rows of the grid.
@@ -41,7 +41,7 @@ public:
     @param y The Y coordinate of the value to get.
     @returns The value of the element.
     */
-    type get(int x, int y) const {
+    type get(uint8_t x, uint8_t y) const {
         return this->data[y].get(x);
     }
 
@@ -51,17 +51,23 @@ public:
     @param y The Y coordinate of the value to set.
     @param value The value to set.
     */
-    void set(int x, int y, type value) {
+    void set(uint8_t x, uint8_t y, type value) {
+        DEBUG_print("(");
+        DEBUG_print((int)x);
+        DEBUG_print(", ");
+        DEBUG_print((int)y);
+        DEBUG_print(") set to: ");
+        DEBUG_println((int)value);
         this->data[y].set(x, value);
     }
 
-    void increment(int x, int y);
+    void increment(uint8_t x, uint8_t y);
 
-    void decrement(int x, int y);
+    void decrement(uint8_t x, uint8_t y);
 
     class StreamWriter {
     private:
-        int y = -1;
+        uint8_t y = -1;
         const Grid<B, X, Y> *pGrid;
         typename array_type::StreamWriter arrayWriter;
 
@@ -88,12 +94,12 @@ public:
         @param pWrittenY The Y coordinate of the first written byte.
         @returns If whole grid has not been written yet: number of bytes written, else: -1 * (number of bytes written).
         */
-        int next(ByteArray<COMM_MSG_DATA_LENGTH>& result, int maxBytesNum = COMM_MSG_DATA_LENGTH, int *pWrittenX = NULL, int *pWrittenY = NULL) {
+        uint8_t next(ByteArray<COMM_MSG_DATA_LENGTH>& result, uint8_t maxBytesNum = COMM_MSG_DATA_LENGTH, uint8_t *pWrittenX = NULL, uint8_t *pWrittenY = NULL) {
 
             if (pWrittenY)
                 *pWrittenY = this->y;
 
-            int bytesWritten = this->arrayWriter.next(result, maxBytesNum, pWrittenX);
+            uint8_t bytesWritten = this->arrayWriter.next(result, maxBytesNum, pWrittenX);
             if (bytesWritten < 0) {     // whole row array has been written
 
                 bool finished = ++y == Y;
@@ -120,30 +126,31 @@ public:
     /** @brief Prints grid elements.
     */
     void print() const {
-        for (int y = 0; y < Y; ++y)
+        for (uint8_t y = 0; y < Y; ++y) {
             this->data[y].print();
+        }
     }
 #endif // _DEBUG
 };
 
-template<int B, int X, int Y>
+template<uint8_t B, uint8_t X, uint8_t Y>
 const typename Grid<B, X, Y>::type Grid<B, X, Y>::dataMin = Array<B, X>::dataMin;
 
-template<int B, int X, int Y>
+template<uint8_t B, uint8_t X, uint8_t Y>
 const typename Grid<B, X, Y>::type Grid<B, X, Y>::dataMax = Array<B, X>::dataMax;
 
-template<int B, int X, int Y>
-void Grid<B, X, Y>::increment(int x, int y) {
-    type value = get(x, y);
+template<uint8_t B, uint8_t X, uint8_t Y>
+void Grid<B, X, Y>::increment(uint8_t x, uint8_t y) {
+    type value = this->get(x, y);
     if (value < dataMax)
-        set(x, y, value + 1);
+        this->set(x, y, value + 1);
 }
 
-template<int B, int X, int Y>
-void Grid<B, X, Y>::decrement(int x, int y) {
-    type value = get(x, y);
+template<uint8_t B, uint8_t X, uint8_t Y>
+void Grid<B, X, Y>::decrement(uint8_t x, uint8_t y) {
+    type value = this->get(x, y);
     if (value > dataMin)
-        set(x, y, value - 1);
+        this->set(x, y, value - 1);
 }
 }
 

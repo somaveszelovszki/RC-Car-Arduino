@@ -26,7 +26,7 @@ struct Selector<1> {
 
     /** @brief Mask for getting and setting bool element at given position in a byte container.
     */
-    static const byte mask[8];
+    static const uint8_t mask[8];
 };
 #endif // ARRAY_1_EN
 
@@ -41,7 +41,7 @@ struct Selector<2> {
 
     /** @brief Mask for getting and setting bool element at given position in a byte container.
     */
-    static const byte mask[4];
+    static const uint8_t mask[4];
 };
 #endif // ARRAY_2_EN
 
@@ -56,7 +56,7 @@ struct Selector<4> {
 
     /** @brief Mask for getting and setting bool element at given position in a byte container.
     */
-    static const byte mask[2];
+    static const uint8_t mask[2];
 };
 #endif // ARRAY_4_EN
 
@@ -69,18 +69,18 @@ NOTE: (B * N) must be a multiple of 8!
 @tparam VPB Number of values per byte.
 NOTE: Do not set this number explicitly!
 */
-template <int B, int N, int VPB = 8 / B>
+template <uint8_t B, uint8_t N, uint8_t VPB = 8 / B>
 class Array {
 private:
     /** @brief Byte array containing the binary values.
     */
-    byte data[N / VPB];
+    uint8_t data[N / VPB];
 
 public:
     typedef typename Selector<B>::type type;
     static const type dataMin;
     static const type dataMax;
-    static const byte *mask;
+    static const uint8_t *mask;
 
     /** @brief Constructor - does not initialize elements.
     */
@@ -91,8 +91,9 @@ public:
     @param pos The position of the value to get.
     @returns The value of the element.
     */
-    type get(int pos) const {
-        return data[pos / VPB] & mask[pos % VPB];
+    type get(uint8_t pos) const {
+        uint8_t idx = pos % VPB;
+        return static_cast<type>((data[pos / VPB] & mask[idx]) >> (idx * B));
     }
 
     /** @brief Sets element at given position to the given value.
@@ -100,11 +101,11 @@ public:
     @param pos The position of the value to set.
     @param value The value to set.
     */
-    void set(int pos, type value);
+    void set(uint8_t pos, type value);
 
     class StreamWriter {
     private:
-        int pos = -1;
+        uint8_t pos = -1;
         const Array<B, N> *pArray;
 
     public:
@@ -128,13 +129,13 @@ public:
         @param pWrittenPos Will contain the position of the first written byte.
         @returns If whole array has not been written yet: number of bytes written, else: -1 * (number of bytes written).
         */
-        int next(ByteArray<COMM_MSG_DATA_LENGTH>& result, int maxBytesNum = COMM_MSG_DATA_LENGTH, int *pWrittenPos = NULL) {
+        uint8_t next(ByteArray<COMM_MSG_DATA_LENGTH>& result, uint8_t maxBytesNum = COMM_MSG_DATA_LENGTH, uint8_t *pWrittenPos = NULL) {
 
             if (pWrittenPos)
                 *pWrittenPos = this->pos;
 
-            int bytesWritten;
-            for (bytesWritten = 0; (bytesWritten < maxBytesNum / (int)sizeof(byte)) && (this->pos < N); ++bytesWritten, ++this->pos) {
+            uint8_t bytesWritten;
+            for (bytesWritten = 0; (bytesWritten < maxBytesNum / sizeof(uint8_t)) && (this->pos < N); ++bytesWritten, ++this->pos) {
                 result[bytesWritten] = pArray->data[this->pos];
             }
 
@@ -154,33 +155,57 @@ public:
     */
     void print() const {
         for (int i = 0; i < N - 1; ++i) {
-            DEBUG_print(this->get(i));
+            DEBUG_print((int)this->get(i));
             DEBUG_print(" ");
         }
 
-        if (N > 0)
-            DEBUG_print(this->get(N - 1));
+        if (N > 0) {
+            DEBUG_print((int)this->get(N - 1));
+        }
 
         DEBUG_println();
     }
 #endif // _DEBUG
 };
 
-template <int B, int N, int VPB>
+template <uint8_t B, uint8_t N, uint8_t VPB>
 const typename Array<B, N, VPB>::type Array<B, N, VPB>::dataMin = Selector<B>::min;
 
-template <int B, int N, int VPB>
+template <uint8_t B, uint8_t N, uint8_t VPB>
 const typename Array<B, N, VPB>::type Array<B, N, VPB>::dataMax = Selector<B>::max;
 
-template <int B, int N, int VPB>
-const byte *Array<B, N, VPB>::mask = Selector<B>::mask;
+template <uint8_t B, uint8_t N, uint8_t VPB>
+const uint8_t *Array<B, N, VPB>::mask = Selector<B>::mask;
 
-template<int B, int N, int VPB>
-void Array<B, N, VPB>::set(int pos, type value) {
-    if (value)
-        data[pos / VPB] |= mask[pos % VPB];
-    else
-        data[pos / VPB] &= ~mask[pos % VPB];
+template<uint8_t B, uint8_t N, uint8_t VPB>
+void Array<B, N, VPB>::set(uint8_t pos, type value) {
+    uint8_t group = pos / VPB, idx = pos % VPB;
+
+    DEBUG_print("Before: ");
+    uint8_t b = data[group];
+
+    DEBUG_print((b & 0b10000000) ? "1" : "0");
+    DEBUG_print((b & 0b01000000) ? "1" : "0");
+    DEBUG_print((b & 0b00100000) ? "1" : "0");
+    DEBUG_print((b & 0b00010000) ? "1" : "0");
+    DEBUG_print((b & 0b00001000) ? "1" : "0");
+    DEBUG_print((b & 0b00000100) ? "1" : "0");
+    DEBUG_print((b & 0b00000010) ? "1" : "0");
+    DEBUG_println((b & 0b00000001) ? "1" : "0");
+
+    data[group] = (data[group] & ~mask[idx]) | static_cast<uint8_t>(value << (idx * B));
+
+    b = data[group];
+    DEBUG_print("After:  ");
+    DEBUG_print((b & 0b10000000) ? "1" : "0");
+    DEBUG_print((b & 0b01000000) ? "1" : "0");
+    DEBUG_print((b & 0b00100000) ? "1" : "0");
+    DEBUG_print((b & 0b00010000) ? "1" : "0");
+    DEBUG_print((b & 0b00001000) ? "1" : "0");
+    DEBUG_print((b & 0b00000100) ? "1" : "0");
+    DEBUG_print((b & 0b00000010) ? "1" : "0");
+    DEBUG_println((b & 0b00000001) ? "1" : "0");
+    DEBUG_println();
 }
 }
 

@@ -23,41 +23,43 @@ void Environment::SectionPointCalculator::setSection(const Point2f *pStartPoint,
 }
 
 Environment::Environment(const Point2f *_sensedPoints) :
-    carPos(Point2f::ORIGO),
+    carPos(0.0f, 0.0f),
     carFwdAngle_Rad(M_PI_2),
     carFwdAngle_Cos(0.0f),
     carFwdAngle_Sin(1.0f),
     sensedPoints(_sensedPoints) {
 
-    for (int x = 0; x < ENV_ABS_AXIS_POINTS_NUM; ++x)
-        for (int y = 0; y < ENV_ABS_AXIS_POINTS_NUM; ++y)
+    for (int x = 0; x < ENV_ABS_AXIS_POINTS_NUM; ++x) {
+        for (int y = 0; y < ENV_ABS_AXIS_POINTS_NUM; ++y) {
             grid.set(x, y, static_cast<uint2_t>(0));
+        }
+    }
 
     gridWriter.setGrid(&grid);
 }
 
-Point2i rc_car::Environment::relPointToGridPoint(const Point2f& relPoint) const {
+Point2ui8 Environment::relPointToGridPoint(const Point2f& relPoint) const {
     Point2f absPos = carPos + Point2f(
         relPoint.X * carFwdAngle_Cos - relPoint.Y * carFwdAngle_Sin,
         relPoint.X * carFwdAngle_Sin + relPoint.Y * carFwdAngle_Cos);
 
-    return Point2i(COORD_TO_GRID_POS(absPos.X), COORD_TO_GRID_POS(absPos.Y));
+    return Point2ui8(COORD_TO_GRID_POS(absPos.X), COORD_TO_GRID_POS(absPos.Y));
 }
 
-Point2i rc_car::Environment::getCarGridPos() const {
-    return Point2i(COORD_TO_GRID_POS(carPos.X), COORD_TO_GRID_POS(carPos.Y));
+Point2ui8 Environment::getCarGridPos() const {
+    return Point2ui8(COORD_TO_GRID_POS(carPos.X), COORD_TO_GRID_POS(carPos.Y));
 }
 
 bool Environment::isRelativePointObstacle(const Point2f& relPoint) const {
-    Point2i gridPos = relPointToGridPoint(relPoint);
+    Point2ui8 gridPos = relPointToGridPoint(relPoint);
 
     return gridPos.X < ENV_ABS_AXIS_POINTS_NUM
         && gridPos.Y < ENV_ABS_AXIS_POINTS_NUM
         && grid.get(gridPos.X, gridPos.Y);
 }
 
-void rc_car::Environment::updateGrid() {
-    DEBUG_println("updateGrid");
+void Environment::updateGrid() {
+    //DEBUG_println("updateGrid");
     const Point2f *pSectionStart, *pSectionEnd;
     Common::UltrasonicPos sectionStartPos = Common::UltrasonicPos::RIGHT_FRONT;
 
@@ -69,20 +71,17 @@ void rc_car::Environment::updateGrid() {
         pSectionEnd = &sensedPoints[sectionStartPos = Common::nextUltrasonicPos(sectionStartPos)];
         sectionPointCalculator.setSection(pSectionStart, pSectionEnd, ENV_ABS_POINTS_DIST);
 
-        // section points cannot be in the origo, so it's a good initial value
-        Point2i prevGridPoint = Point2i::ORIGO;
-        int currentGridPointIdx = 0;
+        Point2ui8 carGridPos = relPointToGridPoint(carPos),
+            prevGridPoint = carGridPos;     // section points cannot be where the car is, so the car's position is a good initial value
 
-        Serial.print("1");
+        int currentGridPointIdx = 0;
 
         // iterates through section points, adds them to the section grid points array,
         // and increments obstacle probabilities (section points are sensed as obstacles)
         while (sectionPointCalculator.nextExists() && currentGridPointIdx < ENV_ABS_SECTION_POINTS_MAX_NUM) {
-            Serial.print(" 2");
 
-            Point2i gridPoint = relPointToGridPoint(sectionPointCalculator.next());
+            Point2ui8 gridPoint = relPointToGridPoint(sectionPointCalculator.next());
             if (gridPoint != prevGridPoint) {
-                Serial.print(" 3");
 
                 sectionGridPoints[currentGridPointIdx++] = gridPoint;
 
@@ -93,22 +92,21 @@ void rc_car::Environment::updateGrid() {
 
         int sectionGridPointsNum = currentGridPointIdx;
 
-        Point2i bl, tr;     // bottom left, top right corners of the triangle bounding box
-        Point2i carGridPos = relPointToGridPoint(carPos),
+        Point2ui8 bl, tr,     // bottom left, top right corners of the triangle bounding box
             startGridPos = relPointToGridPoint(*pSectionStart),
             endGridPos = relPointToGridPoint(*pSectionEnd);
 
-        Point2i triangle[3] = {
+        Point2ui8 triangle[3] = {
             carGridPos,
             startGridPos,
             endGridPos
         };
 
         // checks points defined by the bounding box of the car position and the start and end points if the are inside the triangle defined by these points
-        Point2i::bbox(triangle, 3, &bl, &tr);
+        Point2ui8::bbox(triangle, 3, &bl, &tr);
         for (int x = bl.X; x <= tr.X; ++x) {
             for (int y = bl.Y; y <= tr.Y; ++y) {
-                Point2i current(x, y);
+                Point2ui8 current(x, y);
                 // checks if current point is inside the triangle determined by the car position and start and end points
                 // if yes (and it is not a section point, then decrements its obstacle probability, because it has not been sensed as an obstacle)
                 if (current.isInside(carGridPos, startGridPos, endGridPos) && !Common::contains(current, sectionGridPoints, sectionGridPointsNum))
@@ -120,8 +118,8 @@ void rc_car::Environment::updateGrid() {
     }
 }
 
-rc_car::Point2i rc_car::Environment::nextToStream(ByteArray<COMM_MSG_DATA_LENGTH>& result) {
-    Point2i firstByte;
+Point2ui8 Environment::nextToStream(ByteArray<COMM_MSG_DATA_LENGTH>& result) {
+    Point2ui8 firstByte;
     gridWriter.next(result, COMM_MSG_DATA_LENGTH, &firstByte.X, &firstByte.Y);
     return firstByte;
 }

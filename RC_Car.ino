@@ -55,7 +55,6 @@ void setup() {
 }
 
 void loop() {
-    DEBUG_println("loop");
     RUN_TASK(communicatorTask);
     RUN_TASK(ultrasonicTask);
     RUN_TASK(rotaryTask);

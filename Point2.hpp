@@ -11,9 +11,6 @@ namespace rc_car {
 template <typename T>
 class Point2;
 
-typedef Point2<float>   Point2f, Vec2f;
-typedef Point2<int>     Point2i, Vec2i;
-
 template <typename T>
 using Vec2 = Point2<T>;
 
@@ -27,10 +24,6 @@ public:
     /** @brief The Y coordinate.
     */
     T Y;
-
-    /** @brief Contains the ORIGO.
-    */
-    static const Point2<T> ORIGO;
 
     /** @brief Constructor - does not initializes coordinates.
     */
@@ -229,9 +222,6 @@ public:
 };
 
 template <typename T>
-const Point2<T> Point2<T>::ORIGO(static_cast<T>(0), static_cast<T>(0));
-
-template <typename T>
 float Point2<T>::getAngle(const Vec2<T>& other, Common::RotationDir dir) const {
     float angle;
 
@@ -317,19 +307,22 @@ bool Point2<T>::isInside(const Point2<T>& a, const Point2<T>& b, const Point2<T>
     Common::Sign sA = ab.getAngleSign(ap, dir), sB = bc.getAngleSign(bp, dir), sC = ca.getAngleSign(cp, dir);
 
     // if point is in line of the side, determines it if it is outside or on the line
-    if (sA == Common::Sign::ZERO && !Common::isBtw(ap.X, 0, ab.X))
+    if (sA == Common::Sign::ZERO && !Common::isBtw(ap.X, static_cast<T>(0), ab.X))
         return false;
 
-    if (sB == Common::Sign::ZERO && !Common::isBtw(bp.X, 0, bc.X))
+    if (sB == Common::Sign::ZERO && !Common::isBtw(bp.X, static_cast<T>(0), bc.X))
         return false;
 
-    if (sC == Common::Sign::ZERO && !Common::isBtw(cp.X, 0, ca.X))
+    if (sC == Common::Sign::ZERO && !Common::isBtw(cp.X, static_cast<T>(0), ca.X))
         return false;
 
     // sum can be +-3 when all values are either POSITIVE or NEGATIVE,
     // or it can be +-2 if one of the results is ZERO
-    return abs(static_cast<int>(sA) + static_cast<int>(sB) + static_cast<int>(sC)) >= 2;
+    return abs(static_cast<int8_t>(sA) + static_cast<int8_t>(sB) + static_cast<int8_t>(sC)) >= static_cast<int8_t>(2);
 }
+
+typedef Point2<float>       Point2f, Vec2f;
+typedef Point2<uint8_t>     Point2ui8, Vec2ui8;
 
 }
 #endif // RC_CAR__POINT2__HPP

@@ -24,6 +24,7 @@ void DriveTask::initialize() {
 }
 
 void DriveTask::run() {
+    DEBUG_println("run");
     float speed = rotaryTask.getSpeed(), steeringAngle = motorHandler.getSteeringAngle();
 
     motorHandler.updateSpeed(speed);
@@ -38,7 +39,7 @@ void DriveTask::run() {
 
         if (!communicatorTask.isSendMsgAvailable(getTaskId())) {
             ByteArray<COMM_MSG_DATA_LENGTH> envGridPart;
-            Point2i gridCoords = environment.nextToStream(envGridPart);
+            Point2ui8 gridCoords = environment.nextToStream(envGridPart);
             communicatorTask.setMessageToSend(Message(Environment::gridCoordsToCodeByte(gridCoords), envGridPart), getTaskId());
         }
     }
@@ -47,7 +48,7 @@ void DriveTask::run() {
     case Common::SAFE_DRIVE:
     {
         updateEnvironmentGridPoints();
-        //environment.print();
+        environment.print();
         DEBUG_println();
 
         if (false) {
@@ -62,7 +63,7 @@ void DriveTask::run() {
 
             int fwdRelPos = Common::diff(fwdPos, sectionCalcStartPos);
 
-            //DEBUG_println(remainingTimes[fwdRelPos]);
+            ////DEBUG_println(remainingTimes[fwdRelPos]);
 
 
             bool prev = forceSteeringActive;
@@ -88,12 +89,12 @@ void DriveTask::run() {
                 //    if (!isDistanceCritical(remainingTimes[i], DRIVE_PRE_CRASH_TIME_DRIVE_CMD_DISABLE)) {
                 //        newFwdPosFound = true;
                 //        Common::UltrasonicPos newFwdPos = static_cast<Common::UltrasonicPos>(static_cast<int>(globalStartPos) + i);
-                //                 DEBUG_println("newFwdPos: " + String(newFwdPos) + " -> " + ((static_cast<int>(newFwdPos) % 6) / 3 ? 1 : -1));
+                //                 //DEBUG_println("newFwdPos: " + String(newFwdPos) + " -> " + ((static_cast<int>(newFwdPos) % 6) / 3 ? 1 : -1));
                 //        float newSteeringAngle = SERVO_POS_MID + ((static_cast<int>(newFwdPos) % 6) / 3 ? 1 : -1) * SERVO_ROT_MAX;
                 //        motorHandler.updateSteeringAngle(newSteeringAngle);
                 //        forceSteeringWatchdog.restart();
                 //        forceSteeringActive = true;
-                //        //DEBUG_println("new fwd pos: " + String(newFwdPos) + " -> " + String(ultrasonicTask.getSensorViewAngle(newFwdPos)));
+                //        ////DEBUG_println("new fwd pos: " + String(newFwdPos) + " -> " + String(ultrasonicTask.getSensorViewAngle(newFwdPos)));
                 //        //motorHandler.updateSteeringAngle(ultrasonicTask.getSensorViewAngle(newFwdPos));
                 //    }
                 //}
@@ -135,6 +136,8 @@ void DriveTask::run() {
         // TODO
         break;
     }
+
+    //DEBUG_println("run over");
 }
 
 void DriveTask::executeMessage() {
@@ -204,10 +207,10 @@ void DriveTask::calculateRemainingTimes(Common::UltrasonicPos startPos) {
 
     const Point2f *pSectionStart, *pSectionEnd;
 
-    //DEBUG_println("####################");
-    //DEBUG_println("fwdPos: " + String(fwdPos));
-    //DEBUG_println("startPos: " + String(globalStartPos));
-    //DEBUG_println("####################");
+    ////DEBUG_println("####################");
+    ////DEBUG_println("fwdPos: " + String(fwdPos));
+    ////DEBUG_println("startPos: " + String(globalStartPos));
+    ////DEBUG_println("####################");
 
     for (int i = 0; i < ENV_SECTIONS_NUM; ++i) {
         pSectionStart = &ultrasonicTask.sensedPoints[startPos];
@@ -216,12 +219,12 @@ void DriveTask::calculateRemainingTimes(Common::UltrasonicPos startPos) {
 
         float minRemainingTime;
         bool obstacle = false;
-        //DEBUG_println("---------------------");
-        //DEBUG_println("section start: " + String(sectionStart.X) + ", " + String(sectionStart.Y));
+        ////DEBUG_println("---------------------");
+        ////DEBUG_println("section start: " + String(sectionStart.X) + ", " + String(sectionStart.Y));
 
         while (environment.nextSectionPointExists()) {
             Point2f next = environment.nextSectionPoint();
-            //DEBUG_println("next: " + String(next.X) + ", " + String(next.Y));
+            ////DEBUG_println("next: " + String(next.X) + ", " + String(next.Y));
             Trajectory::TrackDistance td = trajectory.trackdistancePoint(next);
 
             if (td.isCritical() && (!obstacle || td.remainingTime < minRemainingTime)) {
@@ -231,7 +234,7 @@ void DriveTask::calculateRemainingTimes(Common::UltrasonicPos startPos) {
         }
 
         remainingTimes[i] = obstacle ? minRemainingTime : 0.0f;
-        //DEBUG_println(String(i) + ": " + String(remainingTimes[i]));
+        ////DEBUG_println(String(i) + ": " + String(remainingTimes[i]));
 
         pSectionStart = pSectionEnd;
     }
