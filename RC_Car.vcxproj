@@ -81,6 +81,7 @@
   <ItemGroup>
     <ClInclude Include="Array.hpp" />
     <ClInclude Include="ByteArray.hpp" />
+    <ClInclude Include="CarProps.hpp" />
     <ClInclude Include="config.hpp" />
     <ClInclude Include="Grid.hpp" />
     <ClInclude Include="Message.hpp" />

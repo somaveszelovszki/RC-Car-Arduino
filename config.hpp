@@ -58,14 +58,16 @@
 
 #define COMM_MSG_SEPARATOR          static_cast<int32_t>(0x7fffffff)    // forbidden as data value
 
+// Trajectory
+#define TRAJ_CAR_POS_UPDATE_TIMEOUT             10      // [ms]
+
 // DriveTask
 #define DRIVE_ENV_GRID_SEND_TIMEOUT             2       // [ms]
 #define DRIVE_MSG_WATCHDOG_TIMEOUT              1000    // [ms]
 #define DRIVE_FORCE_STEERING_TIME               500     // [ms]
 #define DRIVE_FORCE_STOP_TIME                   3000    // [ms]
-#define DRIVE_PRE_CRASH_TIME_FORCE_STOP         0.5f    // critical time until crash - in [sec]
-#define DRIVE_PRE_CRASH_TIME_DRIVE_CMD_DISABLE  0.8f
-
+#define DRIVE_PRE_CRASH_TIME_FORCE_STOP         0.5f    // critical time until crash for force stop - in [sec]
+#define DRIVE_PRE_CRASH_TIME_DRIVE_CMD_DISABLE  0.8f    // critical time until crash for command disable - in [sec]
 
 // minimum distance to keep from obstacles - in [cm]
 // if trajectory is within this distance from an obstacle, will be handled as if a crash was going to happen

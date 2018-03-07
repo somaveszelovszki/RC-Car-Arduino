@@ -1,12 +1,13 @@
 #ifndef RC_CAR__TRAJECTORY__HPP
 #define RC_CAR__TRAJECTORY__HPP
 
-#include "Point2.hpp"
+#include "CarProps.hpp"
+#include "Periodic.hpp"
 
 namespace rc_car {
 /** @brief Calculates car trajectory from steering angle, and calculates object distance from this trajectory.
 */
-class Trajectory {
+class Trajectory : public Periodic {
 public:
     /** @brief Stores information about the distance of an obstacle and the car track.
     */
@@ -27,7 +28,7 @@ public:
         float remainingTime;
 
         /** @brief Checks if The distance between the obstacle and the track is critical
-        (if car is going to hit the obstacle, or go too near it).
+        (if car is going to hit the obstacle, or go too close to it).
 
         @returns Boolean value indicating if the distance is critical.
         */
@@ -37,17 +38,9 @@ public:
     };
 
 private:
-    /** @brief The current speed of the car.
+    /** @brief Pointer to the structure storing the car properties (speed, steering angle, etc).
     */
-    float speed;
-
-    /** @brief The current steering angle.
-    */
-    float steeringAngle;
-
-    /** @brief The current steering direction.
-    */
-    Common::RotationDir steeringDir;
+    CarProps *pCar;
 
     /** @brief The current radius of the rear middle point of the car.
     */
@@ -79,12 +72,19 @@ private:
     void updateRadiuses();
 
 public:
+    /** @brief Constructor - sets period time, initializes position and angle.
+
+    @param _periodTime The period time.
+    @param _pCar Pointer to the structure storing the car properties.
+    */
+    Trajectory(int _periodTime, CarProps *_pCar) : Periodic(_periodTime) {}
+
     /** @brief Updates speed, steering angle and then updates radiuses according to the steering angle.
 
     @param _speed The current speed of the car.
     @param _steeringAngle The current steering angle.
     */
-    void updateValues(float _speed, float _steeringAngle);
+    void update(float _speed, float _steeringAngle);
 
     /** @brief Calculates distance between given point and the car trajectory.
 

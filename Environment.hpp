@@ -1,7 +1,7 @@
 ﻿#ifndef RC_CAR__ENVIRONMENT__HPP
 #define RC_CAR__ENVIRONMENT__HPP
 
-#include "Point2.hpp"
+#include "CarProps.hpp"
 #include "Grid.hpp"
 #include "Message.hpp"
 
@@ -11,21 +11,13 @@ namespace rc_car {
 */
 class Environment {
 private:
-    /** @brief Position of the car relative to its start position.
+    /** @brief Pointer to the structure storing the car properties (speed, steering angle, etc).
     */
-    Point2f carPos;
+    const CarProps * pCar;
 
-    /** @brief Car's forward angle in [rad].
+    /** @brief Grid position of the car.
     */
-    float carFwdAngle_Rad;
-
-    /** @brief Car's forward angle's cosine.
-    */
-    float carFwdAngle_Cos;
-
-    /** @brief Car's forward angle's sine.
-    */
-    float carFwdAngle_Sin;
+    Point2ui8 carGridPos;
 
     /** @brief The grid type.
     */
@@ -101,9 +93,10 @@ private:
 public:
     /** @brief Constructor - resets grid and sets sensed points array.
 
+    @param _pCar Pointer to the structure storing the car properties.
     @param _sensedPoints Array of the sensed points (provided by the UltrasonicTask).
     */
-    Environment(const Point2f *_sensedPoints);
+    Environment(const CarProps *_pCar, const Point2f *_sensedPoints);
 
     /** @brief Converts relative point to grid point.
     Relative points' coordinates are relative to the car's current position.
@@ -138,24 +131,6 @@ public:
     Point2f nextSectionPoint() {
         return sectionPointCalculator.next();
     }
-
-    /** @brief Sets car position.
-
-    @param _carPos The car position to set.
-    */
-    void setCarPosition(const Point2f _carPos) {
-        carPos = _carPos;
-    }
-
-    /** @brief Gets car position.
-
-    @returns The car position.
-    */
-    const Point2f& getCarPos() const {
-        return carPos;
-    }
-
-    Point2ui8 getCarGridPos() const;
 
     /** @brief Gets grid point at the given coordinates.
 

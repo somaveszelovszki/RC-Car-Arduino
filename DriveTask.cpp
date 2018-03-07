@@ -16,7 +16,8 @@ DriveTask::DriveTask() : PeriodicTask(TASK_PERIOD_TIME_DRIVE, TASK_WATCHDOG_TIME
     forceSteeringWatchdog(DRIVE_FORCE_STEERING_TIME, Watchdog::State::STOPPED),
     forceStopWatchdog(DRIVE_FORCE_STOP_TIME, Watchdog::State::STOPPED),
     sendEnvGridWatchdog(DRIVE_ENV_GRID_SEND_TIMEOUT),
-    environment(ultrasonicTask.sensedPoints) {}
+    environment(&car, ultrasonicTask.sensedPoints),
+    trajectory(TRAJ_CAR_POS_UPDATE_TIMEOUT, &car) {}
 
 void DriveTask::initialize() {
     motorHandler.initialize();
@@ -28,6 +29,10 @@ void DriveTask::run() {
     float speed = rotaryTask.getSpeed(), steeringAngle = motorHandler.getSteeringAngle();
 
     motorHandler.updateSpeed(speed);
+    if (trajectory.periodTimeReached()) {
+        trajectory.update(speed, steeringAngle);    // updates car properties and trajectory radiuses
+        trajectory.restartPeriodCheck();
+    }
 
     bool isNewMsgAvailable = communicatorTask.isRecvMsgAvailable(getTaskId());
 
@@ -52,8 +57,6 @@ void DriveTask::run() {
         DEBUG_println();
 
         if (false) {
-            trajectory.updateValues(speed, steeringAngle);
-
             // calculates section start position according to forward direction
             Common::UltrasonicPos fwdPos = ultrasonicTask.getForwardPos(steeringAngle),
                 sectionCalcStartPos = Common::calcSectionStart(fwdPos);

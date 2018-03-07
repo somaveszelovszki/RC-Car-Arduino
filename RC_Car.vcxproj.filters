@@ -75,6 +75,9 @@
     <ClInclude Include="Grid.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CarProps.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common.cpp">

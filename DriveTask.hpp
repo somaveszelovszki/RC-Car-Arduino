@@ -1,6 +1,7 @@
 #ifndef RC_CAR__DRIVE_TASK__HPP
 #define RC_CAR__DRIVE_TASK__HPP
 
+#include "CarProps.hpp"
 #include "MotorHandler.hpp"
 #include "Trajectory.hpp"
 #include "Environment.hpp"
@@ -14,6 +15,10 @@ private:
     /** @brief Drive mode determines how much influence the firmware has got in making driving decisions.
     */
     Common::DriveMode mode;
+
+    /** @ brief Stores car properties (speed, steering angle, etc).
+    */
+    CarProps car;
 
     /** @brief Handles the DC and servo motors.
     */

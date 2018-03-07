@@ -48,7 +48,8 @@ private:
     */
     float desiredSpeed;
 
-    /** @brief The current steering angle.
+    /** @brief The current steering angle - in [rad].
+    NOTE: Steering angle is relative to the Y axis!
     */
     float steeringAngle;
 
@@ -84,17 +85,19 @@ public:
         desiredSpeed = newDesiredSpeed;
     }
 
-    /** @brief Sets steering angle and writes it to the servo motor.
+    /** @brief Sets steering angle and writes it to the servo motor - in [rad].
+    NOTE: Steering angle is relative to the Y axis!
 
-    @param _steeringAngle The steering angle to set.
+    @param _steeringAngle The steering angle to set - in [rad].
     */
     void updateSteeringAngle(float _steeringAngle) {
         servoMotor.writeAngle(steeringAngle = _steeringAngle);
     }
 
-    /** @brief Gets the current steering angle.
+    /** @brief Gets the current steering angle - in [rad].
+    NOTE: Steering angle is relative to the Y axis!
 
-    @returns The current steering angle.
+    @returns The current steering angle - in [rad].
     */
     float getSteeringAngle() {
         return steeringAngle;
