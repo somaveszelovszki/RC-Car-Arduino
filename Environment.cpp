@@ -5,7 +5,7 @@ using namespace rc_car;
 /** @brief Converts relative coordinate to grid position.
 Coordinate is relative to car, grid position is a position in the grid (0-indexed 2-dimensional array).
 */
-#define COORD_TO_GRID_POS(coord) static_cast<uint8_t>((ENV_ABS_POINTS_DIST / 2 + coord) / ENV_ABS_POINTS_DIST)
+#define COORD_TO_GRID_POS(coord) static_cast<uint8_t>(ENV_ABS_AXIS_POINTS_NUM / 2 + coord / ENV_ABS_POINTS_DIST)
 
 /** @brief Converts grid position to relative coordinate.
 Coordinate is relative to car, grid position is a position in the grid (0-indexed 2-dimensional array).
@@ -34,9 +34,11 @@ Environment::Environment(const CarProps *_pCar, const Point2f *_sensedPoints) : 
 }
 
 Point2ui8 Environment::relPointToGridPoint(const Point2f& relPoint) const {
+
+    // car pos + relative pos rotated with (fwdAngle - 90 degrees)
     Point2f absPos = this->pCar->pos + Point2f(
-        relPoint.X * this->pCar->fwdAngle_Cos - relPoint.Y * this->pCar->fwdAngle_Sin,
-        relPoint.X * this->pCar->fwdAngle_Sin + relPoint.Y * this->pCar->fwdAngle_Cos);
+        relPoint.X * this->pCar->fwdAngle_Sin + relPoint.Y * this->pCar->fwdAngle_Cos,
+        - relPoint.X * this->pCar->fwdAngle_Cos + relPoint.Y * this->pCar->fwdAngle_Sin);
 
     return Point2ui8(COORD_TO_GRID_POS(absPos.X), COORD_TO_GRID_POS(absPos.Y));
 }
@@ -46,7 +48,7 @@ bool Environment::isRelativePointObstacle(const Point2f& relPoint) const {
 
     return gridPos.X < ENV_ABS_AXIS_POINTS_NUM
         && gridPos.Y < ENV_ABS_AXIS_POINTS_NUM
-        && grid.get(gridPos.X, gridPos.Y);
+        && grid.get(gridPos.X, gridPos.Y) >= 2;
 }
 
 void Environment::updateGrid() {
@@ -62,10 +64,33 @@ void Environment::updateGrid() {
         pSectionEnd = &sensedPoints[sectionStartPos = Common::nextUltrasonicPos(sectionStartPos)];
         sectionPointCalculator.setSection(pSectionStart, pSectionEnd, ENV_ABS_POINTS_DIST);
 
+        //DEBUG_print("car: (");
+        //DEBUG_print(this->pCar->pos.X);
+        //DEBUG_print(", ");
+        //DEBUG_print(this->pCar->pos.Y);
+        //DEBUG_println(")");
+
         Point2ui8 carGridPos = relPointToGridPoint(this->pCar->pos),
             prevGridPoint = carGridPos;     // section points cannot be where the car is, so the car's position is a good initial value
 
+        //DEBUG_print("car idx: (");
+        //DEBUG_print(carGridPos.X);
+        //DEBUG_print(", ");
+        //DEBUG_print(carGridPos.Y);
+        //DEBUG_println(")");
+
         int currentGridPointIdx = 0;
+
+        //DEBUG_print("Section: (");
+        //DEBUG_print(pSectionStart->X);
+        //DEBUG_print(", ");
+        //DEBUG_print(pSectionStart->Y);
+        //DEBUG_print(") - (");
+        //DEBUG_print(pSectionEnd->X);
+        //DEBUG_print(", ");
+        //DEBUG_print(pSectionEnd->Y);
+        //DEBUG_println(")");
+
 
         // iterates through section points, adds them to the section grid points array,
         // and increments obstacle probabilities (section points are sensed as obstacles)
@@ -73,7 +98,6 @@ void Environment::updateGrid() {
 
             Point2ui8 gridPoint = relPointToGridPoint(sectionPointCalculator.next());
             if (gridPoint != prevGridPoint) {
-
                 sectionGridPoints[currentGridPointIdx++] = gridPoint;
 
                 grid.increment(gridPoint.X, gridPoint.Y);
@@ -93,8 +117,34 @@ void Environment::updateGrid() {
             endGridPos
         };
 
+        //DEBUG_print("start: (");
+        //DEBUG_print(startGridPos.X);
+        //DEBUG_print(", ");
+        //DEBUG_print(startGridPos.Y);
+        //DEBUG_println(")");
+        //
+        //DEBUG_print("end: (");
+        //DEBUG_print(endGridPos.X);
+        //DEBUG_print(", ");
+        //DEBUG_print(endGridPos.Y);
+        //DEBUG_println(")");
+
         // checks points defined by the bounding box of the car position and the start and end points if the are inside the triangle defined by these points
         Point2ui8::bbox(triangle, 3, &bl, &tr);
+
+        //DEBUG_println(String("bbox: (") + bl.X + ", " + bl.Y + ") - (" + tr.X + ", " + tr.Y + ")");
+
+        //DEBUG_print("\nbbox: (");
+        //DEBUG_print(bl.X);
+        //DEBUG_print(", ");
+        //DEBUG_print(bl.Y);
+        //DEBUG_print(") - (");
+        //DEBUG_print(tr.X);
+        //DEBUG_print(", ");
+        //DEBUG_print(tr.Y);
+        //DEBUG_println(")");
+
+
         for (int x = bl.X; x <= tr.X; ++x) {
             for (int y = bl.Y; y <= tr.Y; ++y) {
                 Point2ui8 current(x, y);

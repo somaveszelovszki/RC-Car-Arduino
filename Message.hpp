@@ -28,10 +28,12 @@ public:
         Speed,          // [cm/sec] (>0 means FORWARD)
         SteeringAngle,  // [degree] (>0 means LEFT)
         DriveMode,      // values in Common::DriveMode
+        CarPos,         // Absolute position of the car.
+        CarAngle,       // Forward angle of the car (X axis is ZERO).
         RelEnvEn,       // enable/disable relative environment point sending
         RelEnvPoint,    // group for sensed relative points
         EnvGridEn,      // enable/disable environment grid sending
-        EnvGrid,        // group for environment grid points
+        EnvGrid,        // group for environment grid points (container's X (2) and Y (4) coordinates need to be added to this number)
         NUM_CODES
     };
 
@@ -271,13 +273,11 @@ public:
     */
     static void fromBytes(const ByteArray<COMM_MSG_LENGTH>& bytes, Message& result);
 
-#if _DEBUG
-    /** @brief Builds String from Message object.
-
-    @returns The message as a String.
+#if __DEBUG__
+    /** @brief Prints Message object to the Serial port.
     */
-    String toString() const;
-#endif // _DEBUG
+    void print() const;
+#endif // __DEBUG__
 };
 }
 

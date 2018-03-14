@@ -122,7 +122,7 @@ void UltrasonicTask::run() {
 
         if (!isBusy()) {
 
-            if (sendRelEnvEnabled && !currentRelEnvPointSent && currentSensorPos % 2) {
+            if (false && sendRelEnvEnabled && !currentRelEnvPointSent && currentSensorPos % 2) {
                 msg.setCode(ultraPosToMsgCode(currentSensorPos));
 
                 ByteArray<2> lowBytes, highBytes;
@@ -262,6 +262,8 @@ void UltrasonicTask::executeMessage() {
     case Message::CODE::RelEnvPoint:
     case Message::CODE::EnvGridEn:
     case Message::CODE::EnvGrid:
+    case Message::CODE::CarPos:
+    case Message::CODE::CarAngle:
     case Message::CODE::NUM_CODES:
         break;
     }

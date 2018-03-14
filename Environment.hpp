@@ -180,23 +180,13 @@ public:
         return Point2ui8((codeByte & 0b00110000) >> 4, codeByte & 0b00001111);
     }
 
-#if _DEBUG
+#if __DEBUG__
     /** @brief Prints grid points to the Serial port.
     */
     void print() const {
-        /*for (int y = 0; y < ENV_ABS_AXIS_POINTS_NUM; ++y) {
-            for (int x = 0; x < ENV_ABS_AXIS_POINTS_NUM; ++x)
-                if (x == ENV_ABS_AXIS_POINTS_NUM / 2 && y == ENV_ABS_AXIS_POINTS_NUM / 2)
-                    DEBUG_print("X");
-                else
-                    DEBUG_print(String(getGridPoint(x, y) ? "1" : "0"));
-            //DEBUG_println();
-        }
-        //DEBUG_println();*/
-
         grid.print();
     }
-#endif // _DEBUG
+#endif // __DEBUG__
 };
 }
 

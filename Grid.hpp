@@ -52,12 +52,6 @@ public:
     @param value The value to set.
     */
     void set(uint8_t x, uint8_t y, type value) {
-        DEBUG_print("(");
-        DEBUG_print((int)x);
-        DEBUG_print(", ");
-        DEBUG_print((int)y);
-        DEBUG_print(") set to: ");
-        DEBUG_println((int)value);
         this->data[y].set(x, value);
     }
 
@@ -122,7 +116,7 @@ public:
 
     friend class StreamWriter;
 
-#if _DEBUG
+#if __DEBUG__
     /** @brief Prints grid elements.
     */
     void print() const {
@@ -130,7 +124,7 @@ public:
             this->data[y].print();
         }
     }
-#endif // _DEBUG
+#endif // __DEBUG__
 };
 
 template<uint8_t B, uint8_t X, uint8_t Y>

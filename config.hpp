@@ -7,6 +7,8 @@
 /** @brief Configurations - car specifications, task period times, communication parameters, Arduino pinout, etc.
 */
 
+#define __DEBUG__   1
+
 // Car specifications [cm]
 
 #define CAR_PIVOT_DIST_FRONT_REAR   20.0f        // distance between front and rear pivots
@@ -62,7 +64,7 @@
 #define TRAJ_CAR_POS_UPDATE_TIMEOUT             10      // [ms]
 
 // DriveTask
-#define DRIVE_ENV_GRID_SEND_TIMEOUT             2       // [ms]
+#define DRIVE_ENV_GRID_UPDATE_TIMEOUT           500     // [ms]
 #define DRIVE_MSG_WATCHDOG_TIMEOUT              1000    // [ms]
 #define DRIVE_FORCE_STEERING_TIME               500     // [ms]
 #define DRIVE_FORCE_STOP_TIME                   3000    // [ms]

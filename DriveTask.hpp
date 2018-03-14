@@ -41,9 +41,9 @@ private:
     */
     bool sendEnvGridEnabled;
 
-    /** @brief Watchdog for environment grid sending.
+    /** @brief Watchdog for environment grid update.
     */
-    Watchdog sendEnvGridWatchdog;
+    Watchdog envGridUpdateWatchdog;
 
     /** @brief Calculates environment points according to sensed points received from the UltrasonicTask.
     */
@@ -74,20 +74,14 @@ private:
     */
     void executeMessage();
 
-    /** @brief Updates environment grid points according to sensed points acquired from the UltrasonicTask.
+    /** @brief Checks if given distance is critical.
+
+    TODO: Remove this function, find a more elegant way of deciding if command override is needed!
+
+    @param dist The distance.
+    @param minDist The minimum distance to compare the distance to.
+    @returns Boolean value indicating if the distance is critical.
     */
-    void updateEnvironmentGridPoints();
-
-    int gridPrintCntr = 0;    // TODO remove this variable
-
-                              /** @brief Checks if given distance is critical.
-
-                              TODO: Remove this function, find a more elegant way of deciding if command override is needed!
-
-                              @param dist The distance.
-                              @param minDist The minimum distance to compare the distance to.
-                              @returns Boolean value indicating if the distance is critical.
-                              */
     static bool isDistanceCritical(float dist, float minDist);
 
     void calculateRemainingTimes(Common::UltrasonicPos startPos);

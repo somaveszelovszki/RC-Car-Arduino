@@ -17,7 +17,7 @@
 // Converts sec to millisec
 #define SEC_TO_MSEC 1000
 
-#if _DEBUG
+#if __DEBUG__
 // Prints string to Serial port
 #define DEBUG_print(str) Serial.print(str)
 
@@ -34,7 +34,7 @@ DEBUG_print((b & 0b00001000) ? "1" : "0");  \
 DEBUG_print((b & 0b00000100) ? "1" : "0");  \
 DEBUG_print((b & 0b00000010) ? "1" : "0");  \
 DEBUG_print((b & 0b00000001) ? "1" : "0");
-#endif // _DEBUG
+#endif // __DEBUG__
 
 namespace rc_car {
 

@@ -13,48 +13,48 @@ typedef uint8_t uint4_t;
 @tparam B Number of bits per value.
 */
 template <int B>
-struct Selector;
+struct ArraySelector;
 
 #if ARRAY_1_EN
-/** @brief Selects type and mask array for bit length of 1.
+/** @brief Selects type and mask array for bit length of 1 (bool).
 */
 template <>
-struct Selector<1> {
+struct ArraySelector<1> {
     typedef bool type;
     static const bool min = false;
     static const bool max = true;
 
-    /** @brief Mask for getting and setting bool element at given position in a byte container.
+    /** @brief Mask for getting/setting element at given position in a byte container.
     */
     static const uint8_t mask[8];
 };
 #endif // ARRAY_1_EN
 
 #if ARRAY_2_EN
-/** @brief Selects type and mask array for bit length of 2.
+/** @brief Selects type and mask array for bit length of 2 (uint2_t).
 */
 template <>
-struct Selector<2> {
+struct ArraySelector<2> {
     typedef uint2_t type;
     static const uint2_t min = static_cast<uint2_t>(0b00000000);
     static const uint2_t max = static_cast<uint2_t>(0b00000011);
 
-    /** @brief Mask for getting and setting bool element at given position in a byte container.
+    /** @brief Mask for getting/setting element at given position in a byte container.
     */
     static const uint8_t mask[4];
 };
 #endif // ARRAY_2_EN
 
 #if ARRAY_4_EN
-/** @brief Selects type and mask array for bit length of 4.
+/** @brief Selects type and mask array for bit length of 4 (uint4_t).
 */
 template <>
-struct Selector<4> {
+struct ArraySelector<4> {
     typedef uint4_t type;
     static const uint4_t min = static_cast<uint4_t>(0b00000000);
     static const uint4_t max = static_cast<uint4_t>(0b00001111);
 
-    /** @brief Mask for getting and setting bool element at given position in a byte container.
+    /** @brief Mask for getting/setting element at given position in a byte container.
     */
     static const uint8_t mask[2];
 };
@@ -77,7 +77,7 @@ private:
     uint8_t data[N / VPB];
 
 public:
-    typedef typename Selector<B>::type type;
+    typedef typename ArraySelector<B>::type type;
     static const type dataMin;
     static const type dataMax;
     static const uint8_t *mask;
@@ -150,62 +150,45 @@ public:
 
     friend class StreamWriter;
 
-#if _DEBUG
+#if __DEBUG__
     /** @brief Prints array elements.
     */
     void print() const {
         for (int i = 0; i < N - 1; ++i) {
-            DEBUG_print((int)this->get(i));
+            int v = (int)this->get(i);
+            if (v)
+                DEBUG_print(v);
+            else
+                DEBUG_print(" ");
             DEBUG_print(" ");
         }
 
         if (N > 0) {
-            DEBUG_print((int)this->get(N - 1));
+            int v = (int)this->get(N - 1);
+            if (v)
+                DEBUG_print(v);
+            else
+                DEBUG_print(" ");
         }
 
         DEBUG_println();
     }
-#endif // _DEBUG
+#endif // __DEBUG__
 };
 
 template <uint8_t B, uint8_t N, uint8_t VPB>
-const typename Array<B, N, VPB>::type Array<B, N, VPB>::dataMin = Selector<B>::min;
+const typename Array<B, N, VPB>::type Array<B, N, VPB>::dataMin = ArraySelector<B>::min;
 
 template <uint8_t B, uint8_t N, uint8_t VPB>
-const typename Array<B, N, VPB>::type Array<B, N, VPB>::dataMax = Selector<B>::max;
+const typename Array<B, N, VPB>::type Array<B, N, VPB>::dataMax = ArraySelector<B>::max;
 
 template <uint8_t B, uint8_t N, uint8_t VPB>
-const uint8_t *Array<B, N, VPB>::mask = Selector<B>::mask;
+const uint8_t *Array<B, N, VPB>::mask = ArraySelector<B>::mask;
 
 template<uint8_t B, uint8_t N, uint8_t VPB>
 void Array<B, N, VPB>::set(uint8_t pos, type value) {
     uint8_t group = pos / VPB, idx = pos % VPB;
-
-    DEBUG_print("Before: ");
-    uint8_t b = data[group];
-
-    DEBUG_print((b & 0b10000000) ? "1" : "0");
-    DEBUG_print((b & 0b01000000) ? "1" : "0");
-    DEBUG_print((b & 0b00100000) ? "1" : "0");
-    DEBUG_print((b & 0b00010000) ? "1" : "0");
-    DEBUG_print((b & 0b00001000) ? "1" : "0");
-    DEBUG_print((b & 0b00000100) ? "1" : "0");
-    DEBUG_print((b & 0b00000010) ? "1" : "0");
-    DEBUG_println((b & 0b00000001) ? "1" : "0");
-
     data[group] = (data[group] & ~mask[idx]) | static_cast<uint8_t>(value << (idx * B));
-
-    b = data[group];
-    DEBUG_print("After:  ");
-    DEBUG_print((b & 0b10000000) ? "1" : "0");
-    DEBUG_print((b & 0b01000000) ? "1" : "0");
-    DEBUG_print((b & 0b00100000) ? "1" : "0");
-    DEBUG_print((b & 0b00010000) ? "1" : "0");
-    DEBUG_print((b & 0b00001000) ? "1" : "0");
-    DEBUG_print((b & 0b00000100) ? "1" : "0");
-    DEBUG_print((b & 0b00000010) ? "1" : "0");
-    DEBUG_println((b & 0b00000001) ? "1" : "0");
-    DEBUG_println();
 }
 }
 

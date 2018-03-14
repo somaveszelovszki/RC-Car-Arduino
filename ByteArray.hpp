@@ -275,24 +275,21 @@ public:
         return index;
     }
 
-#if _DEBUG
-    /** @brief Converts ByteArray to displayable String.
-
-    @returns ByteArray as String.
+#if __DEBUG__
+    /** @brief Prints ByteArray to the Serial port.
     */
-    String toString() const {
-        String str("[ ");
+    void print() const {
+        DEBUG_print("[ ");
         for (int i = 0; i < size - 1; ++i) {
-            str += value[i];
-            str += ", ";
+            DEBUG_print(value[i]);
+            DEBUG_print(", ");
         }
         if (size > 0)
-            str += value[size - 1];
+            DEBUG_print(value[size - 1]);
 
-        str += " ]";
-        return str;
+        DEBUG_print(" ]");
     }
-#endif // _DEBUG
+#endif // __DEBUG__
 };
 }
 

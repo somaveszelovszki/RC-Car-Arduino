@@ -11,11 +11,11 @@ extern UltrasonicTask ultrasonicTask;
 extern RotaryTask rotaryTask;
 
 DriveTask::DriveTask() : PeriodicTask(TASK_PERIOD_TIME_DRIVE, TASK_WATCHDOG_TIMEOUT_DRIVE),
-    mode(Common::DriveMode::SAFE_DRIVE),
+    mode(Common::DriveMode::FREE_DRIVE),
     msgWatchdog(DRIVE_MSG_WATCHDOG_TIMEOUT),
     forceSteeringWatchdog(DRIVE_FORCE_STEERING_TIME, Watchdog::State::STOPPED),
     forceStopWatchdog(DRIVE_FORCE_STOP_TIME, Watchdog::State::STOPPED),
-    sendEnvGridWatchdog(DRIVE_ENV_GRID_SEND_TIMEOUT),
+    envGridUpdateWatchdog(DRIVE_ENV_GRID_UPDATE_TIMEOUT),
     environment(&car, ultrasonicTask.sensedPoints),
     trajectory(TRAJ_CAR_POS_UPDATE_TIMEOUT, &car) {}
 
@@ -25,22 +25,26 @@ void DriveTask::initialize() {
 }
 
 void DriveTask::run() {
-    DEBUG_println("run");
     float speed = rotaryTask.getSpeed(), steeringAngle = motorHandler.getSteeringAngle();
 
     motorHandler.updateSpeed(speed);
-    if (trajectory.periodTimeReached()) {
-        trajectory.update(speed, steeringAngle);    // updates car properties and trajectory radiuses
-        trajectory.restartPeriodCheck();
-    }
+    //if (trajectory.periodTimeReached()) {
+    //    trajectory.update(speed, steeringAngle);    // updates car properties and trajectory radiuses
+    //    trajectory.restartPeriodCheck();
+    //}
 
     bool isNewMsgAvailable = communicatorTask.isRecvMsgAvailable(getTaskId());
 
     if (isNewMsgAvailable)
         msg = communicatorTask.getReceivedMessage(getTaskId());
 
-    if (sendEnvGridEnabled && sendEnvGridWatchdog.hasTimedOut()) {
-        sendEnvGridWatchdog.restart();
+    if (false && sendEnvGridEnabled) {
+        if (envGridUpdateWatchdog.hasTimedOut()) {
+            envGridUpdateWatchdog.restart();
+            environment.updateGrid();
+            //environment.print();
+            //DEBUG_println();
+        }
 
         if (!communicatorTask.isSendMsgAvailable(getTaskId())) {
             ByteArray<COMM_MSG_DATA_LENGTH> envGridPart;
@@ -52,10 +56,6 @@ void DriveTask::run() {
     switch (mode) {
     case Common::SAFE_DRIVE:
     {
-        updateEnvironmentGridPoints();
-        environment.print();
-        DEBUG_println();
-
         if (false) {
             // calculates section start position according to forward direction
             Common::UltrasonicPos fwdPos = ultrasonicTask.getForwardPos(steeringAngle),
@@ -110,6 +110,8 @@ void DriveTask::run() {
         }
     }
 
+    // 'break' is missing on purpose!
+
     case Common::FREE_DRIVE:
         if (isNewMsgAvailable) {
             executeMessage();
@@ -139,14 +141,17 @@ void DriveTask::run() {
         // TODO
         break;
     }
-
-    //DEBUG_println("run over");
 }
 
 void DriveTask::executeMessage() {
+    msg.print();
+    DEBUG_println();
+    DEBUG_println((int)msg.getCode());
     switch (msg.getCode()) {
 
     case Message::CODE::Speed:
+        DEBUG_println(msg.getDataAsFloat());
+        DEBUG_println(forceStopActive);
         if (!forceStopActive)
             motorHandler.setDesiredSpeed(msg.getDataAsFloat());
         break;
@@ -162,7 +167,7 @@ void DriveTask::executeMessage() {
         break;
     case Message::CODE::EnvGridEn:
         if ((sendEnvGridEnabled = static_cast<bool>(msg.getDataAsInt())))
-            sendEnvGridWatchdog.restart();
+            envGridUpdateWatchdog.restart();
 
         communicatorTask.setMessageToSend(Message::ACK, getTaskId());
         break;
@@ -171,34 +176,11 @@ void DriveTask::executeMessage() {
     case Message::CODE::RelEnvEn:
     case Message::CODE::RelEnvPoint:
     case Message::CODE::EnvGrid:
+    case Message::CODE::CarPos:
+    case Message::CODE::CarAngle:
     case Message::CODE::NUM_CODES:
         break;
     }
-}
-
-void DriveTask::updateEnvironmentGridPoints() {
-    environment.updateGrid();
-
-    //--------------------------------------------------
-    /*const Point2f *pSectionStart, *pSectionEnd;
-
-    Common::UltrasonicPos sectionStartPos = Common::UltrasonicPos::RIGHT_FRONT;
-    pSectionStart = ultrasonicTask.getSensedPoint(sectionStartPos);
-
-    for (int i = 0; i < ULTRA_NUM_SENSORS; ++i) {
-        pSectionEnd = ultrasonicTask.getSensedPoint(sectionStartPos = Common::nextUltrasonicPos(sectionStartPos));
-        environment.setSection(pSectionStart, pSectionEnd);
-
-        while (environment.nextSectionPointExists()) {
-            Point2f sectionPoint = environment.nextSectionPoint();
-            environment.setRelativePointObstacle(sectionPoint);
-        }
-
-        pSectionStart = pSectionEnd;
-    }
-
-    if (!(gridPrintCntr++ % 500) && false)
-        environment.print();*/
 }
 
 bool DriveTask::isDistanceCritical(float dist, float minDist) {

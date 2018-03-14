@@ -7,6 +7,8 @@ const Message::Code Message::CODES[Message::CODE::NUM_CODES] = {
     Code(CODE::Speed,           0b00000001                  ),
     Code(CODE::SteeringAngle,   0b00000010                  ),
     Code(CODE::DriveMode,       0b00000011                  ),
+    Code(CODE::CarPos,          0b00000101                  ),
+    Code(CODE::CarAngle,        0b00000110                  ),
     Code(CODE::RelEnvEn,        0b00000111                  ),
     Code(CODE::RelEnvPoint,     0b00001000,     0b11111000  ),
     Code(CODE::EnvGridEn,       0b00000100                  ),
@@ -14,10 +16,10 @@ const Message::Code Message::CODES[Message::CODE::NUM_CODES] = {
 };
 
 Message::CODE Message::Code::apply(byte code) {
-    CODE result;
+    CODE result = NUM_CODES;
     for (int i = 0; result == NUM_CODES && i < CODE::NUM_CODES; ++i) {
         Code codeObj = CODES[i];
-        if (codeObj.codeByte == (code & codeObj.matchPattern))
+        if (codeObj.codeByte == (byte)(code & codeObj.matchPattern))
             result = codeObj.codeIdx;
     }
 
@@ -42,8 +44,10 @@ void Message::fromBytes(const ByteArray<COMM_MSG_LENGTH>& bytes, Message& result
     result.setData(&bytes[COMM_MSG_SEPARATOR_LENGTH + COMM_MSG_CODE_LENGTH]);
 }
 
-#if _DEBUG
-String Message::toString() const {
-    return String(codeByte) + ": " + data.toString();
+#if __DEBUG__
+void Message::print() const {
+    DEBUG_print(String(codeByte));
+    DEBUG_print(": ");
+    data.print();
 }
-#endif // _DEBUG
+#endif // __DEBUG__
