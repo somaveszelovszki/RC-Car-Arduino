@@ -129,17 +129,17 @@ public:
         @param pWrittenPos Will contain the position of the first written byte.
         @returns If whole array has not been written yet: number of bytes written, else: -1 * (number of bytes written).
         */
-        uint8_t next(ByteArray<COMM_MSG_DATA_LENGTH>& result, uint8_t maxBytesNum = COMM_MSG_DATA_LENGTH, uint8_t *pWrittenPos = NULL) {
+        int8_t next(ByteArray<COMM_MSG_DATA_LENGTH>& result, uint8_t maxBytesNum = COMM_MSG_DATA_LENGTH, uint8_t *pWrittenPos = NULL) {
 
             if (pWrittenPos)
                 *pWrittenPos = this->pos;
 
-            uint8_t bytesWritten;
-            for (bytesWritten = 0; (bytesWritten < maxBytesNum / sizeof(uint8_t)) && (this->pos < N); ++bytesWritten, ++this->pos) {
+            int8_t bytesWritten;
+            for (bytesWritten = 0; (bytesWritten < (int8_t)(maxBytesNum / sizeof(uint8_t))) && (this->pos < N / VPB); ++bytesWritten, ++this->pos) {
                 result[bytesWritten] = pArray->data[this->pos];
             }
 
-            if (this->pos == N) {
+            if (this->pos == N / VPB) {
                 this->pos = 0;
                 bytesWritten *= -1;
             }

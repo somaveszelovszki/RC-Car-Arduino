@@ -17,7 +17,7 @@ DriveTask::DriveTask() : PeriodicTask(TASK_PERIOD_TIME_DRIVE, TASK_WATCHDOG_TIME
     forceStopWatchdog(DRIVE_FORCE_STOP_TIME, Watchdog::State::STOPPED),
     envGridUpdateWatchdog(DRIVE_ENV_GRID_UPDATE_TIMEOUT),
     environment(&car, ultrasonicTask.sensedPoints),
-    trajectory(TRAJ_CAR_POS_UPDATE_TIMEOUT, &car) {}
+    trajectory(TRAJ_UPDATE_TIMEOUT, &car) {}
 
 void DriveTask::initialize() {
     motorHandler.initialize();
@@ -28,20 +28,15 @@ void DriveTask::run() {
     float speed = rotaryTask.getSpeed(), steeringAngle = motorHandler.getSteeringAngle();
 
     motorHandler.updateSpeed(speed);
-    //if (trajectory.periodTimeReached()) {
-    //    trajectory.update(speed, steeringAngle);    // updates car properties and trajectory radiuses
-    //    trajectory.restartPeriodCheck();
-    //}
-
-    bool isNewMsgAvailable = communicatorTask.isRecvMsgAvailable(getTaskId());
-
-    if (isNewMsgAvailable)
-        msg = communicatorTask.getReceivedMessage(getTaskId());
+    if (trajectory.periodTimeReached()) {
+        trajectory.update(speed, steeringAngle);    // updates car properties and trajectory radiuses
+        trajectory.restartPeriodCheck();
+    }
 
     if (false && sendEnvGridEnabled) {
         if (envGridUpdateWatchdog.hasTimedOut()) {
-            envGridUpdateWatchdog.restart();
             environment.updateGrid();
+            envGridUpdateWatchdog.restart();
             //environment.print();
             //DEBUG_println();
         }
@@ -52,6 +47,11 @@ void DriveTask::run() {
             communicatorTask.setMessageToSend(Message(Environment::gridCoordsToCodeByte(gridCoords), envGridPart), getTaskId());
         }
     }
+
+    bool isNewMsgAvailable = communicatorTask.isRecvMsgAvailable(getTaskId());
+
+    if (isNewMsgAvailable)
+        msg = communicatorTask.getReceivedMessage(getTaskId());
 
     switch (mode) {
     case Common::SAFE_DRIVE:
@@ -144,14 +144,9 @@ void DriveTask::run() {
 }
 
 void DriveTask::executeMessage() {
-    msg.print();
-    DEBUG_println();
-    DEBUG_println((int)msg.getCode());
     switch (msg.getCode()) {
 
     case Message::CODE::Speed:
-        DEBUG_println(msg.getDataAsFloat());
-        DEBUG_println(forceStopActive);
         if (!forceStopActive)
             motorHandler.setDesiredSpeed(msg.getDataAsFloat());
         break;

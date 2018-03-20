@@ -46,8 +46,9 @@ void Message::fromBytes(const ByteArray<COMM_MSG_LENGTH>& bytes, Message& result
 
 #if __DEBUG__
 void Message::print() const {
-    DEBUG_print(String(codeByte));
+    DEBUG_print((int)codeByte);
     DEBUG_print(": ");
     data.print();
+    DEBUG_println();
 }
 #endif // __DEBUG__

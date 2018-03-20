@@ -88,5 +88,8 @@ void CommunicatorTask::fetchMessage() {
 }
 
 int CommunicatorTask::sendMessage(int taskId) {
-    return Serial.write(static_cast<const byte*>(sendMsgs[taskId].toBytes()), COMM_MSG_LENGTH);
+    const byte *msg = static_cast<const byte*>(sendMsgs[taskId].toBytes());
+    int bytesWritten = Serial.write(reinterpret_cast<const char*>(msg), COMM_MSG_LENGTH);
+    Serial.flush();
+    return bytesWritten;
 }

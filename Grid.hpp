@@ -88,12 +88,11 @@ public:
         @param pWrittenY The Y coordinate of the first written byte.
         @returns If whole grid has not been written yet: number of bytes written, else: -1 * (number of bytes written).
         */
-        uint8_t next(ByteArray<COMM_MSG_DATA_LENGTH>& result, uint8_t maxBytesNum = COMM_MSG_DATA_LENGTH, uint8_t *pWrittenX = NULL, uint8_t *pWrittenY = NULL) {
-
+        int8_t next(ByteArray<COMM_MSG_DATA_LENGTH>& result, uint8_t maxBytesNum = COMM_MSG_DATA_LENGTH, uint8_t *pWrittenX = NULL, uint8_t *pWrittenY = NULL) {
             if (pWrittenY)
                 *pWrittenY = this->y;
 
-            uint8_t bytesWritten = this->arrayWriter.next(result, maxBytesNum, pWrittenX);
+            int8_t bytesWritten = this->arrayWriter.next(result, maxBytesNum, pWrittenX);
             if (bytesWritten < 0) {     // whole row array has been written
 
                 bool finished = ++y == Y;
@@ -104,7 +103,7 @@ public:
 
                 this->arrayWriter.setArray(&this->pGrid->data[y]);
 
-                if (!finished && ((bytesWritten *= -1) < maxBytesNum)) {    // not all data bytes have been filled yet
+                if (!finished && ((bytesWritten *= -1) < (int8_t)maxBytesNum)) {    // not all data bytes have been filled yet
                     ByteArray<COMM_MSG_DATA_LENGTH> sub(&result[bytesWritten]);
                     bytesWritten += this->arrayWriter.next(sub, maxBytesNum - bytesWritten);
                 }

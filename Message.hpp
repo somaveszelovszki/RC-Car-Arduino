@@ -33,7 +33,7 @@ public:
         RelEnvEn,       // enable/disable relative environment point sending
         RelEnvPoint,    // group for sensed relative points
         EnvGridEn,      // enable/disable environment grid sending
-        EnvGrid,        // group for environment grid points (container's X (2) and Y (4) coordinates need to be added to this number)
+        EnvGrid,        // group for environment grid points (container's Y coordinate needs to be added to this number)
         NUM_CODES
     };
 
@@ -72,7 +72,7 @@ private:
 
 public:
 
-    /** @brief Constructor.
+    /** @brief Constructor - does not set elements.
     */
     Message() {}
 

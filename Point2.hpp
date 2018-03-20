@@ -219,6 +219,17 @@ public:
     Common::Sign getAngleSign(const Vec2<T>& other, Common::RotationDir dir) const;
 
     bool isInside(const Point2<T>& a, const Point2<T>& b, const Point2<T>& c) const;
+
+#if __DEBUG__
+    void print() const {
+        DEBUG_print("(");
+        DEBUG_print(this->X);
+        DEBUG_print(", ");
+        DEBUG_print(this->Y);
+        DEBUG_print(")");
+    }
+#endif // __DEBUG__
+
 };
 
 template <typename T>
@@ -228,13 +239,11 @@ float Point2<T>::getAngle(const Vec2<T>& other, Common::RotationDir dir) const {
     switch (dir) {
     case Common::RotationDir::LEFT:
         if (Common::eq(X, other.X))
-            angle = other.Y > Y ? static_cast<float>(M_PI_2) : 3 * static_cast<float>(M_PI_2);
+            angle = other.Y > Y ? M_PI_2 : 3 * M_PI_2;
         else if (other.X > X)
-            angle = other.Y >= Y ?
-            static_cast<float>(atan(static_cast<double>((other.Y - Y) / (other.X - X))))
-            : static_cast<float>(2 * M_PI + atan(static_cast<double>((other.Y - Y) / (other.X - X))));
+            angle = other.Y >= Y ? atanf((other.Y - Y) / (other.X - X)) : 2 * M_PI + atanf((other.Y - Y) / (other.X - X));
         else
-            angle = static_cast<float>(M_PI + atan(static_cast<double>((other.Y - Y) / (other.X - X))));
+            angle = M_PI + atanf((other.Y - Y) / (other.X - X));
         break;
 
     case Common::RotationDir::RIGHT:

@@ -168,7 +168,7 @@ public:
     @returns The code byte.
     */
     static byte gridCoordsToCodeByte(const Point2ui8& coords) {
-        return Message::CODES[Message::CODE::EnvGrid].codeByte + (coords.X << 4) + coords.Y;
+        return Message::CODES[Message::CODE::EnvGrid].codeByte + coords.Y;
     }
 
     /** @brief Gets grid coordinates from environment grid message code.

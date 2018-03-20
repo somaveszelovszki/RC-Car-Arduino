@@ -52,9 +52,11 @@ void setup() {
     INIT_TASK(ultrasonicTask);
     INIT_TASK(rotaryTask);
     INIT_TASK(driveTask);
+    wdt_enable(WDTO_500MS);
 }
 
 void loop() {
+    wdt_reset();
     RUN_TASK(communicatorTask);
     RUN_TASK(ultrasonicTask);
     RUN_TASK(rotaryTask);

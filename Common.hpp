@@ -2,7 +2,7 @@
 #define RC_CAR__COMMON__HPP
 
 #include <math.h>
-
+#include <avr/wdt.h>
 #include "config.hpp"
 
 /** @brief Common macros that are used throughout the project.
@@ -35,6 +35,8 @@ DEBUG_print((b & 0b00000100) ? "1" : "0");  \
 DEBUG_print((b & 0b00000010) ? "1" : "0");  \
 DEBUG_print((b & 0b00000001) ? "1" : "0");
 #endif // __DEBUG__
+
+#define pythag(a, b) sqrtf(a * a + b * b)
 
 namespace rc_car {
 
@@ -186,9 +188,8 @@ public:
     @param b The length of the other leg of the tri angle.
     @returns The length of the hypotenuse of the triangle.
     */
-    template <typename T>
-    static T pythagoras(T a, T b) {
-        return static_cast<T>(sqrt(static_cast<float>(a * a + b * b)));
+    static float pythagoras(float a, float b) {
+        return sqrtf(a * a + b * b);
     }
 
     /** @brief Checks if a value is between the given boundaries.

@@ -145,15 +145,15 @@ void Environment::updateGrid() {
         //DEBUG_println(")");
 
 
-        for (int x = bl.X; x <= tr.X; ++x) {
-            for (int y = bl.Y; y <= tr.Y; ++y) {
-                Point2ui8 current(x, y);
-                // checks if current point is inside the triangle determined by the car position and start and end points
-                // if yes (and it is not a section point, then decrements its obstacle probability, because it has not been sensed as an obstacle)
-                if (current.isInside(carGridPos, startGridPos, endGridPos) && !Common::contains(current, sectionGridPoints, sectionGridPointsNum))
-                    grid.decrement(current.X, current.Y);
-            }
-        }
+        //for (int x = bl.X; x <= tr.X; ++x) {
+        //    for (int y = bl.Y; y <= tr.Y; ++y) {
+        //        Point2ui8 current(x, y);
+        //        // checks if current point is inside the triangle determined by the car position and start and end points
+        //        // if yes (and it is not a section point, then decrements its obstacle probability, because it has not been sensed as an obstacle)
+        //        if (current.isInside(carGridPos, startGridPos, endGridPos) && !Common::contains(current, sectionGridPoints, sectionGridPointsNum))
+        //            grid.decrement(current.X, current.Y);
+        //    }
+        //}
 
         pSectionStart = pSectionEnd;
     }

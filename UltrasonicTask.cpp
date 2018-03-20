@@ -228,8 +228,8 @@ void UltrasonicTask::updatePoint(Common::UltrasonicPos sensorPos) {
     // view angles are relative to the y-axis, but now we need the angle frm the x-axis
     // the conversion is defined by dirAngleToXY(viewAngle)
     Sensor& sensor = sensors[sensorPos];
-    sensedPoints[sensorPos].X = sensor.pos.X + sensor.dist_valid * cos(dirAngleToXY(sensor.viewAngle));
-    sensedPoints[sensorPos].Y = sensor.pos.Y + sensor.dist_valid * sin(dirAngleToXY(sensor.viewAngle));
+    sensedPoints[sensorPos].X = sensor.pos.X + sensor.dist_valid * cosf(dirAngleToXY(sensor.viewAngle));
+    sensedPoints[sensorPos].Y = sensor.pos.Y + sensor.dist_valid * sinf(dirAngleToXY(sensor.viewAngle));
 }
 
 Common::UltrasonicPos UltrasonicTask::getForwardPos(float steeringAngle) const {

@@ -61,7 +61,7 @@
 #define COMM_MSG_SEPARATOR          static_cast<int32_t>(0x7fffffff)    // forbidden as data value
 
 // Trajectory
-#define TRAJ_CAR_POS_UPDATE_TIMEOUT             10      // [ms]
+#define TRAJ_UPDATE_TIMEOUT                     50      // [ms]
 
 // DriveTask
 #define DRIVE_ENV_GRID_UPDATE_TIMEOUT           500     // [ms]
