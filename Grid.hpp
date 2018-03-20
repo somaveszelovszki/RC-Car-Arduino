@@ -42,7 +42,7 @@ public:
     @returns The value of the element.
     */
     type get(uint8_t x, uint8_t y) const {
-        return this->data[y].get(x);
+        return data[y].get(x);
     }
 
     /** @brief Sets element at given X,Y coordinate to the given value.
@@ -52,12 +52,33 @@ public:
     @param value The value to set.
     */
     void set(uint8_t x, uint8_t y, type value) {
-        this->data[y].set(x, value);
+        data[y].set(x, value);
     }
 
-    void increment(uint8_t x, uint8_t y);
+    void increment(uint8_t x, uint8_t y) {
+        type value = get(x, y);
+        if (value < dataMax)
+            set(x, y, value + 1);
+    }
 
-    void decrement(uint8_t x, uint8_t y);
+    void decrement(uint8_t x, uint8_t y) {
+        type value = get(x, y);
+        if (value > dataMin)
+            set(x, y, value - 1);
+    }
+
+
+#if __DEBUG__
+    /** @brief Prints grid elements.
+    */
+    void print() const {
+        for (uint8_t y = 0; y < Y; ++y) {
+            wdt_reset();
+            data[y].print();
+            Serial.flush();
+        }
+    }
+#endif // __DEBUG__
 
     class StreamWriter {
     private:
@@ -75,9 +96,9 @@ public:
         @param _pGrid Pointer to the grid.
         */
         void setGrid(const Grid<B, X, Y> *_pGrid) {
-            this->pGrid = _pGrid;
-            this->y = 0;
-            this->arrayWriter.setArray(&_pGrid->data[0]);
+            pGrid = _pGrid;
+            y = 0;
+            arrayWriter.setArray(&_pGrid->data[0]);
         }
 
         /** @brief Writes next segment to byte array.
@@ -90,22 +111,22 @@ public:
         */
         int8_t next(ByteArray<COMM_MSG_DATA_LENGTH>& result, uint8_t maxBytesNum = COMM_MSG_DATA_LENGTH, uint8_t *pWrittenX = NULL, uint8_t *pWrittenY = NULL) {
             if (pWrittenY)
-                *pWrittenY = this->y;
+                *pWrittenY = y;
 
-            int8_t bytesWritten = this->arrayWriter.next(result, maxBytesNum, pWrittenX);
+            int8_t bytesWritten = arrayWriter.next(result, maxBytesNum, pWrittenX);
             if (bytesWritten < 0) {     // whole row array has been written
 
                 bool finished = ++y == Y;
                 if (finished) {
                     // bytesWritten is already negative, no need to change it
-                    this->y = 0;
+                    y = 0;
                 }
 
-                this->arrayWriter.setArray(&this->pGrid->data[y]);
+                arrayWriter.setArray(&pGrid->data[y]);
 
                 if (!finished && ((bytesWritten *= -1) < (int8_t)maxBytesNum)) {    // not all data bytes have been filled yet
                     ByteArray<COMM_MSG_DATA_LENGTH> sub(&result[bytesWritten]);
-                    bytesWritten += this->arrayWriter.next(sub, maxBytesNum - bytesWritten);
+                    bytesWritten += arrayWriter.next(sub, maxBytesNum - bytesWritten);
                 }
             }
 
@@ -113,17 +134,7 @@ public:
         }
     };
 
-    friend class StreamWriter;
-
-#if __DEBUG__
-    /** @brief Prints grid elements.
-    */
-    void print() const {
-        for (uint8_t y = 0; y < Y; ++y) {
-            this->data[y].print();
-        }
-    }
-#endif // __DEBUG__
+    friend class Grid<B, X, Y>::StreamWriter;
 };
 
 template<uint8_t B, uint8_t X, uint8_t Y>
@@ -131,20 +142,6 @@ const typename Grid<B, X, Y>::type Grid<B, X, Y>::dataMin = Array<B, X>::dataMin
 
 template<uint8_t B, uint8_t X, uint8_t Y>
 const typename Grid<B, X, Y>::type Grid<B, X, Y>::dataMax = Array<B, X>::dataMax;
-
-template<uint8_t B, uint8_t X, uint8_t Y>
-void Grid<B, X, Y>::increment(uint8_t x, uint8_t y) {
-    type value = this->get(x, y);
-    if (value < dataMax)
-        this->set(x, y, value + 1);
-}
-
-template<uint8_t B, uint8_t X, uint8_t Y>
-void Grid<B, X, Y>::decrement(uint8_t x, uint8_t y) {
-    type value = this->get(x, y);
-    if (value > dataMin)
-        this->set(x, y, value - 1);
-}
 }
 
 #endif // RC_CAR__GRID__HPP

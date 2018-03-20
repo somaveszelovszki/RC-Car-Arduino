@@ -3,10 +3,10 @@
 using namespace rc_car;
 
 //void Trajectory::updateRadiuses() {
-//    float cosAngle = cos(this->pCar->steeringAngle);
+//    float cosAngle = cos(pCar->steeringAngle);
 //    if (!(isNoSteering = Common::eq(cosAngle, 0.0f))) {
-//        float sinAngle = sin(this->pCar->steeringAngle), tanAngle = sinAngle / cosAngle;
-//        int steerMul = static_cast<int>(this->pCar->steeringDir);
+//        float sinAngle = sin(pCar->steeringAngle), tanAngle = sinAngle / cosAngle;
+//        int steerMul = static_cast<int>(pCar->steeringDir);
 //
 //        R_rearMid = CAR_PIVOT_DIST_FRONT_REAR / tanAngle;
 //
@@ -21,18 +21,18 @@ using namespace rc_car;
 //}
 //
 //void Trajectory::update(float _speed, float _steeringAngle) {
-//    this->pCar->steeringAngle = _steeringAngle;
-//    this->pCar->steeringDir = this->pCar->steeringAngle >= 0.0f ? Common::RotationDir::LEFT : Common::RotationDir::RIGHT;
-//    this->pCar->speed = _speed;
+//    pCar->steeringAngle = _steeringAngle;
+//    pCar->steeringDir = pCar->steeringAngle >= 0.0f ? Common::RotationDir::LEFT : Common::RotationDir::RIGHT;
+//    pCar->speed = _speed;
 //
 //    updateRadiuses();
 //}
 
 void Trajectory::updateRadiuses() {
-    if (!(isNoSteering = (abs(this->pCar->steeringAngle) <= 0.05f))) {
-        float tanAngle = tanf(this->pCar->steeringAngle);
+    if (!(isNoSteering = (abs(pCar->steeringAngle) <= 0.05f))) {
+        float tanAngle = tanf(pCar->steeringAngle);
 
-        int steerMul = static_cast<int>(this->pCar->steeringDir);
+        int steerMul = static_cast<int>(pCar->steeringDir);
 
         R_rearMid = CAR_PIVOT_DIST_FRONT_REAR / tanAngle;
 
@@ -44,24 +44,24 @@ void Trajectory::updateRadiuses() {
 }
 
 void Trajectory::update(float _speed, float _steeringAngle) {
-    unsigned long d_time = millis() - getPrevCalledTime();
+    float d_time = (millis() - getPrevCalledTime()) / 1000; // in [sec]
 
-    this->pCar->speed = _speed;
+    pCar->speed = _speed;
 
-    if (this->pCar->steeringAngle != _steeringAngle) {
-        this->pCar->steeringAngle = _steeringAngle;
-        this->pCar->steeringDir = _steeringAngle >= 0.0f ? Common::RotationDir::LEFT : Common::RotationDir::RIGHT;
+    if (pCar->steeringAngle != _steeringAngle) {
+        pCar->steeringAngle = _steeringAngle;
+        pCar->steeringDir = _steeringAngle >= 0.0f ? Common::RotationDir::LEFT : Common::RotationDir::RIGHT;
         updateRadiuses();
     }
 
     if (!isNoSteering) {
-        this->pCar->fwdAngle += d_time * this->pCar->speed / R_rearFar;
-        this->pCar->fwdAngle_Cos = cosf(this->pCar->fwdAngle);
-        this->pCar->fwdAngle_Sin = sinf(this->pCar->fwdAngle)/*sqrtf(1 - this->pCar->fwdAngle_Cos * this->pCar->fwdAngle_Cos)*/;
+        pCar->fwdAngle += d_time * pCar->speed / R_rearFar;
+        //pCar->fwdAngle_Cos = cosf(pCar->fwdAngle);
+        //pCar->fwdAngle_Sin = sinf(pCar->fwdAngle);
     }
 
-    this->pCar->pos.X += this->pCar->speed * this->pCar->fwdAngle_Cos * d_time;
-    this->pCar->pos.Y += this->pCar->speed * this->pCar->fwdAngle_Sin * d_time;
+    //pCar->pos.X += pCar->speed * pCar->fwdAngle_Cos * d_time;
+    //pCar->pos.Y += pCar->speed * pCar->fwdAngle_Sin * d_time;
 }
 
 Trajectory::TrackDistance Trajectory::trackdistancePoint(const Point2f& relativePos, bool forceCalcRemainingTime) const {
@@ -77,7 +77,7 @@ Trajectory::TrackDistance Trajectory::trackdistancePoint(const Point2f& relative
 
         // calculates remaining time
         if (td.isCritical() || forceCalcRemainingTime)
-            td.remainingTime = (relativePos.Y - (CAR_HEIGHT / 2) * (relativePos.Y > 0 ? 1 : -1)) / this->pCar->speed;
+            td.remainingTime = (relativePos.Y - (CAR_HEIGHT / 2) * (relativePos.Y > 0 ? 1 : -1)) / pCar->speed;
     } else {
         // origo    center of the trajectory circle of the rear pivot's center
         // obs        position of the obstacle relative to the rear pivot's center
@@ -86,7 +86,7 @@ Trajectory::TrackDistance Trajectory::trackdistancePoint(const Point2f& relative
         obs.X = relativePos.X + R_rearMid;
         obs.Y = relativePos.Y + CAR_PIVOT_DIST_MID;
 
-        float obsAngle = origo.getAngle(obs, this->pCar->steeringDir);
+        float obsAngle = origo.getAngle(obs, pCar->steeringDir);
 
         float abs_R_inner = abs(R_inner), abs_R_outer = abs(R_outer);
 
@@ -96,7 +96,7 @@ Trajectory::TrackDistance Trajectory::trackdistancePoint(const Point2f& relative
 
         // checks if car hits obstacle - if yes, minimum distance is negative
         td.dist = (Common::isBtw(obsDist, abs_R_inner, abs_R_outer) ? -1 : 1) * min(innerDist, outerDist);
-        td.dir = static_cast<Common::RotationDir>((innerDist < outerDist ? 1 : -1) * static_cast<int>(this->pCar->steeringDir));
+        td.dir = static_cast<Common::RotationDir>((innerDist < outerDist ? 1 : -1) * static_cast<int>(pCar->steeringDir));
 
         // calculates remaining time
         if (td.isCritical() || forceCalcRemainingTime) {
@@ -114,7 +114,7 @@ Trajectory::TrackDistance Trajectory::trackdistancePoint(const Point2f& relative
             }
 
             float hitAngle = obsAngle - dAngle;
-            td.remainingTime = R_rearFar * hitAngle / this->pCar->speed;
+            td.remainingTime = R_rearFar * hitAngle / pCar->speed;
         }
     }
 

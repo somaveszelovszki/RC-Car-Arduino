@@ -120,9 +120,11 @@ void UltrasonicTask::run() {
             executeMessage();
         }
 
-        if (!isBusy()) {
+        if (isBusy() && echoWatchdog.hasTimedOut())
+            onSensorTimedOut();
 
-            if (false && sendRelEnvEnabled && !currentRelEnvPointSent && currentSensorPos % 2) {
+        if (!isBusy()) {
+            if (sendRelEnvEnabled && !currentRelEnvPointSent && currentSensorPos % 2) {
                 msg.setCode(ultraPosToMsgCode(currentSensorPos));
 
                 ByteArray<2> lowBytes, highBytes;
@@ -157,19 +159,21 @@ void UltrasonicTask::pingNextSensor() {
     busy = true;
     sensorConnection.timer_stop();
     echoWatchdog.restart();
-    sensorConnection.ping_timer(ultrasonicEchoCheckIT);
+    sensorConnection.ping_timer(ultrasonicEchoCheckIT, ULTRA_MAX_DIST);
+}
+
+void UltrasonicTask::onSensorTimedOut() {
+    sensors[currentSensorPos].dist_measured = ULTRA_MAX_DIST;
+    busy = false;
+    sensorConnection.timer_stop();
 }
 
 void UltrasonicTask::echoCheck() {
     if (sensorConnection.check_timer()) {
         sensors[currentSensorPos].dist_measured = sensorConnection.ping_result / US_ROUNDTRIP_CM;
         busy = false;
-
-    } else if (echoWatchdog.hasTimedOut()) {
-        sensors[currentSensorPos].dist_measured = ULTRA_MAX_DIST;
-        busy = false;
-        sensorConnection.timer_stop();
-    }
+    } else if (echoWatchdog.hasTimedOut())
+        onSensorTimedOut();
 }
 
 void UltrasonicTask::updateSensorSelection() {

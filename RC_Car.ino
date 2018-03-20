@@ -39,6 +39,7 @@ if(task.periodTimeReached()) {      \
     if (task.hasTimedOut())         \
         task.onTimedOut();          \
     else {                          \
+        wdt_reset();                \
         task.run();                 \
         task.restartPeriodCheck();  \
         task.restartTimeoutCheck(); \
@@ -48,15 +49,22 @@ if(task.periodTimeReached()) {      \
 /** @brief Initializes tasks.
 */
 void setup() {
+#if __DEBUG__
+    Serial.begin(9600);
+    while (!Serial) {}
+    DEBUG_println("setup...");
+    Serial.flush();
+#endif // __DEBUG__
+
     INIT_TASK(communicatorTask);
     INIT_TASK(ultrasonicTask);
     INIT_TASK(rotaryTask);
     INIT_TASK(driveTask);
+
     wdt_enable(WDTO_500MS);
 }
 
 void loop() {
-    wdt_reset();
     RUN_TASK(communicatorTask);
     RUN_TASK(ultrasonicTask);
     RUN_TASK(rotaryTask);

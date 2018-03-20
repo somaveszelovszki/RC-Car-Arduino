@@ -168,15 +168,17 @@ public:
 
     /** @brief Enables/disables ultrasonic distance measuring.
 
-    @param enabled Boolean value indicating if ultrasonic distance measuring is enabled.
+    @param _enabled Boolean value indicating if ultrasonic distance measuring is enabled.
     */
-    void setEnabled(bool enabled) {
-        this->enabled = enabled;
+    void setEnabled(bool _enabled) {
+        enabled = _enabled;
     }
 
     /** @brief Updates sensor position, and sends TRIGGER signal to the ultrasonic sensor.
     */
     void pingNextSensor();
+
+    void onSensorTimedOut();
 
     /** @brief Checks if ECHO signal has arrived or if it has timed out, and sets sensor distance.
     */

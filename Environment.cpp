@@ -26,19 +26,19 @@ Environment::Environment(const CarProps *_pCar, const Point2f *_sensedPoints) : 
 
     for (int x = 0; x < ENV_ABS_AXIS_POINTS_NUM; ++x) {
         for (int y = 0; y < ENV_ABS_AXIS_POINTS_NUM; ++y) {
-            this->grid.set(x, y, static_cast<uint2_t>(0));
+            grid.set(x, y, static_cast<uint2_t>(0));
         }
     }
 
-    this->gridWriter.setGrid(&grid);
+    gridWriter.setGrid(&grid);
 }
 
 Point2ui8 Environment::relPointToGridPoint(const Point2f& relPoint) const {
 
     // car pos + relative pos rotated with (fwdAngle - 90 degrees)
-    Point2f absPos = this->pCar->pos + Point2f(
-        relPoint.X * this->pCar->fwdAngle_Sin + relPoint.Y * this->pCar->fwdAngle_Cos,
-        - relPoint.X * this->pCar->fwdAngle_Cos + relPoint.Y * this->pCar->fwdAngle_Sin);
+    Point2f absPos = pCar->pos + Point2f(
+        relPoint.X * pCar->fwdAngle_Sin + relPoint.Y * pCar->fwdAngle_Cos,
+        - relPoint.X * pCar->fwdAngle_Cos + relPoint.Y * pCar->fwdAngle_Sin);
 
     return Point2ui8(COORD_TO_GRID_POS(absPos.X), COORD_TO_GRID_POS(absPos.Y));
 }
@@ -52,7 +52,6 @@ bool Environment::isRelativePointObstacle(const Point2f& relPoint) const {
 }
 
 void Environment::updateGrid() {
-    //DEBUG_println("updateGrid");
     const Point2f *pSectionStart, *pSectionEnd;
     Common::UltrasonicPos sectionStartPos = Common::UltrasonicPos::RIGHT_FRONT;
 
@@ -65,13 +64,12 @@ void Environment::updateGrid() {
         sectionPointCalculator.setSection(pSectionStart, pSectionEnd, ENV_ABS_POINTS_DIST);
 
         //DEBUG_print("car: (");
-        //DEBUG_print(this->pCar->pos.X);
+        //DEBUG_print(pCar->pos.X);
         //DEBUG_print(", ");
-        //DEBUG_print(this->pCar->pos.Y);
+        //DEBUG_print(pCar->pos.Y);
         //DEBUG_println(")");
 
-        Point2ui8 carGridPos = relPointToGridPoint(this->pCar->pos),
-            prevGridPoint = carGridPos;     // section points cannot be where the car is, so the car's position is a good initial value
+        Point2ui8 carGridPos = relPointToGridPoint(pCar->pos), prevGridPoint = carGridPos;     // section points cannot be where the car is, so the car's position is a good initial value
 
         //DEBUG_print("car idx: (");
         //DEBUG_print(carGridPos.X);
@@ -94,14 +92,19 @@ void Environment::updateGrid() {
 
         // iterates through section points, adds them to the section grid points array,
         // and increments obstacle probabilities (section points are sensed as obstacles)
-        while (sectionPointCalculator.nextExists() && currentGridPointIdx < ENV_ABS_SECTION_POINTS_MAX_NUM) {
+        while (sectionPointCalculator.nextExists() && currentGridPointIdx < ENV_ABS_SECTION_POINTS_MAX_NUM - 1) {
 
             Point2ui8 gridPoint = relPointToGridPoint(sectionPointCalculator.next());
-            if (gridPoint != prevGridPoint) {
-                sectionGridPoints[currentGridPointIdx++] = gridPoint;
 
+            //DEBUG_print("grid point: (");
+            //DEBUG_print(gridPoint.X);
+            //DEBUG_print(", ");
+            //DEBUG_print(gridPoint.Y);
+            //DEBUG_println(")");
+
+            if (gridPoint != prevGridPoint) {
                 grid.increment(gridPoint.X, gridPoint.Y);
-                prevGridPoint = gridPoint;
+                sectionGridPoints[currentGridPointIdx++] = prevGridPoint = gridPoint;
             }
         }
 
@@ -145,15 +148,15 @@ void Environment::updateGrid() {
         //DEBUG_println(")");
 
 
-        //for (int x = bl.X; x <= tr.X; ++x) {
-        //    for (int y = bl.Y; y <= tr.Y; ++y) {
-        //        Point2ui8 current(x, y);
-        //        // checks if current point is inside the triangle determined by the car position and start and end points
-        //        // if yes (and it is not a section point, then decrements its obstacle probability, because it has not been sensed as an obstacle)
-        //        if (current.isInside(carGridPos, startGridPos, endGridPos) && !Common::contains(current, sectionGridPoints, sectionGridPointsNum))
-        //            grid.decrement(current.X, current.Y);
-        //    }
-        //}
+        for (int x = bl.X; x <= tr.X; ++x) {
+            for (int y = bl.Y; y <= tr.Y; ++y) {
+                Point2ui8 current(x, y);
+                // checks if current point is inside the triangle determined by the car position and start and end points
+                // if yes (and it is not a section point, then decrements its obstacle probability, because it has not been sensed as an obstacle)
+                if (current.isInside(carGridPos, startGridPos, endGridPos) && !Common::contains(current, sectionGridPoints, sectionGridPointsNum))
+                    grid.decrement(current.X, current.Y);
+            }
+        }
 
         pSectionStart = pSectionEnd;
     }

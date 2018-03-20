@@ -38,6 +38,8 @@ void DriveTask::run() {
         if (envGridUpdateWatchdog.hasTimedOut()) {
             environment.updateGrid();
             envGridUpdateWatchdog.restart();
+            //environment.print();
+            //DEBUG_println();
         }
 
         if (!communicatorTask.isSendMsgAvailable(getTaskId())) {

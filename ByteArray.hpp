@@ -198,7 +198,7 @@ public:
     template <int size2>
     ByteArray<size + size2> operator+(const ByteArray<size2>& other) const {
         ByteArray<size + size2> result;
-        this->concat(other, result);
+        concat(other, result);
         return result;
     }
 
@@ -209,7 +209,7 @@ public:
     */
     ByteArray<size + 1> operator+(byte b) const {
         ByteArray<size + 1> result;
-        this->append(b, result);
+        append(b, result);
         return result;
     }
 

@@ -13,7 +13,7 @@ class Environment {
 private:
     /** @brief Pointer to the structure storing the car properties (speed, steering angle, etc).
     */
-    const CarProps * pCar;
+    const CarProps *pCar;
 
     /** @brief Grid position of the car.
     */
@@ -27,7 +27,7 @@ private:
     */
     grid_type grid;
 
-    typename grid_type::StreamWriter gridWriter;
+    grid_type::StreamWriter gridWriter;
 
     /** @brief Array containing the grid points of the current section.
     */

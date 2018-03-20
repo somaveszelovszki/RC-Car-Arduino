@@ -50,10 +50,10 @@ private:
 
     /** @brief Enebles/disables counter.
 
-    @param enabled Indicates if counter should be enabled or disabled.
+    @param _enabled Indicates if counter should be enabled or disabled.
     */
-    void setEnabled(bool enabled) {
-        digitalWrite(ROT_EN_PIN, static_cast<uint8_t>(enabled));
+    void setEnabled(bool _enabled) {
+        digitalWrite(ROT_EN_PIN, static_cast<uint8_t>(_enabled));
     }
 
     /** @brief Updates new rotary position so that position overflow will not affect difference calculations.

@@ -223,9 +223,9 @@ public:
 #if __DEBUG__
     void print() const {
         DEBUG_print("(");
-        DEBUG_print(this->X);
+        DEBUG_print(X);
         DEBUG_print(", ");
-        DEBUG_print(this->Y);
+        DEBUG_print(Y);
         DEBUG_print(")");
     }
 #endif // __DEBUG__

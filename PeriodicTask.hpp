@@ -29,7 +29,7 @@ public:
     @param _watchdogTimeout The maximum task timeout (if task does not run for this long, onTimedOut() will be called).
     */
     PeriodicTask(int _periodTime, int _watchdogTimeout) : Periodic(_periodTime), timeoutCheckWatchdog(_watchdogTimeout) {
-        this->id = tasksCount++;
+        id = tasksCount++;
     }
 
     /** brief Gets the task's id.
@@ -37,7 +37,7 @@ public:
     @returns The task id.
     */
     int getTaskId() const {
-        return this->id;
+        return id;
     }
 
     /** @brief Checks if task has timed out.
