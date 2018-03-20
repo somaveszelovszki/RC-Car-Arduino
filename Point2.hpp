@@ -171,7 +171,7 @@ public:
     @returns The distance between the two points.
     */
     T distance(Point2<T> other) const {
-        return Common::pythagoras(X - other.X, Y - other.Y);
+        return Common::pythag(X - other.X, Y - other.Y);
     }
 
     /** @brief Calculates length of the point vector.
@@ -179,7 +179,7 @@ public:
     @returns The length of the point vector.
     */
     T length() const {
-        return Common::pythagoras(X, Y);
+        return Common::pythag(X, Y);
     }
 
     /** @brief Calculates steering angle of given vector using this point as the origo.

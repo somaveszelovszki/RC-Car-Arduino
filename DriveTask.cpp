@@ -28,17 +28,16 @@ void DriveTask::run() {
     float speed = rotaryTask.getSpeed(), steeringAngle = motorHandler.getSteeringAngle();
 
     motorHandler.updateSpeed(speed);
+
     if (trajectory.periodTimeReached()) {
         trajectory.update(speed, steeringAngle);    // updates car properties and trajectory radiuses
         trajectory.restartPeriodCheck();
     }
 
-    if (false && sendEnvGridEnabled) {
+    if (sendEnvGridEnabled) {
         if (envGridUpdateWatchdog.hasTimedOut()) {
             environment.updateGrid();
             envGridUpdateWatchdog.restart();
-            //environment.print();
-            //DEBUG_println();
         }
 
         if (!communicatorTask.isSendMsgAvailable(getTaskId())) {
@@ -56,57 +55,54 @@ void DriveTask::run() {
     switch (mode) {
     case Common::SAFE_DRIVE:
     {
-        if (false) {
-            // calculates section start position according to forward direction
-            Common::UltrasonicPos fwdPos = ultrasonicTask.getForwardPos(steeringAngle),
-                sectionCalcStartPos = Common::calcSectionStart(fwdPos);
+        // calculates section start position according to forward direction
+        Common::UltrasonicPos fwdPos = ultrasonicTask.getForwardPos(steeringAngle), sectionCalcStartPos = Common::calcSectionStart(fwdPos);
 
-            // calculates remaining times for sections
-            calculateRemainingTimes(sectionCalcStartPos);
+        // calculates remaining times for sections
+        calculateRemainingTimes(sectionCalcStartPos);
 
-            int fwdRelPos = Common::diff(fwdPos, sectionCalcStartPos);
+        int fwdRelPos = Common::diff(fwdPos, sectionCalcStartPos);
 
-            ////DEBUG_println(remainingTimes[fwdRelPos]);
+        ////DEBUG_println(remainingTimes[fwdRelPos]);
 
 
-            bool prev = forceSteeringActive;
-            forceSteeringActive |= isDistanceCritical(remainingTimes[fwdRelPos], DRIVE_PRE_CRASH_TIME_DRIVE_CMD_DISABLE);
+        bool prev = forceSteeringActive;
+        forceSteeringActive |= isDistanceCritical(remainingTimes[fwdRelPos], DRIVE_PRE_CRASH_TIME_DRIVE_CMD_DISABLE);
 
-            if (!prev && forceSteeringActive) {
-                //bool newFwdPosFound = false;
+        if (!prev && forceSteeringActive) {
+            //bool newFwdPosFound = false;
 
-                //float newSteeringAngle = ((static_cast<int>(fwdPos) % 6) / 3 ? 1 : -1) * SERVO_MAX_STEERING;
-                float newSteeringAngle;
-                if (speed > 0) {
-                    newSteeringAngle = (remainingTimes[Common::diff(Common::UltrasonicPos::FRONT_LEFT_CORNER, sectionCalcStartPos)]
+            //float newSteeringAngle = ((static_cast<int>(fwdPos) % 6) / 3 ? 1 : -1) * SERVO_MAX_STEERING;
+            float newSteeringAngle;
+            if (speed > 0) {
+                newSteeringAngle = (remainingTimes[Common::diff(Common::UltrasonicPos::FRONT_LEFT_CORNER, sectionCalcStartPos)]
                     > remainingTimes[Common::diff(Common::UltrasonicPos::FRONT_RIGHT_CORNER, sectionCalcStartPos)] ? 1 : -1) * SERVO_MAX_STEERING;
-                } else {
-                    newSteeringAngle = (remainingTimes[Common::diff(Common::UltrasonicPos::REAR_LEFT_CORNER, sectionCalcStartPos)]
+            } else {
+                newSteeringAngle = (remainingTimes[Common::diff(Common::UltrasonicPos::REAR_LEFT_CORNER, sectionCalcStartPos)]
                     > remainingTimes[Common::diff(Common::UltrasonicPos::REAR_RIGHT_CORNER, sectionCalcStartPos)] ? 1 : -1) * SERVO_MAX_STEERING;
-                }
-
-                motorHandler.updateSteeringAngle(newSteeringAngle);
-                forceSteeringWatchdog.restart();
-
-                //for (int i = 0; !newFwdPosFound && i < ENV_SECTIONS_NUM; ++i) {
-                //    if (!isDistanceCritical(remainingTimes[i], DRIVE_PRE_CRASH_TIME_DRIVE_CMD_DISABLE)) {
-                //        newFwdPosFound = true;
-                //        Common::UltrasonicPos newFwdPos = static_cast<Common::UltrasonicPos>(static_cast<int>(globalStartPos) + i);
-                //                 //DEBUG_println("newFwdPos: " + String(newFwdPos) + " -> " + ((static_cast<int>(newFwdPos) % 6) / 3 ? 1 : -1));
-                //        float newSteeringAngle = SERVO_POS_MID + ((static_cast<int>(newFwdPos) % 6) / 3 ? 1 : -1) * SERVO_ROT_MAX;
-                //        motorHandler.updateSteeringAngle(newSteeringAngle);
-                //        forceSteeringWatchdog.restart();
-                //        forceSteeringActive = true;
-                //        ////DEBUG_println("new fwd pos: " + String(newFwdPos) + " -> " + String(ultrasonicTask.getSensorViewAngle(newFwdPos)));
-                //        //motorHandler.updateSteeringAngle(ultrasonicTask.getSensorViewAngle(newFwdPos));
-                //    }
-                //}
-
-                //if (/*!newFwdPosFound && */remainingTimes[fwdRelPos] <= DRIVE_PRE_CRASH_TIME_FORCE_STOP) {
-                //    forceStopWatchdog.restart();
-                //    forceStopActive = true;
-                //}
             }
+
+            motorHandler.updateSteeringAngle(newSteeringAngle);
+            forceSteeringWatchdog.restart();
+
+            //for (int i = 0; !newFwdPosFound && i < ENV_SECTIONS_NUM; ++i) {
+            //    if (!isDistanceCritical(remainingTimes[i], DRIVE_PRE_CRASH_TIME_DRIVE_CMD_DISABLE)) {
+            //        newFwdPosFound = true;
+            //        Common::UltrasonicPos newFwdPos = static_cast<Common::UltrasonicPos>(static_cast<int>(globalStartPos) + i);
+            //                 //DEBUG_println("newFwdPos: " + String(newFwdPos) + " -> " + ((static_cast<int>(newFwdPos) % 6) / 3 ? 1 : -1));
+            //        float newSteeringAngle = SERVO_POS_MID + ((static_cast<int>(newFwdPos) % 6) / 3 ? 1 : -1) * SERVO_ROT_MAX;
+            //        motorHandler.updateSteeringAngle(newSteeringAngle);
+            //        forceSteeringWatchdog.restart();
+            //        forceSteeringActive = true;
+            //        ////DEBUG_println("new fwd pos: " + String(newFwdPos) + " -> " + String(ultrasonicTask.getSensorViewAngle(newFwdPos)));
+            //        //motorHandler.updateSteeringAngle(ultrasonicTask.getSensorViewAngle(newFwdPos));
+            //    }
+            //}
+
+            //if (/*!newFwdPosFound && */remainingTimes[fwdRelPos] <= DRIVE_PRE_CRASH_TIME_FORCE_STOP) {
+            //    forceStopWatchdog.restart();
+            //    forceStopActive = true;
+            //}
         }
     }
 

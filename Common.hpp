@@ -36,8 +36,6 @@ DEBUG_print((b & 0b00000010) ? "1" : "0");  \
 DEBUG_print((b & 0b00000001) ? "1" : "0");
 #endif // __DEBUG__
 
-#define pythag(a, b) sqrtf(a * a + b * b)
-
 namespace rc_car {
 
 /** @brief Common functions and enumerations that are used throughout the project.
@@ -188,7 +186,7 @@ public:
     @param b The length of the other leg of the tri angle.
     @returns The length of the hypotenuse of the triangle.
     */
-    static float pythagoras(float a, float b) {
+    static float pythag(float a, float b) {
         return sqrtf(a * a + b * b);
     }
 
