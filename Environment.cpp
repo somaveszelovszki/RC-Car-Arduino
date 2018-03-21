@@ -2,15 +2,21 @@
 
 using namespace rc_car;
 
-/** @brief Converts relative coordinate to grid position.
-Coordinate is relative to car, grid position is a position in the grid (0-indexed 2-dimensional array).
+/** @brief Converts relative X coordinate to grid position. Coordinate is relative to car, grid position is a position in the grid (0-indexed 2-dimensional array).
 */
-#define COORD_TO_GRID_POS(coord) static_cast<uint8_t>(ENV_ABS_AXIS_POINTS_NUM / 2 + coord / ENV_ABS_POINTS_DIST)
+#define COORD_TO_GRID_POS_X(coord) static_cast<uint8_t>(ENV_ABS_AXIS_POINTS_NUM / 2 + coord / ENV_ABS_POINTS_DIST)
 
-/** @brief Converts grid position to relative coordinate.
-Coordinate is relative to car, grid position is a position in the grid (0-indexed 2-dimensional array).
+/** @brief Converts relative Y coordinate to grid position. Coordinate is relative to car, grid position is a position in the grid (0-indexed 2-dimensional array).
 */
-#define GRID_POS_TO_COORD(pos) ((pos - ENV_ABS_AXIS_POINTS_NUM / 2) * ENV_ABS_POINTS_DIST)
+#define COORD_TO_GRID_POS_Y(coord) static_cast<uint8_t>(ENV_ABS_AXIS_POINTS_NUM / 2 - coord / ENV_ABS_POINTS_DIST)
+
+/** @brief Converts grid X position to relative coordinate. Coordinate is relative to car, grid position is a position in the grid (0-indexed 2-dimensional array).
+*/
+#define GRID_POS_TO_COORD_X(pos) ((pos - ENV_ABS_AXIS_POINTS_NUM / 2) * ENV_ABS_POINTS_DIST)
+
+/** @brief Converts grid Y position to relative coordinate. Coordinate is relative to car, grid position is a position in the grid (0-indexed 2-dimensional array).
+*/
+#define GRID_POS_TO_COORD_Y(pos) ((ENV_ABS_AXIS_POINTS_NUM / 2 - pos) * ENV_ABS_POINTS_DIST)
 
 void Environment::SectionPointCalculator::setSection(const Point2f *pStartPoint, const Point2f *pEndPoint, float fixDiff) {
     startPoint = *pStartPoint;
@@ -36,11 +42,13 @@ Environment::Environment(const CarProps *_pCar, const Point2f *_sensedPoints) : 
 Point2ui8 Environment::relPointToGridPoint(const Point2f& relPoint) const {
 
     // car pos + relative pos rotated with (fwdAngle - 90 degrees)
-    Point2f absPos = pCar->pos + Point2f(
+    /*Point2f absPos = pCar->pos + Point2f(
         relPoint.X * pCar->fwdAngle_Sin + relPoint.Y * pCar->fwdAngle_Cos,
-        - relPoint.X * pCar->fwdAngle_Cos + relPoint.Y * pCar->fwdAngle_Sin);
+        - relPoint.X * pCar->fwdAngle_Cos + relPoint.Y * pCar->fwdAngle_Sin);TODO*/
 
-    return Point2ui8(COORD_TO_GRID_POS(absPos.X), COORD_TO_GRID_POS(absPos.Y));
+    Point2f absPos = relPoint;
+
+    return Point2ui8(COORD_TO_GRID_POS_X(absPos.X), COORD_TO_GRID_POS_Y(absPos.Y));
 }
 
 bool Environment::isRelativePointObstacle(const Point2f& relPoint) const {
@@ -52,6 +60,14 @@ bool Environment::isRelativePointObstacle(const Point2f& relPoint) const {
 }
 
 void Environment::updateGrid() {
+
+    // TODO remove these resetting lines
+    for (int x = 0; x < ENV_ABS_AXIS_POINTS_NUM; ++x) {
+        for (int y = 0; y < ENV_ABS_AXIS_POINTS_NUM; ++y) {
+            grid.set(x, y, static_cast<uint2_t>(0));
+        }
+    }
+
     const Point2f *pSectionStart, *pSectionEnd;
     Common::UltrasonicPos sectionStartPos = Common::UltrasonicPos::RIGHT_FRONT;
 

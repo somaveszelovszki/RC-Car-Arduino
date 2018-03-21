@@ -39,7 +39,7 @@ if(task.periodTimeReached()) {      \
     if (task.hasTimedOut())         \
         task.onTimedOut();          \
     else {                          \
-        wdt_reset();                \
+        /*wdt_reset();*/                \
         task.run();                 \
         task.restartPeriodCheck();  \
         task.restartTimeoutCheck(); \
@@ -61,7 +61,7 @@ void setup() {
     INIT_TASK(rotaryTask);
     INIT_TASK(driveTask);
 
-    wdt_enable(WDTO_500MS);
+    //wdt_enable(WDTO_500MS);
 }
 
 void loop() {

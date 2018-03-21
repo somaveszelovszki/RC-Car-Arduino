@@ -149,7 +149,7 @@ void UltrasonicTask::pingNextSensor() {
 
     // validates previously measured point
     sensors[currentSensorPos].validate(currentSampleIndex);
-    updatePoint(static_cast<Common::UltrasonicPos>(currentSensorPos));
+    updatePoint(currentSensorPos);
 
     // increments sensor position
     currentSensorPos = Common::nextUltrasonicPos(currentSensorPos);

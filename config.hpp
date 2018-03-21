@@ -64,7 +64,7 @@
 #define TRAJ_UPDATE_TIMEOUT                     50      // [ms]
 
 // DriveTask
-#define DRIVE_ENV_GRID_UPDATE_TIMEOUT           500     // [ms]
+#define DRIVE_ENV_GRID_UPDATE_TIMEOUT           5000     // [ms]
 #define DRIVE_MSG_WATCHDOG_TIMEOUT              1000    // [ms]
 #define DRIVE_FORCE_STEERING_TIME               500     // [ms]
 #define DRIVE_FORCE_STOP_TIME                   3000    // [ms]
@@ -260,9 +260,7 @@
 #define ENV_ABS_POINTS_DIST         (CAR_WIDTH / 2)     // distance between stored absoulte points [cm]
 #define ENV_ABS_AXIS_POINTS_NUM     48                  // number of absolute points stored in a direction (x, y)
 
-#define ENV_ABS_MIN_FIT_DIFF        (CAR_WIDTH / ENV_ABS_POINTS_DIST)    // minimum grid distance that car fits in (ratio of car width and environment points distance)
-
-#define ENV_ABS_POINTS_BIT_DEPTH    2
+#define ENV_ABS_POINTS_BIT_DEPTH    1
 
 #define ENV_ABS_SECTION_POINTS_MAX_NUM      20  // max number of grid points in a section
 

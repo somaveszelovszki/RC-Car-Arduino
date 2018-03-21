@@ -73,8 +73,8 @@ public:
     */
     void print() const {
         for (uint8_t y = 0; y < Y; ++y) {
-            wdt_reset();
-            data[y].print();
+            //wdt_reset();
+            data[y].print(y == Y / 2);
             Serial.flush();
         }
     }

@@ -109,13 +109,18 @@ public:
 #if __DEBUG__
     /** @brief Prints array elements.
     */
-    void print() const {
+    void print(bool car) const {
         for (uint8_t i = 0; i < N - 1; ++i) {
             int v = (int)get(i);
-            if (v)
-                DEBUG_print(v);
-            else
-                DEBUG_print("0");
+            if (car && i == N / 2)
+                DEBUG_print(" ");
+            else {
+                if (v)
+                    DEBUG_print(v);
+                else
+                    DEBUG_print("0");
+            }
+
         }
 
         if (N > 0) {
