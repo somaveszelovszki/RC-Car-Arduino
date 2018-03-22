@@ -251,6 +251,7 @@ public:
     static void arrayConcat(const T ar1[], const T ar2[], T res[]);
 
     /** @brief Converts byte array to integer.
+    NOTE: Uses little endian byte order!
 
     @param bytes The byte array.
     @param startIndex The start index of the conversion - integer value is stored in bytes [startIndex, startIndex + 3].
@@ -259,6 +260,7 @@ public:
     static int32_t bytesToInt(const byte bytes[], int startIndex = 0);
 
     /** @brief Converts byte array to float.
+    NOTE: Uses little endian byte order!
 
     @param bytes The byte array.
     @param startIndex The start index of the conversion - float value is stored in bytes [startIndex, startIndex + 3].
@@ -267,6 +269,7 @@ public:
     static float bytesToFloat(const byte bytes[], int startIndex = 0);
 
     /** @brief Converts integer value to byte array.
+    NOTE: Uses little endian byte order!
 
     @param value The integer value.
     @param dest The destination byte array.
@@ -274,6 +277,7 @@ public:
     static void intToBytes(int32_t value, byte dest[]);
 
     /** @brief Converts float value to byte array.
+    NOTE: Uses little endian byte order!
 
     @param value The float value.
     @param dest The destination byte array.

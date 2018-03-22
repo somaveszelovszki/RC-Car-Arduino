@@ -61,12 +61,12 @@ bool Environment::isRelativePointObstacle(const Point2f& relPoint) const {
 
 void Environment::updateGrid() {
 
-    // TODO remove these resetting lines
-    for (int x = 0; x < ENV_ABS_AXIS_POINTS_NUM; ++x) {
-        for (int y = 0; y < ENV_ABS_AXIS_POINTS_NUM; ++y) {
-            grid.set(x, y, static_cast<uint2_t>(0));
-        }
-    }
+    //// TODO remove these resetting lines            grid.set(x, y, static_cast<grid_type::type>(x > y ? 1 : 0));
+
+    //for (int x = 0; x < ENV_ABS_AXIS_POINTS_NUM; ++x) {
+    //    for (int y = 0; y < ENV_ABS_AXIS_POINTS_NUM; ++y) {
+    //    }
+    //}
 
     const Point2f *pSectionStart, *pSectionEnd;
     Common::UltrasonicPos sectionStartPos = Common::UltrasonicPos::RIGHT_FRONT;

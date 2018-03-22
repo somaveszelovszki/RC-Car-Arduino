@@ -34,12 +34,12 @@ void DriveTask::run() {
         trajectory.restartPeriodCheck();
     }
 
-    if (true || sendEnvGridEnabled) {
+    if (sendEnvGridEnabled) {
         if (envGridUpdateWatchdog.hasTimedOut()) {
             environment.updateGrid();
             envGridUpdateWatchdog.restart();
-            environment.print();
-            DEBUG_println();
+            //environment.print();
+            //DEBUG_println();
         }
 
         if (!communicatorTask.isSendMsgAvailable(getTaskId())) {
