@@ -14,7 +14,7 @@ public:
     */
     float speed;
 
-    /** @brief The current steering angle.
+    /** @brief The current steering angle - in [rad].
     NOTE: Steering angle is relative to the Y axis!
     */
     float steeringAngle;

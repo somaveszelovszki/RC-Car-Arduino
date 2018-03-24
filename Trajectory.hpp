@@ -77,7 +77,7 @@ public:
     @param _periodTime The period time.
     @param _pCar Pointer to the structure storing the car properties.
     */
-    Trajectory(int _periodTime, CarProps *_pCar) : Periodic(_periodTime), pCar(_pCar) {}
+    Trajectory(int _periodTime, CarProps *_pCar) : Periodic(_periodTime), pCar(_pCar), isNoSteering(true) {}
 
     /** @brief Updates speed, steering angle and then updates radiuses according to the steering angle.
 

@@ -22,6 +22,7 @@ DriveTask::DriveTask() : PeriodicTask(TASK_PERIOD_TIME_DRIVE, TASK_WATCHDOG_TIME
 void DriveTask::initialize() {
     motorHandler.initialize();
     sendEnvGridEnabled = false;
+    envGridSendState = EnvGridSendState::RESET;
 }
 
 void DriveTask::run() {
@@ -43,9 +44,33 @@ void DriveTask::run() {
         }
 
         if (!communicatorTask.isSendMsgAvailable(getTaskId())) {
-            ByteArray<COMM_MSG_DATA_LENGTH> envGridPart;
-            Point2ui8 gridCoords = environment.nextToStream(envGridPart);
-            communicatorTask.setMessageToSend(Message(Environment::gridCoordsToCodeByte(gridCoords), envGridPart), getTaskId());
+
+            ByteArray<COMM_MSG_DATA_LENGTH> data;
+            Message msgToSend;
+
+            switch (envGridSendState) {
+            case EnvGridSendState::RESET:
+            case EnvGridSendState::CAR:
+            {
+                Point2ui8 gridPoint(environment.getCarGridPoint());
+                int32_t angle = static_cast<int32_t>(car.fwdAngle / (2 * M_PI) * (int32_t)65535);
+                msgToSend = Message(Message::Car, static_cast<int32_t>(gridPoint.X) | (static_cast<int32_t>(gridPoint.Y) << 8) | (angle << 16));
+
+                envGridSendState = EnvGridSendState::COORDS;
+            }
+                break;
+            case EnvGridSendState::COORDS:
+            {
+                Point2ui8 gridCoords = environment.nextToStream(data);
+                msgToSend = Message(Environment::gridCoordsToCodeByte(gridCoords), data);
+
+                if (!gridCoords.X)
+                    envGridSendState = EnvGridSendState::CAR;
+            }
+                break;
+            }
+
+            communicatorTask.setMessageToSend(msgToSend, getTaskId());
         }
     }
 
@@ -65,7 +90,7 @@ void DriveTask::run() {
 
         int fwdRelPos = Common::diff(fwdPos, sectionCalcStartPos);
 
-        ////DEBUG_println(remainingTimes[fwdRelPos]);
+        //DEBUG_println(remainingTimes[fwdRelPos]);
 
 
         bool prev = forceSteeringActive;
@@ -74,14 +99,14 @@ void DriveTask::run() {
         if (!prev && forceSteeringActive) {
             //bool newFwdPosFound = false;
 
-            //float newSteeringAngle = ((static_cast<int>(fwdPos) % 6) / 3 ? 1 : -1) * SERVO_MAX_STEERING;
+            //float newSteeringAngle = ((static_cast<int>(fwdPos) % 6) / 3 ? 1 : -1) * STEER_MAX;
             float newSteeringAngle;
             if (speed > 0) {
                 newSteeringAngle = (remainingTimes[Common::diff(Common::UltrasonicPos::FRONT_LEFT_CORNER, sectionCalcStartPos)]
-                    > remainingTimes[Common::diff(Common::UltrasonicPos::FRONT_RIGHT_CORNER, sectionCalcStartPos)] ? 1 : -1) * SERVO_MAX_STEERING;
+                    > remainingTimes[Common::diff(Common::UltrasonicPos::FRONT_RIGHT_CORNER, sectionCalcStartPos)] ? 1 : -1) * STEER_MAX;
             } else {
                 newSteeringAngle = (remainingTimes[Common::diff(Common::UltrasonicPos::REAR_LEFT_CORNER, sectionCalcStartPos)]
-                    > remainingTimes[Common::diff(Common::UltrasonicPos::REAR_RIGHT_CORNER, sectionCalcStartPos)] ? 1 : -1) * SERVO_MAX_STEERING;
+                    > remainingTimes[Common::diff(Common::UltrasonicPos::REAR_RIGHT_CORNER, sectionCalcStartPos)] ? 1 : -1) * STEER_MAX;
             }
 
             motorHandler.updateSteeringAngle(newSteeringAngle);
@@ -92,7 +117,7 @@ void DriveTask::run() {
             //        newFwdPosFound = true;
             //        Common::UltrasonicPos newFwdPos = static_cast<Common::UltrasonicPos>(static_cast<int>(globalStartPos) + i);
             //                 //DEBUG_println("newFwdPos: " + String(newFwdPos) + " -> " + ((static_cast<int>(newFwdPos) % 6) / 3 ? 1 : -1));
-            //        float newSteeringAngle = SERVO_POS_MID + ((static_cast<int>(newFwdPos) % 6) / 3 ? 1 : -1) * SERVO_ROT_MAX;
+            //        float newSteeringAngle = SERVO_POS_MID_DEG + ((static_cast<int>(newFwdPos) % 6) / 3 ? 1 : -1) * SERVO_ROT_MAX_DEG;
             //        motorHandler.updateSteeringAngle(newSteeringAngle);
             //        forceSteeringWatchdog.restart();
             //        forceSteeringActive = true;
@@ -169,8 +194,7 @@ void DriveTask::executeMessage() {
     case Message::CODE::RelEnvEn:
     case Message::CODE::RelEnvPoint:
     case Message::CODE::EnvGrid:
-    case Message::CODE::CarPos:
-    case Message::CODE::CarAngle:
+    case Message::CODE::Car:
     case Message::CODE::NUM_CODES:
         break;
     }

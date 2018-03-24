@@ -142,6 +142,15 @@ public:
         return grid.get(x, y);
     }
 
+    /** @brief Checks if grid index is out of bounds, and if yes, returns out-of-bounds index.
+
+    @param coord The unchecked grid index.
+    @returns The checked grid index.
+    */
+    static uint8_t toRealIdx(int32_t idx);
+
+    Point2ui8 getCarGridPoint() const;
+
     /** Checks if relative point is an obstacle - checks point in the environment grid.
 
     @param relPoint The relative point to check for an obstacle.

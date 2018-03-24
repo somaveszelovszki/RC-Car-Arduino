@@ -40,7 +40,7 @@ void RotaryTask::run() {
 
     // updates speed
     speed = diff.time > 0 ?
-        (1 / MOT_ROT_TR) * MOT_WHEEL_TR * (diff.pos / static_cast<float>(ROT_RES * ROT_EVAL_MUL) * CAR_WHEEL_CIRC) / diff.time * SEC_TO_MSEC
+        (1 / MOTOR_TO_ROTARY_TR) * MOTOR_TO_WHEEL_TR * (diff.pos / static_cast<float>(ROT_RES * ROT_EVAL_MUL) * CAR_WHEEL_CIRC) / diff.time * SEC_TO_MSEC
         : 0.0f;
 }
 

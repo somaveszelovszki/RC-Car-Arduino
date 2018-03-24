@@ -42,7 +42,7 @@ public:
     @returns The value of the element.
     */
     type get(uint8_t x, uint8_t y) const {
-        return data[y].get(x);
+        return y < Y ? data[y].get(x) : 0;
     }
 
     /** @brief Sets element at given X,Y coordinate to the given value.
@@ -52,7 +52,8 @@ public:
     @param value The value to set.
     */
     void set(uint8_t x, uint8_t y, type value) {
-        data[y].set(x, value);
+        if (y < Y)
+            data[y].set(x, value);
     }
 
     void increment(uint8_t x, uint8_t y) {

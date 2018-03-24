@@ -266,8 +266,7 @@ void UltrasonicTask::executeMessage() {
     case Message::CODE::RelEnvPoint:
     case Message::CODE::EnvGridEn:
     case Message::CODE::EnvGrid:
-    case Message::CODE::CarPos:
-    case Message::CODE::CarAngle:
+    case Message::CODE::Car:
     case Message::CODE::NUM_CODES:
         break;
     }

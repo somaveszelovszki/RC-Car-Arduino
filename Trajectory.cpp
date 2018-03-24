@@ -2,32 +2,6 @@
 
 using namespace rc_car;
 
-//void Trajectory::updateRadiuses() {
-//    float cosAngle = cos(pCar->steeringAngle);
-//    if (!(isNoSteering = Common::eq(cosAngle, 0.0f))) {
-//        float sinAngle = sin(pCar->steeringAngle), tanAngle = sinAngle / cosAngle;
-//        int steerMul = static_cast<int>(pCar->steeringDir);
-//
-//        R_rearMid = CAR_PIVOT_DIST_FRONT_REAR / tanAngle;
-//
-//        R_outer = Common::pythag(R_rearMid + CAR_PIVOT_LENGTH * steerMul,
-//            CAR_PIVOT_DIST_FRONT_REAR + CAR_PIVOT_FRONT_DIST) * steerMul;
-//
-//        R_inner = R_rearMid - CAR_PIVOT_LENGTH * steerMul;
-//
-//        R_frontNear = Common::pythag(R_inner, CAR_PIVOT_DIST_FRONT_REAR) * steerMul;
-//        R_rearFar = R_rearMid + CAR_PIVOT_LENGTH * steerMul;
-//    }
-//}
-//
-//void Trajectory::update(float _speed, float _steeringAngle) {
-//    pCar->steeringAngle = _steeringAngle;
-//    pCar->steeringDir = pCar->steeringAngle >= 0.0f ? Common::RotationDir::LEFT : Common::RotationDir::RIGHT;
-//    pCar->speed = _speed;
-//
-//    updateRadiuses();
-//}
-
 void Trajectory::updateRadiuses() {
     if (!(isNoSteering = (abs(pCar->steeringAngle) <= 0.05f))) {
         float tanAngle = tanf(pCar->steeringAngle);
@@ -40,11 +14,12 @@ void Trajectory::updateRadiuses() {
         R_inner = R_rearMid - CAR_PIVOT_LENGTH * steerMul;
         R_rearFar = R_rearMid + CAR_PIVOT_LENGTH * steerMul;
         R_frontNear = Common::pythag(R_inner, CAR_PIVOT_DIST_FRONT_REAR) * steerMul;
-    }
+    } else
+        R_rearMid = R_outer = R_inner = R_rearFar = R_frontNear = 0.0f;
 }
 
 void Trajectory::update(float _speed, float _steeringAngle) {
-    float d_time = (millis() - getPrevCalledTime()) / 1000; // in [sec]
+    float d_time = (millis() - getPrevCalledTime()) / 1000.0f; // in [sec]
 
     pCar->speed = _speed;
 
@@ -56,12 +31,20 @@ void Trajectory::update(float _speed, float _steeringAngle) {
 
     if (!isNoSteering) {
         pCar->fwdAngle += d_time * pCar->speed / R_rearFar;
-        //pCar->fwdAngle_Cos = cosf(pCar->fwdAngle);
-        //pCar->fwdAngle_Sin = sinf(pCar->fwdAngle);
+
+        // normalizes angle to the [0, 2*PI) interval
+        if (pCar->fwdAngle >= 2 * M_PI_2)
+            pCar->fwdAngle -= 2 * M_PI;
+
+        if (pCar->fwdAngle < 0)
+            pCar->fwdAngle += 2 * M_PI;
+
+        pCar->fwdAngle_Cos = cosf(pCar->fwdAngle);
+        pCar->fwdAngle_Sin = sinf(pCar->fwdAngle);
     }
 
-    //pCar->pos.X += pCar->speed * pCar->fwdAngle_Cos * d_time;
-    //pCar->pos.Y += pCar->speed * pCar->fwdAngle_Sin * d_time;
+    pCar->pos.X += pCar->speed * pCar->fwdAngle_Cos * d_time;
+    pCar->pos.Y += pCar->speed * pCar->fwdAngle_Sin * d_time;
 }
 
 Trajectory::TrackDistance Trajectory::trackdistancePoint(const Point2f& relativePos, bool forceCalcRemainingTime) const {

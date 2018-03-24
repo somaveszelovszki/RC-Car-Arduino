@@ -207,13 +207,13 @@ public:
 
     @tparam T Type of the elements.
     @param value The value to incarcerate.
-    @param b1 The lower boundary.
-    @param b2 The higher boundary.
+    @param b1 The first boundary.
+    @param b2 The second boundary.
     @returns The incarcerated value.
     */
     template <typename T>
     static T incarcerate(T value, T b1, T b2) {
-        return min(max(value, b1), b2);
+        return b2 > b1 ? min(max(value, b1), b2) : min(max(value, b2), b1);
     }
 
     /** @brief Copies elements of the source array into the destination array.

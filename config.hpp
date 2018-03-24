@@ -31,7 +31,7 @@
 // frequencies [ms]
 
 #define TASK_PERIOD_TIME_ULTRASONIC         15
-#define TASK_PERIOD_TIME_COMMUNICATOR       20
+#define TASK_PERIOD_TIME_COMMUNICATOR       10
 #define TASK_PERIOD_TIME_DRIVE              5
 #define TASK_PERIOD_TIME_ROT                15
 
@@ -64,7 +64,7 @@
 #define TRAJ_UPDATE_TIMEOUT                     50      // [ms]
 
 // DriveTask
-#define DRIVE_ENV_GRID_UPDATE_TIMEOUT           500     // [ms]
+#define DRIVE_ENV_GRID_UPDATE_TIMEOUT           100     // [ms]
 #define DRIVE_MSG_WATCHDOG_TIMEOUT              1000    // [ms]
 #define DRIVE_FORCE_STEERING_TIME               500     // [ms]
 #define DRIVE_FORCE_STOP_TIME                   3000    // [ms]
@@ -84,15 +84,14 @@
 #define DC_MOTOR_BACKWARD_PIN   6
 
 // steering construction restrictions
-#define SERVO_ROT_MAX        60
-#define SERVO_POS_MID        90
-#define SERVO_POS_MIN        (SERVO_POS_MID - SERVO_ROT_MAX)
-#define SERVO_POS_MAX        (SERVO_POS_MID + SERVO_ROT_MAX)
+#define STEER_MAX           0.698131701f    // 40 degrees - in [rad]
 
-// Transfer rate between servo motor and wheel steering angle
-#define SERVO_STEERING_TR   1.17f
+// Transfer rate between wheel steering angle and servo angle
+#define STEER_TO_SERVO_TR   (-1.5f)
 
-#define SERVO_MAX_STEERING  (SERVO_ROT_MAX * SERVO_STEERING_TR)
+#define SERVO_POS_MID_DEG   80  // in [degree]
+#define SERVO_POS_MIN_DEG   static_cast<int32_t>(SERVO_POS_MID_DEG - STEER_MAX * RAD_TO_DEG * STEER_TO_SERVO_TR)
+#define SERVO_POS_MAX_DEG   static_cast<int32_t>(SERVO_POS_MID_DEG + STEER_MAX * RAD_TO_DEG * STEER_TO_SERVO_TR)
 
 // DCMotor
 #define DC_MAX_value        255
@@ -109,8 +108,8 @@
 
 // motor transfer rates
 
-#define MOT_ROT_TR      1.0f    // transfer rate between motor and rotary encoder
-#define MOT_WHEEL_TR    1.0f    // transfer rate between motor and wheels
+#define MOTOR_TO_ROTARY_TR   1.0f    // transfer rate between motor and rotary encoder
+#define MOTOR_TO_WHEEL_TR    1.0f    // transfer rate between motor and wheels
 
 // Rotary encoder
 

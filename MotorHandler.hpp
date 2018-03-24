@@ -19,7 +19,7 @@ private:
     public:
         /** @brief Writes value to servo motor in order to achieve given steering angle.
 
-        @param _angle The desired steering angle in [degree].
+        @param _angle The desired steering angle - in [rad].
         */
         void writeAngle(float _angle);
     };
@@ -91,7 +91,7 @@ public:
     @param _steeringAngle The steering angle to set - in [rad].
     */
     void updateSteeringAngle(float _steeringAngle) {
-        servoMotor.writeAngle(steeringAngle = _steeringAngle);
+        servoMotor.writeAngle((steeringAngle = _steeringAngle));
     }
 
     /** @brief Gets the current steering angle - in [rad].
@@ -101,11 +101,6 @@ public:
     */
     float getSteeringAngle() {
         return steeringAngle;
-    }
-    /** @brief Positions servo motor to middle position.
-    */
-    void positionServoMiddle() {
-        updateSteeringAngle(0.0f);
     }
 
     /** @brief Attaches servo motor to the configured pin.

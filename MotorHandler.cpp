@@ -3,8 +3,8 @@
 using namespace rc_car;
 
 void MotorHandler::ServoMotor::writeAngle(float _angle) {
-    int _value = static_cast<int>(_angle * SERVO_STEERING_TR + SERVO_POS_MID);
-    write(Common::incarcerate(_value, SERVO_POS_MIN, SERVO_POS_MAX));
+    int32_t _value = static_cast<int32_t>(_angle * RAD_TO_DEG * STEER_TO_SERVO_TR + SERVO_POS_MID_DEG);
+    write(Common::incarcerate(_value, SERVO_POS_MIN_DEG, SERVO_POS_MAX_DEG));
 }
 
 void MotorHandler::DCMotor::initialize() {
@@ -24,7 +24,7 @@ void MotorHandler::DCMotor::writeValue(int _value) {
 void MotorHandler::initialize() {
     DC_Motor.initialize();
     attachServo();
-    positionServoMiddle();
+    updateSteeringAngle(0.0f);
     setDesiredSpeed(0.0f);
 }
 

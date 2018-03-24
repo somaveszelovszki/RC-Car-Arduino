@@ -45,6 +45,12 @@ private:
     */
     Watchdog envGridUpdateWatchdog;
 
+    enum EnvGridSendState {
+        RESET = 0, CAR, COORDS
+    };
+
+    EnvGridSendState envGridSendState;
+
     /** @brief Calculates environment points according to sensed points received from the UltrasonicTask.
     */
     Environment environment;

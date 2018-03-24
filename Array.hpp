@@ -92,8 +92,15 @@ public:
     @returns The value of the element.
     */
     type get(uint8_t pos) const {
-        uint8_t idx = pos % VPB;
-        return static_cast<type>((data[pos / VPB] & mask[idx]) >> (idx * B));
+        type result;
+
+        if (pos < N) {
+            uint8_t idx = pos % VPB;
+            result = static_cast<type>((data[pos / VPB] & mask[idx]) >> (idx * B));
+        } else
+            result = 0;
+
+        return result;
     }
 
     /** @brief Sets element at given position to the given value.
@@ -102,8 +109,10 @@ public:
     @param value The value to set.
     */
     void set(uint8_t pos, type value) {
-        uint8_t group = pos / VPB, idx = pos % VPB;
-        data[group] = (data[group] & ~mask[idx]) | static_cast<uint8_t>(value << (idx * B));
+        if (pos < N) {
+            uint8_t group = pos / VPB, idx = pos % VPB;
+            data[group] = (data[group] & ~mask[idx]) | static_cast<uint8_t>(value << (idx * B));
+        }
     }
 
 #if __DEBUG__

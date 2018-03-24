@@ -26,10 +26,9 @@ public:
     enum CODE {
         ACK_ = 0,       // for acknowledgements
         Speed,          // [cm/sec] (>0 means FORWARD)
-        SteeringAngle,  // [degree] (>0 means LEFT)
+        SteeringAngle,  // [rad] (>0 means LEFT)
         DriveMode,      // values in Common::DriveMode
-        CarPos,         // Absolute position of the car.
-        CarAngle,       // Forward angle of the car (X axis is ZERO).
+        Car,            // Absolute position and forward angle of the car - forward angle is relative to the X axis.
         RelEnvEn,       // enable/disable relative environment point sending
         RelEnvPoint,    // group for sensed relative points
         EnvGridEn,      // enable/disable environment grid sending
