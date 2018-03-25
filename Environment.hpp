@@ -7,6 +7,22 @@
 
 namespace rc_car {
 
+/** @brief Converts X coordinate to grid index.
+*/
+#define COORD_TO_GRID_X(coord) (ENV_GRID_AXIS_NUM_POINTS / 2 + coord / ENV_GRID_DIST)
+
+/** @brief Converts Y coordinate to grid index.
+*/
+#define COORD_TO_GRID_Y(coord) (ENV_GRID_AXIS_NUM_POINTS / 2 - coord / ENV_GRID_DIST)
+
+/** @brief Converts grid X index to coordinate.
+*/
+#define GRID_TO_COORD_X(pos) ((pos - ENV_GRID_AXIS_NUM_POINTS / 2) * ENV_GRID_DIST)
+
+/** @brief Converts grid Y index to coordinate.
+*/
+#define GRID_TO_COORD_Y(pos) ((ENV_GRID_AXIS_NUM_POINTS / 2 - pos) * ENV_GRID_DIST)
+
 /** @brief Calculates environment around car from the measured data of the ultrasonic sensors.
 */
 class Environment {
@@ -21,7 +37,7 @@ private:
 
     /** @brief The grid type.
     */
-    typedef Grid<ENV_ABS_POINTS_BIT_DEPTH, ENV_ABS_AXIS_POINTS_NUM, ENV_ABS_AXIS_POINTS_NUM> grid_type;
+    typedef Grid<ENV_GRID_POINT_BIT_DEPTH, ENV_GRID_AXIS_NUM_POINTS, ENV_GRID_AXIS_NUM_POINTS> grid_type;
 
     /** @brief Boolean grid indicating for each point if there is an obstacle there.
     */
@@ -63,9 +79,10 @@ private:
 
         @param pStartPoint Pointer to the starting point of the section.
         @param pEndPoint Pointer to the end point of the section.
-        @param fixDiff If set, section points will be chosen with this difference relative to each other.
+        @param targetDiff Distance of section points. NOTE: If using this difference results in more section points than the maximum, will not be used!
+        @param maxPointsNum Maximum number of section points (0 means no limit) - 0 by default.
         */
-        void setSection(const Point2f *pStartPoint, const Point2f *pEndPoint, float fixDiff = 0.0f);
+        void setSection(const Point2f *pStartPoint, const Point2f *pEndPoint, float targetDiff, uint8_t maxPointsNum = 0);
 
         /** @brief Checks if there still exists a point in the section that has not been acquired.
 
@@ -102,18 +119,29 @@ public:
     Relative points' coordinates are relative to the car's current position.
     Grid point coordinates are indexes of the environment grid (2-dimensional binary array).
 
+    @tparam Numeric type of the result point type - uint8_t by default.
     @param relPoint The relative point.
     @returns The grid point.
     */
-    Point2ui8 relPointToGridPoint(const Point2f& relPoint) const;
+    template <typename T = uint8_t>
+    Point2<T> relPointToGridPoint(const Point2f& relPoint) const {
+        // car pos + pos rotated with (fwdAngle - 90 degrees)
+        Point2f absPos = pCar->pos + Point2f(
+            relPoint.X * pCar->fwdAngle_Sin + relPoint.Y * pCar->fwdAngle_Cos,
+            -relPoint.X * pCar->fwdAngle_Cos + relPoint.Y * pCar->fwdAngle_Sin);
+
+        return Point2<T>(toRealIdx<T>(COORD_TO_GRID_X(absPos.X)), toRealIdx<T>(COORD_TO_GRID_Y(absPos.Y)));
+    }
 
     /** @brief Sets section parameters.
 
     @param pStartPoint Pointer to the starting point of the section.
     @param pEndPoint Pointer to the end point of the section.
+    @param targetDiff Distance of section points. NOTE: If using this difference results in more section points than the maximum, will not be used!
+    @param maxPointsNum Maximum number of section points.
     */
-    void setSection(const Point2f *pStartPoint, const Point2f *pEndPoint) {
-        sectionPointCalculator.setSection(pStartPoint, pEndPoint);
+    void setSection(const Point2f *pStartPoint, const Point2f *pEndPoint, float targetDiff, uint8_t maxPointsNum) {
+        sectionPointCalculator.setSection(pStartPoint, pEndPoint, targetDiff, maxPointsNum);
     }
 
     /** @brief Checks if there still exists a point in the section that has not been acquired.
@@ -144,12 +172,28 @@ public:
 
     /** @brief Checks if grid index is out of bounds, and if yes, returns out-of-bounds index.
 
-    @param coord The unchecked grid index.
+    @tparam T Numeric type of the result.
+    @param idx The unchecked grid index.
+    @param gridResRate Rate of the current grid resolution and the environment grid resolution - 1 by default.
     @returns The checked grid index.
     */
-    static uint8_t toRealIdx(int32_t idx);
+    template <typename T>
+    static T toRealIdx(float idx, uint8_t gridResRate = 1) {
+        float _idx = idx * gridResRate, _max = ENV_GRID_AXIS_NUM_POINTS * gridResRate;
+        return static_cast<T>((idx < 0.0f || _idx >= _max) ? -1 : _idx);
+    }
 
-    Point2ui8 getCarGridPoint() const;
+    /** @brief Calculates car grid coordinates with a given resolution.
+    When sending car coodinates, it is good to have a higher resolution so that the car's movement is flawless.
+
+    @tparam T Numeric type of the result point - uint8_t by default.
+    @param gridResRate Rate of the car grid resolution and the environment grid resolution - 1 by default.
+    @returns The car grid coordinates.
+    */
+    template <typename T = uint8_t>
+    Point2<T> getCarGridCoords(uint8_t gridResRate = 1) const {
+        return Point2<T>(toRealIdx<T>(COORD_TO_GRID_X(pCar->pos.X), gridResRate), toRealIdx<T>(COORD_TO_GRID_Y(pCar->pos.Y), gridResRate));
+    }
 
     /** Checks if relative point is an obstacle - checks point in the environment grid.
 

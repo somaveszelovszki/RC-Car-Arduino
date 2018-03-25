@@ -256,32 +256,32 @@
 
 // Absolute position is measured from the start position
 // (the moment the car is powered on, its position is saved as absolute origo)
-#define ENV_ABS_POINTS_DIST         (CAR_WIDTH / 2)     // distance between stored absoulte points [cm]
-#define ENV_ABS_AXIS_POINTS_NUM     64                  // number of absolute points stored in a direction (x, y)
-
-#define ENV_ABS_POINTS_BIT_DEPTH    1
+#define ENV_GRID_DIST               (CAR_WIDTH / 2)     // distance between stored absoulte points [cm]
+#define ENV_GRID_AXIS_NUM_POINTS    64                  // number of absolute points stored in a direction (x, y)
+#define ENV_GRID_POINT_BIT_DEPTH    1                   // bit depth of the environment points
+#define ENV_CAR_GRID_DIST_RATE      4                   // defines car grid resolution (used when sending car grid coordinates with higher resolution)
 
 #define ENV_ABS_SECTION_POINTS_MAX_NUM      20  // max number of grid points in a section
 
 // Array: supported bit depths
 
-#if ENV_ABS_POINTS_BIT_DEPTH == 1
+#if ENV_GRID_POINT_BIT_DEPTH == 1
 #   define ARRAY_1_EN true
 #else
 #   define ARRAY_1_EN false
-#endif // ENV_ABS_POINTS_BIT_DEPTH == 1
+#endif // ENV_GRID_POINT_BIT_DEPTH == 1
 
-#if ENV_ABS_POINTS_BIT_DEPTH == 2
+#if ENV_GRID_POINT_BIT_DEPTH == 2
 #   define ARRAY_2_EN true
 #else
 #   define ARRAY_2_EN false
-#endif // ENV_ABS_POINTS_BIT_DEPTH == 2
+#endif // ENV_GRID_POINT_BIT_DEPTH == 2
 
-#if ENV_ABS_POINTS_BIT_DEPTH == 4
+#if ENV_GRID_POINT_BIT_DEPTH == 4
 #   define ARRAY_4_EN true
 #else
 #   define ARRAY_4_EN false
-#endif // ENV_ABS_POINTS_BIT_DEPTH == 4
+#endif // ENV_GRID_POINT_BIT_DEPTH == 4
 
 
 #endif // RC_CAR__CONFIG__HPP

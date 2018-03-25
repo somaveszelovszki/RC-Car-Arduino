@@ -33,7 +33,7 @@ void Trajectory::update(float _speed, float _steeringAngle) {
         pCar->fwdAngle += d_time * pCar->speed / R_rearFar;
 
         // normalizes angle to the [0, 2*PI) interval
-        if (pCar->fwdAngle >= 2 * M_PI_2)
+        if (pCar->fwdAngle >= 2 * M_PI)
             pCar->fwdAngle -= 2 * M_PI;
 
         if (pCar->fwdAngle < 0)

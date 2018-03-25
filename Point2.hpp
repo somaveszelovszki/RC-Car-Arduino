@@ -164,6 +164,14 @@ public:
         return p * c;
     }
 
+    /** @brief Casts point to another type.
+
+    @returns Point cast to another type.
+    */
+    template <typename T2>
+    operator Point2<T2>() const {
+        return Point2<T2>(static_cast<T>(X), static_cast<T>(Y));
+    }
 
     /** @brief Calculates distance between the two points.
 

@@ -39,8 +39,6 @@ void DriveTask::run() {
         if (envGridUpdateWatchdog.hasTimedOut()) {
             environment.updateGrid();
             envGridUpdateWatchdog.restart();
-            //environment.print();
-            //DEBUG_println();
         }
 
         if (!communicatorTask.isSendMsgAvailable(getTaskId())) {
@@ -52,7 +50,8 @@ void DriveTask::run() {
             case EnvGridSendState::RESET:
             case EnvGridSendState::CAR:
             {
-                Point2ui8 gridPoint(environment.getCarGridPoint());
+                Point2ui8 gridPoint(environment.getCarGridCoords(ENV_CAR_GRID_DIST_RATE));
+
                 int32_t angle = static_cast<int32_t>(car.fwdAngle / (2 * M_PI) * (int32_t)65535);
                 msgToSend = Message(Message::Car, static_cast<int32_t>(gridPoint.X) | (static_cast<int32_t>(gridPoint.Y) << 8) | (angle << 16));
 
@@ -217,7 +216,7 @@ void DriveTask::calculateRemainingTimes(Common::UltrasonicPos startPos) {
     for (int i = 0; i < ENV_SECTIONS_NUM; ++i) {
         pSectionStart = &ultrasonicTask.sensedPoints[startPos];
         pSectionEnd = &ultrasonicTask.sensedPoints[startPos = Common::nextUltrasonicPos(startPos)];
-        environment.setSection(pSectionStart, pSectionEnd);
+        environment.setSection(pSectionStart, pSectionEnd, ENV_SECTION_POINTS_DIST, ENV_SECTION_POINTS_MAX_NUM);
 
         float minRemainingTime;
         bool obstacle = false;
