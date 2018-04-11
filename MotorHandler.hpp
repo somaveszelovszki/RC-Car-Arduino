@@ -91,7 +91,9 @@ public:
     @param _steeringAngle The steering angle to set - in [rad].
     */
     void updateSteeringAngle(float _steeringAngle) {
-        servoMotor.writeAngle((steeringAngle = _steeringAngle));
+        this->steeringAngle = Common::incarcerate(_steeringAngle, -STEER_MAX, STEER_MAX);
+        int32_t _value = static_cast<int32_t>(_steeringAngle * RAD_TO_DEG * STEER_TO_SERVO_TR + SERVO_POS_MID_DEG);
+        servoMotor.write(_value);
     }
 
     /** @brief Gets the current steering angle - in [rad].

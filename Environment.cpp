@@ -33,24 +33,34 @@ bool Environment::isRelativePointObstacle(const Point2f& relPoint) const {
         && grid.get(gridPos.X, gridPos.Y) >= (1 << (ENV_GRID_POINT_BIT_DEPTH - 1));
 }
 
+#define ENV_MIN_DIST 1.0f   // minimum grid distance from the car that is added to map - in [grid position]
+#define ENV_MAX_DIST 15.0f  // maximum grid distance from the car that is added to map - in [grid position]
+
 void Environment::updateGrid() {
     // updates all sections in the grid:
     // obstacle probability of the points between the sensed points are incremented, inner points are decremented
 
-    Point2f carGridPos = relPointToGridPoint<float>(pCar->pos);
+    Point2f carGridPos = getCarGridCoords<float>();
 
     for (int i = 0; i < ULTRA_NUM_SENSORS; ++i) {
         Point2f sensedGridPoint = relPointToGridPoint<float>(sensedPoints[i]);
-        Point2ui8 prevGridPoint = static_cast<Point2ui8>(sensedGridPoint);
 
-        grid.increment(sensedGridPoint.X, sensedGridPoint.Y);
-        sectionPointCalculator.setSection(&carGridPos, &sensedGridPoint, 1);
+        // if sensed point is out of measurement range, does not add it to the map
+        float dist = sensedGridPoint.distance(carGridPos);
 
-        // iterates through section points (points that are between the car and the sensed point) and decrements them
-        while (sectionPointCalculator.nextExists()) {
-            Point2ui8 gridPoint = static_cast<Point2ui8>(sectionPointCalculator.next());
-            if (gridPoint != prevGridPoint)
-                grid.decrement(gridPoint.X, gridPoint.Y);
+        if (ENV_MIN_DIST <= dist && dist <= ENV_MAX_DIST) {
+            Point2ui8 prevGridPoint = static_cast<Point2ui8>(sensedGridPoint);
+
+            grid.increment(sensedGridPoint.X, sensedGridPoint.Y);
+            sectionPointCalculator.setSection(&carGridPos, &sensedGridPoint, 1);
+
+            // iterates through section points (points that are between the car and the sensed point) and decrements them
+            while (sectionPointCalculator.nextExists()) {
+                Point2ui8 gridPoint = static_cast<Point2ui8>(sectionPointCalculator.next());
+                if (gridPoint != prevGridPoint) {
+                    grid.decrement(gridPoint.X, gridPoint.Y);
+                }
+            }
         }
     }
 }

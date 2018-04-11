@@ -123,6 +123,10 @@ private:
     }
 
 public:
+    int getDist(int pos) {
+        return this->sensors[pos].dist_valid;
+    }
+
     /** @brief The sensed points position - relative to the car's current position.
     */
     Point2f sensedPoints[ULTRA_NUM_SENSORS];

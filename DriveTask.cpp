@@ -200,8 +200,7 @@ void DriveTask::executeMessage() {
 }
 
 bool DriveTask::isDistanceCritical(float dist, float minDist) {
-    return dist == dist       // not NaN
-        && dist > 0 && dist <= minDist;
+    return Common::isNaN(dist) && dist > 0 && dist <= minDist;
 }
 
 void DriveTask::calculateRemainingTimes(Common::UltrasonicPos startPos) {

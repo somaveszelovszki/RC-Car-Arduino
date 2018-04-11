@@ -2,11 +2,6 @@
 
 using namespace rc_car;
 
-void MotorHandler::ServoMotor::writeAngle(float _angle) {
-    int32_t _value = static_cast<int32_t>(_angle * RAD_TO_DEG * STEER_TO_SERVO_TR + SERVO_POS_MID_DEG);
-    write(Common::incarcerate(_value, SERVO_POS_MIN_DEG, SERVO_POS_MAX_DEG));
-}
-
 void MotorHandler::DCMotor::initialize() {
     pinMode(DC_MOTOR_FORWARD_PIN, OUTPUT);
     pinMode(DC_MOTOR_BACKWARD_PIN, OUTPUT);

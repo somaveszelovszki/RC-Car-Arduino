@@ -238,6 +238,17 @@ public:
         return Common::isBtw(value, static_cast<T>(ref * (1.0f - relErr)), static_cast<T>(ref * (1.0f + relErr)));
     }
 
+    /** @brief Checks if value is Nan.
+
+    @tparam T Numeric type of the value.
+    @param value The value to check.
+    @returns Boolean value indicating if the value is NaN.
+    */
+    template <typename T>
+    static bool isNaN(const T& value) {
+        return value != value;
+    }
+
     /** @brief Concatenates two arrays.
 
     @tparam size1 Size of the first array.

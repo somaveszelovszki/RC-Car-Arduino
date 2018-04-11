@@ -87,11 +87,9 @@
 #define STEER_MAX           0.698131701f    // 40 degrees - in [rad]
 
 // Transfer rate between wheel steering angle and servo angle
-#define STEER_TO_SERVO_TR   (-1.5f)
+#define STEER_TO_SERVO_TR   (-1.6f)
 
 #define SERVO_POS_MID_DEG   80  // in [degree]
-#define SERVO_POS_MIN_DEG   static_cast<int32_t>(SERVO_POS_MID_DEG - STEER_MAX * RAD_TO_DEG * STEER_TO_SERVO_TR)
-#define SERVO_POS_MAX_DEG   static_cast<int32_t>(SERVO_POS_MID_DEG + STEER_MAX * RAD_TO_DEG * STEER_TO_SERVO_TR)
 
 // DCMotor
 #define DC_MAX_value        255
@@ -168,7 +166,7 @@
 
 // Sensor positions and view angles
 // view angle defines the angle of the sensor relative to the RIGHT direction
-#define __ULTRA_VIEW_ANGLE        static_cast<float>(18.435f * RAD_TO_DEG)
+#define __ULTRA_VIEW_ANGLE          static_cast<float>(18.435f * DEG_TO_RAD)
 
 #define __ULTRA_POS_X_MID           2.4f
 #define __ULTRA_POS_Y_MID           CAR_PIVOT_DIST_MID
@@ -261,7 +259,7 @@
 #define ENV_GRID_POINT_BIT_DEPTH    1                   // bit depth of the environment points
 #define ENV_CAR_GRID_DIST_RATE      4                   // defines car grid resolution (used when sending car grid coordinates with higher resolution)
 
-#define ENV_ABS_SECTION_POINTS_MAX_NUM      20  // max number of grid points in a section
+#define ENV_ABS_SECTION_POINTS_MAX_NUM  20  // max number of grid points in a section
 
 // Array: supported bit depths
 
