@@ -3,8 +3,6 @@ Receives and sends messages, reads ultrasonic sensor distances and motor speed.
 Handles motors according to Drive mode.
 */
 
-#include "include/Environment.hpp"
-
 #include "include/CommunicatorTask.hpp"
 #include "include/UltrasonicTask.hpp"
 #include "include/RotaryTask.hpp"

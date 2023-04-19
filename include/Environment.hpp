@@ -1,4 +1,4 @@
-﻿#ifndef RC_CAR__ENVIRONMENT__HPP
+#ifndef RC_CAR__ENVIRONMENT__HPP
 #define RC_CAR__ENVIRONMENT__HPP
 
 #include "CarProps.hpp"
