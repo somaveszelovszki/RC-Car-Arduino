@@ -3,10 +3,12 @@ Receives and sends messages, reads ultrasonic sensor distances and motor speed.
 Handles motors according to Drive mode.
 */
 
-#include "CommunicatorTask.hpp"
-#include "UltrasonicTask.hpp"
-#include "RotaryTask.hpp"
-#include "DriveTask.hpp"
+#include "include/Environment.hpp"
+
+#include "include/CommunicatorTask.hpp"
+#include "include/UltrasonicTask.hpp"
+#include "include/RotaryTask.hpp"
+#include "include/DriveTask.hpp"
 
 using namespace rc_car;
 

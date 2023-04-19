@@ -1,4 +1,4 @@
-#include "Trajectory.hpp"
+#include "include/Trajectory.hpp"
 
 using namespace rc_car;
 

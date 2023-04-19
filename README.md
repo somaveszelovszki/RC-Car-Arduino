@@ -1,4 +1,3 @@
-# RC-Car-Arduino
 RC Car with self-driving features for Arduino.
 
 ### Watch video of car:
